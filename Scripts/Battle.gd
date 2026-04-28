@@ -275,7 +275,7 @@ func update_spell_buttons():
 	#for i in range(spell_bar.get_child_count()):
 		#var btn = spell_bar.get_child(i)
 		#btn.position = Vector2(200 + i * 160, get_viewport_rect().size.y - 80)
-		#
+		# 
 func update_popup_text_scale():
 	var panel_size = $WinPopup/Panel.size
 
