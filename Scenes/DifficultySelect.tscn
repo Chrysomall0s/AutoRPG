@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://ndv6fye0ghkx"]
+
+[ext_resource type="Script" uid="uid://dhc57jov4kdfy" path="res://Scripts/DifficultySelect.gd" id="1_tr1gt"]
+
+[node name="DifficultySelect" type="Control" unique_id=1312915547]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_tr1gt")
+
+[node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=829445671]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

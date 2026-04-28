@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://d3a2rmy55yye0"]
+
+[ext_resource type="Script" uid="uid://b2jfxrl34sxfk" path="res://Scripts/Store.gd" id="1_voxcw"]
+
+[node name="Store" type="Control" unique_id=480470293]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_voxcw")
+
+[node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1727398375]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

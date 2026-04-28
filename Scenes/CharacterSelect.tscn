@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bwocal8qpy0k1"]
+
+[ext_resource type="Script" uid="uid://c4qpvjd1vfsb8" path="res://Scripts/CharacterSelect.gd" id="1_r5nmx"]
+
+[node name="CharacterSelect" type="Control" unique_id=2144129016]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_r5nmx")
+
+[node name="Label" type="Label" parent="." unique_id=1959181849]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "CharacterSelect"
+
+[node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=958393363]
+layout_mode = 0
+offset_right = 40.0

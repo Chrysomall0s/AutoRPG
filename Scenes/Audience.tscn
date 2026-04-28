@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://bkq81ulyqfbgf"]
+
+[ext_resource type="Script" uid="uid://b4ukcqb3xd5aa" path="res://Scripts/Audience.gd" id="1_6fy64"]
+[ext_resource type="Texture2D" uid="uid://bp1xntkd18lxs" path="res://Assets/Audience.png" id="2_uui05"]
+[ext_resource type="Texture2D" uid="uid://jukus0gl0bxr" path="res://Assets/Seat.png" id="3_mxbuo"]
+
+[node name="Audience" type="Node2D" unique_id=771106212]
+scale = Vector2(1.6, 1.6)
+script = ExtResource("1_6fy64")
+
+[node name="Person" type="Sprite2D" parent="." unique_id=1194428705]
+position = Vector2(0, 21.874998)
+texture = ExtResource("2_uui05")
+
+[node name="Seat" type="Sprite2D" parent="." unique_id=1467693951]
+position = Vector2(2, 40)
+texture = ExtResource("3_mxbuo")

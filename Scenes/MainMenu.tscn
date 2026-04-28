@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://d3tmht1yo4k02"]
+
+[ext_resource type="Script" uid="uid://bna3rkm4ldjfl" path="res://Scripts/MainMenu.gd" id="1_tt5f1"]
+
+[node name="MainMenu" type="Control" unique_id=1180344965]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 672.0
+offset_bottom = 1107.0
+script = ExtResource("1_tt5f1")
+
+[node name="KnightBattle" type="Label" parent="." unique_id=2132693918]
+layout_mode = 0
+offset_left = 232.0
+offset_top = 105.0
+offset_right = 438.975
+offset_bottom = 255.0
+text = "KnightBattle"
+
+[node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1382867474]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

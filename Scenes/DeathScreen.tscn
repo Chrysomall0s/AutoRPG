@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bd635n3lk46uw"]
+
+[ext_resource type="Script" uid="uid://d03w055ntee8f" path="res://Scripts/DeathScreen.gd" id="1_4pnsc"]
+
+[node name="DeathScreen" type="Control" unique_id=964236488]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_4pnsc")
+
+[node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1887384]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

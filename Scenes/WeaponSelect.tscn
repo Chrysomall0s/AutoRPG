@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bjdhsn4ha8m8y"]
+
+[ext_resource type="Script" uid="uid://dqnhqjah27cj6" path="res://Scripts/WeaponSelect.gd" id="1_kbck4"]
+
+[node name="WeaponSelect" type="Control" unique_id=516288232]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_kbck4")
+
+[node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1515800741]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
