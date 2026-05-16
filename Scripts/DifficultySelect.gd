@@ -9,7 +9,7 @@ func _ready():
 func create_button(text, callback):
 	var button = Button.new()
 	button.text = text
-	button.custom_minimum_size = Vector2(500, 120)
+	button.custom_minimum_size = Vector2(720, 120)
 
 	button.pressed.connect(callback)
 	$ButtonContainer.add_child(button)

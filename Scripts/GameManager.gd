@@ -1,6 +1,14 @@
 # GameManager.gd
 extends Node
 
+var equipped_slots = {
+	"Left": null,
+	"Middle": null,
+	"Right": null
+}
+
+var owned_upgrades: Array = []
+
 var selected_character = ""
 var selected_difficulty = 1
 var selected_weapon = ""

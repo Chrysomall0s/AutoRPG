@@ -9,12 +9,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_r5nmx")
 
-[node name="Label" type="Label" parent="." unique_id=1959181849]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-text = "CharacterSelect"
-
 [node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=958393363]
 layout_mode = 0
 offset_right = 40.0

@@ -1,25 +1,30 @@
 extends Control
 
 @onready var gold_label: Label = Label.new()
+@onready var main_button_container: VBoxContainer = $ButtonContainer 
 
+var slot_button_container: HBoxContainer 
 var upgrade_buttons = []
+var pending_upgrade = null 
 
 var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
 var UpgradeSystem = preload("res://Scripts/UpgradeSystem.gd").new()
 
-
 func _ready():
 	randomize()
-
 	setup_gold_ui()
 
-	var selected_upgrades = get_random_upgrades(3)
+	# Create the horizontal menu container for slots, keep hidden at first
+	slot_button_container = HBoxContainer.new()
+	slot_button_container.hide()
+	add_child(slot_button_container)
+	setup_slot_buttons()
 
+	var selected_upgrades = get_random_upgrades(3)
 	for upgrade in selected_upgrades:
 		create_upgrade_button(upgrade)
 
 	create_button("Play", _play)
-
 	update_gold()
 
 
@@ -40,7 +45,6 @@ func get_random_upgrades(amount: int) -> Array:
 
 func get_weighted_random(pool: Array) -> Dictionary:
 	var total_weight = 0
-
 	for item in pool:
 		total_weight += item["weight"]
 
@@ -49,7 +53,6 @@ func get_weighted_random(pool: Array) -> Dictionary:
 
 	for item in pool:
 		current += item["weight"]
-
 		if roll < current:
 			return item
 
@@ -61,21 +64,27 @@ func get_weighted_random(pool: Array) -> Dictionary:
 # ---------------------------------
 func create_upgrade_button(upgrade):
 	var button = Button.new()
-
 	button.text = upgrade["name"] + " (" + str(upgrade["cost"]) + ")"
 	button.custom_minimum_size = Vector2(500, 120)
 
 	button.pressed.connect(func():
-		apply_upgrade(upgrade)
+		request_upgrade(upgrade)
 	)
 
-	# store BOTH button + upgrade
 	upgrade_buttons.append({
 		"button": button,
 		"upgrade": upgrade
 	})
+	main_button_container.add_child(button)
 
-	$ButtonContainer.add_child(button)
+
+func create_button(text, callback):
+	var button = Button.new()
+	button.text = text
+	button.custom_minimum_size = Vector2(500, 120)
+	button.pressed.connect(callback)
+	main_button_container.add_child(button)
+
 
 func update_upgrade_colors():
 	for entry in upgrade_buttons:
@@ -83,38 +92,80 @@ func update_upgrade_colors():
 		var upgrade = entry["upgrade"]
 
 		if GameManager.gold < upgrade["cost"]:
-			button.modulate = Color(1, 0.4, 0.4) # red
+			button.modulate = Color(1, 0.4, 0.4) 
 		else:
-			button.modulate = Color(1, 1, 1) # normal
-			
-func create_button(text, callback):
-	var button = Button.new()
-	button.text = text
-	button.custom_minimum_size = Vector2(500, 120)
-
-	button.pressed.connect(callback)
-	$ButtonContainer.add_child(button)
+			button.modulate = Color(1, 1, 1) 
 
 
 # ---------------------------------
-# APPLY UPGRADE (USES SYSTEM)
+# SLOT SELECTION UI
 # ---------------------------------
-func apply_upgrade(upgrade):
+func setup_slot_buttons():
+	var slots = ["Left", "Middle", "Right"]
+	for slot in slots:
+		var btn = Button.new()
+		btn.text = slot
+		btn.custom_minimum_size = Vector2(160, 120)
+		btn.pressed.connect(func():
+			confirm_upgrade_to_slot(slot)
+		)
+		slot_button_container.add_child(btn)
+		
+	var cancel_btn = Button.new()
+	cancel_btn.text = "Cancel"
+	cancel_btn.custom_minimum_size = Vector2(160, 120)
+	cancel_btn.pressed.connect(cancel_slot_selection)
+	slot_button_container.add_child(cancel_btn)
+
+
+# ---------------------------------
+# APPLY UPGRADE LOGIC
+# ---------------------------------
+func request_upgrade(upgrade):
 	if GameManager.gold < upgrade["cost"]:
 		print("Not enough gold")
 		return
 
-	GameManager.gold -= upgrade["cost"]
+	# Check if the upgrade requires choosing a slot
+	if upgrade["is_equip"]:
+		pending_upgrade = upgrade
+		main_button_container.hide()
+		slot_button_container.show()
+	else:
+		# Instant item (like Helmet/Heal) -> process it immediately
+		GameManager.gold -= upgrade["cost"]
+		UpgradeSystem.apply_upgrade(upgrade, "") # No slot needed
+		update_gold()
+		update_upgrade_colors()
 
-	UpgradeSystem.apply_upgrade(upgrade)
 
+func confirm_upgrade_to_slot(slot_name: String):
+	if pending_upgrade == null: return
+	
+	GameManager.gold -= pending_upgrade["cost"]
+	UpgradeSystem.apply_upgrade(pending_upgrade, slot_name)
+	
+	pending_upgrade = null
+	slot_button_container.hide()
+	main_button_container.show()
+	
 	update_gold()
 	update_upgrade_colors()
 
 
+func cancel_slot_selection():
+	pending_upgrade = null
+	slot_button_container.hide()
+	main_button_container.show()
+
+
+# ---------------------------------
+# UTILITY
+# ---------------------------------
 func update_gold():
 	gold_label.text = "Gold: " + str(GameManager.gold)
 	update_upgrade_colors()
+
 
 func setup_gold_ui():
 	gold_label.position = Vector2(20, 20)

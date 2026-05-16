@@ -65,7 +65,57 @@ var enemy_base_pos := Vector2()
 
 var mana_bar: ProgressBar
 
+func load_upgrade_sprites():
+	var layers = $Hero/UpgradeLayers
+
+	# 1. Clear old sprites to prevent visual stacking/duplicates
+	for child in layers.get_children():
+		child.queue_free()
+
+	# 2. Rebuild from general owned upgrades
+	for upgrade in GameManager.owned_upgrades:
+		if not upgrade or not upgrade.has("icon"):
+			continue
+
+		var sprite = Sprite2D.new()
+		sprite.texture = load(upgrade["icon"])
+		sprite.name = upgrade["name"]
+
+		if upgrade.has("layer"):
+			sprite.z_index = upgrade["layer"]
+
+		layers.add_child(sprite)
+	
+	# 3. Rebuild from equipped slots (Left, Middle, Right)
+	for slot_name in GameManager.equipped_slots:
+		var upgrade = GameManager.equipped_slots[slot_name]
+
+		# Skip if the slot is empty (null) or missing an icon config
+		if not upgrade or not upgrade.has("icon"):
+			continue
+
+		var sprite = Sprite2D.new()
+		var icon_suffix = upgrade["icon"]
+		
+		# Match the dictionary key string to append the correct file suffix
+		match slot_name:
+			"Left":
+				icon_suffix += "/L.png"
+			"Middle":
+				icon_suffix += "/M.png"
+			"Right":
+				icon_suffix += "/R.png"
+				
+		sprite.texture = load(icon_suffix)
+		sprite.name = upgrade["name"]
+
+		if upgrade.has("layer"):
+			sprite.z_index = upgrade["layer"]
+
+		layers.add_child(sprite)
+
 func _ready():
+	load_upgrade_sprites()
 	spawn_spells()
 	create_speed_button("Pause", _pause_game, Vector2(20, 20))
 	create_speed_button("Slow", _slow_game, Vector2(150, 20))
@@ -210,6 +260,7 @@ func _on_timer_timeout():
 
 		animate_attack(player_sprite, player_base_pos, Vector2(40, 0))
 		GameManager.enemy_hp -= GameManager.player_damage
+		GameManager.gold += 1
 		print("PLAYER attacks for:", GameManager.player_damage)
 
 	# ENEMY attacks every player_speed ticks

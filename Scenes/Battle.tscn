@@ -27,8 +27,10 @@ texture = ExtResource("3_p46lj")
 
 [node name="Hero" type="Sprite2D" parent="." unique_id=1526777640]
 position = Vector2(173, 505)
-scale = Vector2(1.3097014, 1.2970297)
+scale = Vector2(0.131, 0.13)
 texture = ExtResource("4_8teo4")
+
+[node name="UpgradeLayers" type="Node2D" parent="Hero" unique_id=1197668737]
 
 [node name="Timer" type="Timer" parent="." unique_id=1833122652]
 autostart = true
