@@ -18,7 +18,6 @@ func _ready():
 	slot_button_container = HBoxContainer.new()
 	slot_button_container.hide()
 	add_child(slot_button_container)
-	setup_slot_buttons()
 
 	var selected_upgrades = get_random_upgrades(3)
 	for upgrade in selected_upgrades:
@@ -96,27 +95,40 @@ func update_upgrade_colors():
 		else:
 			button.modulate = Color(1, 1, 1) 
 
-
 # ---------------------------------
-# SLOT SELECTION UI
+# SLOT SELECTION UI (UPDATED)
 # ---------------------------------
 func setup_slot_buttons():
+	# Clear out old buttons first so they don't stack up
+	for child in slot_button_container.get_children():
+		child.queue_free()
+		
 	var slots = ["Left", "Middle", "Right"]
+	if not GameManager.right_slot_unlocked:
+		slots = ["Left", "Middle"]
+		
 	for slot in slots:
 		var btn = Button.new()
-		btn.text = slot
+		
+		# Check GameManager to see what's equipped
+		var current_equip = GameManager.equipped_slots.get(slot)
+		if current_equip:
+			btn.text = slot + "\n(" + str(current_equip.name) + ")"
+		else:
+			btn.text = slot + "\n(Empty)"
+			
 		btn.custom_minimum_size = Vector2(160, 120)
 		btn.pressed.connect(func():
 			confirm_upgrade_to_slot(slot)
 		)
 		slot_button_container.add_child(btn)
 		
+	# Re-add the cancel button at the end
 	var cancel_btn = Button.new()
 	cancel_btn.text = "Cancel"
 	cancel_btn.custom_minimum_size = Vector2(160, 120)
 	cancel_btn.pressed.connect(cancel_slot_selection)
 	slot_button_container.add_child(cancel_btn)
-
 
 # ---------------------------------
 # APPLY UPGRADE LOGIC
@@ -129,6 +141,7 @@ func request_upgrade(upgrade):
 	# Check if the upgrade requires choosing a slot
 	if upgrade["is_equip"]:
 		pending_upgrade = upgrade
+		setup_slot_buttons()
 		main_button_container.hide()
 		slot_button_container.show()
 	else:

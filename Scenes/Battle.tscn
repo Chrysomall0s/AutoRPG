@@ -22,7 +22,7 @@ texture = ExtResource("2_1samx")
 
 [node name="Foe" type="Sprite2D" parent="." unique_id=1417752701]
 position = Vector2(394, 395.99994)
-scale = Vector2(1.445245, 1.4488816)
+scale = Vector2(0.645, 0.647)
 texture = ExtResource("3_p46lj")
 
 [node name="Hero" type="Sprite2D" parent="." unique_id=1526777640]

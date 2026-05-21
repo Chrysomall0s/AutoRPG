@@ -27,5 +27,5 @@ var upgrades = [
 	{"name": "Staff", "type": "heal", "value": 0, "weight": 20, "cost": 1, "icon": "res://Assets/Weapons/Staff", "layer": 9000, "is_equip": true},
 	
 	{"name": "Character1", "type": "heal", "value": 0, "weight": 0, "cost": 1, "icon": "res://Assets/Mods/Faces/Character1.png", "layer": 0, "is_equip": false},
- 	{"name": "Character2", "type": "heal", "value": 0, "weight": 20, "cost": 1, "icon": "res://Assets/Mods/Faces/Character2.png", "layer": 0, "is_equip": false}
+ 	{"name": "Character2", "type": "heal", "value": 0, "weight": 0, "cost": 1, "icon": "res://Assets/Mods/Faces/Character2.png", "layer": 0, "is_equip": false}
 ]

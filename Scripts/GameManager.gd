@@ -6,7 +6,7 @@ var equipped_slots = {
 	"Middle": null,
 	"Right": null
 }
-
+var right_slot_unlocked = false
 var owned_upgrades: Array = []
 
 var selected_character = ""
@@ -22,13 +22,14 @@ var player_damage = 10
 var spellslot1 = -1;
 var spellslot2 = -1;
 var spellslot3 = -1;
+var enemy_dmg = 3
 # --------------------------
 # OTHER
 # --------------------------
 var enemy_hp = 100
 var gold = 0
 var max_player_hp := 100
-var max_enemy_hp := 100
+var max_enemy_hp := 30
 var player_speed := 7
 var enemy_speed := 5
 # --------------------------
