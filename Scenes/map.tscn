@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://buir3oq4vyg44"]
+
+[ext_resource type="Script" uid="uid://c7yju71wnwck0" path="res://Scripts/map.gd" id="1_26yhd"]
+[ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="2_myvm1"]
+
+[node name="Map" type="Node2D" unique_id=1553918307]
+script = ExtResource("1_26yhd")
+
+[node name="Hero" parent="." unique_id=448655595 instance=ExtResource("2_myvm1")]

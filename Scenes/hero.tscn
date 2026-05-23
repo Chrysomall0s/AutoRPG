@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://0obra7qp5v18"]
+
+[ext_resource type="Script" uid="uid://ux8hp21t7h6d" path="res://Scripts/hero.gd" id="1_qhmnl"]
+[ext_resource type="Texture2D" uid="uid://c2387nc0amm61" path="res://Assets/Hero.png" id="2_stlmo"]
+
+[node name="Hero" type="Sprite2D" unique_id=448655595]
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_stlmo")
+script = ExtResource("1_qhmnl")
+
+[node name="UpgradeLayers" type="Node2D" parent="." unique_id=1340055554]

@@ -30,7 +30,7 @@ var enemy_hp = 100
 var gold = 0
 var max_player_hp := 100
 var max_enemy_hp := 30
-var player_speed := 7
+var player_speed := 1
 var enemy_speed := 5
 # --------------------------
 # MODULAR STORE STATS PANEL

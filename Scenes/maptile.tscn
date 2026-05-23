@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://poo16e663vcx"]
+
+[ext_resource type="Script" uid="uid://di4aw6jdu4e5c" path="res://Scripts/maptile.gd" id="1_3riqe"]
+[ext_resource type="Texture2D" uid="uid://jukus0gl0bxr" path="res://Assets/Seat.png" id="2_kb3fr"]
+
+[node name="MapTile" type="Area2D" unique_id=347699491]
+script = ExtResource("1_3riqe")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=854023007]
+
+[node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D" unique_id=200463969]
+position = Vector2(64.75, 71.50001)
+scale = Vector2(1, 0.948)
+texture = ExtResource("2_kb3fr")

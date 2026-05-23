@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://c08idaerxvtaf" path="res://Scripts/Battle.gd" id="1_wvl2i"]
 [ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_1samx"]
 [ext_resource type="Texture2D" uid="uid://cntvp34md6ygy" path="res://Assets/Foe.png" id="3_p46lj"]
-[ext_resource type="Texture2D" uid="uid://c2387nc0amm61" path="res://Assets/Hero.png" id="4_8teo4"]
+[ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="4_1samx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1samx"]
 size = Vector2(809, 435)
@@ -14,6 +14,8 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_wvl2i")
+speed_buttons_start_pos = Vector2(20, 70)
+gap_between_buttons = 180.0
 
 [node name="Arena" type="Sprite2D" parent="." unique_id=1403740229]
 position = Vector2(358.75, 644)
@@ -21,16 +23,12 @@ scale = Vector2(1.6843972, 1.4187082)
 texture = ExtResource("2_1samx")
 
 [node name="Foe" type="Sprite2D" parent="." unique_id=1417752701]
-position = Vector2(394, 395.99994)
+position = Vector2(502.99994, 527)
 scale = Vector2(0.645, 0.647)
 texture = ExtResource("3_p46lj")
 
-[node name="Hero" type="Sprite2D" parent="." unique_id=1526777640]
-position = Vector2(173, 505)
-scale = Vector2(0.131, 0.13)
-texture = ExtResource("4_8teo4")
-
-[node name="UpgradeLayers" type="Node2D" parent="Hero" unique_id=1197668737]
+[node name="Hero" parent="." unique_id=1923588313 instance=ExtResource("4_1samx")]
+position = Vector2(193, 493)
 
 [node name="Timer" type="Timer" parent="." unique_id=1833122652]
 autostart = true
@@ -42,7 +40,7 @@ autostart = true
 [node name="SpawnArea" type="Area2D" parent="AudienceZone" unique_id=114645974]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AudienceZone/SpawnArea" unique_id=574839831]
-position = Vector2(377.5, 878.5)
+position = Vector2(377, 878)
 shape = SubResource("RectangleShape2D_1samx")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1077303518]
@@ -73,7 +71,7 @@ offset_bottom = 8.0
 text = "Continue"
 
 [node name="UIAnchor" type="Node2D" parent="." unique_id=623991233]
-position = Vector2(368, 648)
+position = Vector2(377, 1182)
 
 [node name="SpellBar" type="Control" parent="." unique_id=1344450403]
 anchors_preset = 0
