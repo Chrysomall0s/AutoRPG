@@ -7,6 +7,5 @@
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=854023007]
 
 [node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D" unique_id=200463969]
-position = Vector2(64.75, 71.50001)
 scale = Vector2(1, 0.948)
 texture = ExtResource("1_pf2at")

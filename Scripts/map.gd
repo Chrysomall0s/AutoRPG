@@ -7,10 +7,10 @@ const BRIDGE_SCENE = preload("res://Scenes/MapBridge.tscn")
 @onready var player_token = $Hero 
 
 # Grid Spacing Adjustments for Staggered Rows
-const TILE_X_SPACING: float = 140.0 
-const TILE_Y_SPACING: float = 80.0  
-const ROW_X_OFFSET: float = 70.0    
-const GRID_OFFSET: Vector2 = Vector2(150, 150)
+const TILE_X_SPACING: float = 280.0 
+const TILE_Y_SPACING: float = 160.0  
+const ROW_X_OFFSET: float = 140.0    
+const GRID_OFFSET: Vector2 = Vector2(80, 250)
 
 var tiles: Dictionary = {}
 var current_tile_id: int = 4 
@@ -41,9 +41,9 @@ var bridge_definitions: Array = [
 	{"id": 4,  "from": 2,  "to": 5,  "visible": true},
 	{"id": 5,  "from": 3,  "to": 6,  "visible": true},
 	{"id": 6,  "from": 4,  "to": 6,  "visible": true},
-	{"id": 7, "from": 4,  "to": 7,  "visible": true},
-	{"id": 8, "from": 5,  "to": 7,  "visible": true},
-	{"id": 9, "from": 6,  "to": 8,  "visible": true},   # Normal diagonal (\)
+	{"id": 7,  "from": 4,  "to": 7,  "visible": true},
+	{"id": 8,  "from": 5,  "to": 7,  "visible": true},
+	{"id": 9,  "from": 6,  "to": 8,  "visible": true},   # Normal diagonal (\)
 	{"id": 10, "from": 6,  "to": 9,  "visible": true},   # Mirrored diagonal (/)
 	{"id": 11, "from": 7,  "to": 9,  "visible": true},   # Normal diagonal (\)
 	{"id": 12, "from": 7,  "to": 10, "visible": true},  # Mirrored diagonal (/)
@@ -57,6 +57,10 @@ func _ready():
 	generate_map()
 	spawn_and_connect_bridges()
 	snap_player_to_tile(current_tile_id)
+	
+	# ---- FIX LAYER RENDERING ORDER ----
+	# Pull the Hero token to the absolute front layer after building the map layout
+	move_child(player_token, get_child_count() - 1)
 
 func generate_map():
 	for tile_id in tile_layout:
@@ -98,28 +102,22 @@ func spawn_and_connect_bridges():
 		bridge_instance.name = "Bridge" + str(bridge["id"])
 		bridge_instance.position = (pos_a + pos_b) / 2.0
 		
-		# ---- NEW MIRRORING DETECTOR LOGIC ----
-		# Compare positions to determine direction slope.
-		# If the bridge spans down-and-right, or up-and-left, it is a normal diagonal (\)
-		# If one X position moves right while the Y position goes up (opposite directions), it is an inverse slope (/)
+		# Slope checker detector logic
 		var is_mirrored = false
 		if (pos_b.x > pos_a.x and pos_b.y < pos_a.y) or (pos_b.x < pos_a.x and pos_b.y > pos_a.y):
 			is_mirrored = true
 			
-		# Explicitly force mirror check for your horizontal connections (like Tile 1 to 2) 
-		# so they don't get accidentally scaled backward.
+		# Safe horizontal threshold alignment configuration
 		if abs(pos_a.y - pos_b.y) < 5.0:
 			is_mirrored = false
 			
-		# Apply mirroring state smoothly using scales instead of engine rotation loops
 		if is_mirrored:
 			bridge_instance.scale.x = -1.0
 		else:
 			bridge_instance.scale.x = 1.0
-		# --------------------------------------
 
 		add_child(bridge_instance)
-		move_child(bridge_instance, 0) 
+		move_child(bridge_instance, 0) # Sends bridges to the back layer
 		
 		if not bridge["visible"]:
 			bridge_instance.visible = false
