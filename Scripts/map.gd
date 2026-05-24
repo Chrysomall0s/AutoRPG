@@ -33,6 +33,15 @@ var tile_layout: Dictionary = {
 	11: Vector2i(0, 4), 12: Vector2i(1, 4)
 }
 
+# Explicit assignments for Event tiles
+var tile_assignments: Dictionary = {
+	3: MapTile.TileType.MONSTER,
+	5: MapTile.TileType.SHOP,
+	7: MapTile.TileType.MONSTER,
+	10: MapTile.TileType.MONSTER,
+	12: MapTile.TileType.SHOP
+}
+
 # The 16 physical connection links between those staggered points
 var bridge_definitions: Array = [
 	{"id": 1,  "from": 1,  "to": 3,  "visible": true},
@@ -48,9 +57,9 @@ var bridge_definitions: Array = [
 	{"id": 11, "from": 7,  "to": 9,  "visible": true},   # Normal diagonal (\)
 	{"id": 12, "from": 7,  "to": 10, "visible": true},  # Mirrored diagonal (/)
 	{"id": 13, "from": 8,  "to": 11, "visible": true},
-	{"id": 14,  "from": 9,  "to": 11,  "visible": true},
-	{"id": 15,  "from": 9,  "to": 12,  "visible": true},
-	{"id": 16,  "from": 10,  "to": 12,  "visible": true},
+	{"id": 14, "from": 9,  "to": 11, "visible": true},
+	{"id": 15, "from": 9,  "to": 12, "visible": true},
+	{"id": 16, "from": 10, "to": 12, "visible": true},
 ]
 
 func _ready():
@@ -58,7 +67,6 @@ func _ready():
 	spawn_and_connect_bridges()
 	snap_player_to_tile(current_tile_id)
 	
-	# ---- FIX LAYER RENDERING ORDER ----
 	# Pull the Hero token to the absolute front layer after building the map layout
 	move_child(player_token, get_child_count() - 1)
 
@@ -78,13 +86,24 @@ func generate_map():
 		new_tile.position = pixel_position
 		new_tile.tile_clicked.connect(_on_tile_clicked)
 		
+		# Set if it's a shop, monster, or generic layout node
+		if tile_assignments.has(tile_id):
+			new_tile.set_tile_type(tile_assignments[tile_id])
+		else:
+			new_tile.set_tile_type(MapTile.TileType.NORMAL)
+		
 		add_child(new_tile)
 		tiles[tile_id] = new_tile
 		
+		# Floating Number label setup
 		var label = Label.new()
 		label.text = str(tile_id)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.position = Vector2(-12, -12)
+		
+		# CRITICAL: Keeps label UI hierarchy from capturing mouse events
+		label.mouse_filter = Control.MOUSE_FILTER_IGNORE 
+		
 		new_tile.add_child(label)
 
 func spawn_and_connect_bridges():
@@ -129,6 +148,12 @@ func spawn_and_connect_bridges():
 func _on_tile_clicked(clicked_tile: MapTile):
 	var current_tile = tiles[current_tile_id]
 	
+	print("Attempting move: From Tile ", current_tile_id, " -> To Tile ", clicked_tile.tile_id)
+	
+	if clicked_tile.tile_id == current_tile_id:
+		print("Action Denied: You are already standing on Tile ", clicked_tile.tile_id)
+		return
+
 	if clicked_tile.tile_id in current_tile.connected_tiles:
 		move_player_to_tile(clicked_tile)
 	else:
@@ -145,5 +170,15 @@ func snap_player_to_tile(tile_id: int):
 	if tiles.has(tile_id):
 		player_token.position = tiles[tile_id].position
 
-func handle_tile_event(type: String):
-	pass
+func handle_tile_event(type: MapTile.TileType):
+	match type:
+		MapTile.TileType.MONSTER:
+			print("Encountered a Monster! Loading Battle Scene...")
+			get_tree().change_scene_to_file("res://Scenes/Battle.tscn")
+			
+		MapTile.TileType.SHOP:
+			print("Entering the merchant shop...")
+			get_tree().change_scene_to_file("res://Scenes/Store.tscn")
+			
+		MapTile.TileType.NORMAL:
+			print("Arrived safely on a standard layout tile.")
