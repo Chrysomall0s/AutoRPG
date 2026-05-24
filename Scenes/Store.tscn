@@ -11,8 +11,8 @@ offset_bottom = 40.0
 script = ExtResource("1_voxcw")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1774489409]
-position = Vector2(355.25, 603.5)
-scale = Vector2(1.6678487, 1.3463252)
+position = Vector2(725.25, 1310)
+scale = Vector2(3.4172573, 2.9198215)
 texture = ExtResource("2_2s633")
 
 [node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1727398375]

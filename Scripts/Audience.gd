@@ -1,4 +1,4 @@
-extends Node2D
+extends Area2D
 
 @onready var seat = $Seat
 @onready var person = $Person

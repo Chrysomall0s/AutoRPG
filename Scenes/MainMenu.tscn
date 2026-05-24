@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://d3tmht1yo4k02"]
 
 [ext_resource type="Script" uid="uid://bna3rkm4ldjfl" path="res://Scripts/MainMenu.gd" id="1_tt5f1"]
+[ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_8saeu"]
+[ext_resource type="Texture2D" uid="uid://c2387nc0amm61" path="res://Assets/Hero.png" id="3_ghw46"]
 
 [node name="MainMenu" type="Control" unique_id=1180344965]
 layout_mode = 3
@@ -9,8 +11,20 @@ offset_right = 672.0
 offset_bottom = 1107.0
 script = ExtResource("1_tt5f1")
 
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1838137876]
+position = Vector2(724.25, 1196.5)
+scale = Vector2(3.3983452, 2.655902)
+texture = ExtResource("2_8saeu")
+
+[node name="AudienceContainer" type="Node2D" parent="." unique_id=244993427]
+
 [node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1382867474]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 alignment = 1
+
+[node name="Sprite2D2" type="Sprite2D" parent="." unique_id=1293207957]
+position = Vector2(714, 792)
+scale = Vector2(0.39197758, 0.41336632)
+texture = ExtResource("3_ghw46")

@@ -4,7 +4,10 @@
 [ext_resource type="Texture2D" uid="uid://bp1xntkd18lxs" path="res://Assets/Audience.png" id="2_uui05"]
 [ext_resource type="Texture2D" uid="uid://jukus0gl0bxr" path="res://Assets/Seat.png" id="3_mxbuo"]
 
-[node name="Audience" type="Node2D" unique_id=771106212]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6fy64"]
+size = Vector2(46.875008, 78.124985)
+
+[node name="Audience" type="Area2D" unique_id=418806984]
 scale = Vector2(1.6, 1.6)
 script = ExtResource("1_6fy64")
 
@@ -15,3 +18,8 @@ texture = ExtResource("2_uui05")
 [node name="Seat" type="Sprite2D" parent="." unique_id=1467693951]
 position = Vector2(2, 40)
 texture = ExtResource("3_mxbuo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1005145938]
+position = Vector2(2.8124995, 30.937475)
+scale = Vector2(0.99999964, 0.99999964)
+shape = SubResource("RectangleShape2D_6fy64")

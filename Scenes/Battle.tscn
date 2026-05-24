@@ -5,9 +5,6 @@
 [ext_resource type="Texture2D" uid="uid://cntvp34md6ygy" path="res://Assets/Foe.png" id="3_p46lj"]
 [ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="4_1samx"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_1samx"]
-size = Vector2(1399.5, 966.5)
-
 [node name="Battle" type="Control" unique_id=98889295]
 layout_mode = 3
 anchors_preset = 0
@@ -33,14 +30,6 @@ scale = Vector2(0.33507463, 0.3408416)
 autostart = true
 
 [node name="AudienceContainer" type="Node2D" parent="." unique_id=1109504530]
-
-[node name="AudienceZone" type="Node2D" parent="." unique_id=1987175929]
-
-[node name="SpawnArea" type="Area2D" parent="AudienceZone" unique_id=114645974]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AudienceZone/SpawnArea" unique_id=574839831]
-position = Vector2(717.25, 1734.75)
-shape = SubResource("RectangleShape2D_1samx")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1077303518]
 layout_mode = 0
