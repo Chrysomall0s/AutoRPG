@@ -38,4 +38,4 @@ func select_weapon(weapon_name):
 		print("Warning: Weapon data not found in UpgradeData pool!")
 	# -------------------------------------
 
-	get_tree().change_scene_to_file("res://Scenes/Battle.tscn")
+	get_tree().change_scene_to_file("res://Scenes/Map.tscn")

@@ -19,10 +19,11 @@ var selected_weapon = ""
 var player_hp = 100
 var player_mp = 100
 var player_damage = 10
-var spellslot1 = -1;
-var spellslot2 = -1;
-var spellslot3 = -1;
+var spellslot1 = -1
+var spellslot2 = -1
+var spellslot3 = -1
 var enemy_dmg = 3
+
 # --------------------------
 # OTHER
 # --------------------------
@@ -32,10 +33,23 @@ var max_player_hp := 100
 var max_enemy_hp := 30
 var player_speed := 1
 var enemy_speed := 5
+
+# --------------------------
+# MAP PERSISTENCE STATS 
+# --------------------------
+var current_tile_id: int = 4              # Track where the hero is standing
+var cleared_tiles: Array[int] = []         # Track which monster tiles are dead
+var current_floor: int = 1                # Track current floor depth
+
+# Call this function from your map script when stepping on a stairwell
+func advance_to_next_floor() -> void:
+	current_floor += 1
+	cleared_tiles.clear()                 # Reset enemy tracking for the next layout
+	current_tile_id = 4                   # Put player back at start tile for new floor
+	print("Floor advanced! Welcome to Floor: ", current_floor)
+
 # --------------------------
 # MODULAR STORE STATS PANEL
-# Add new stats here and they
-# automatically show in Store
 # --------------------------
 var store_stats = [
 	{

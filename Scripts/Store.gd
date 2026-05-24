@@ -286,4 +286,4 @@ func setup_gold_ui():
 
 func _play():
 	GameManager.enemy_hp = 100 + (GameManager.selected_difficulty * 20)
-	get_tree().change_scene_to_file("res://Scenes/Battle.tscn")
+	get_tree().change_scene_to_file("res://Scenes/Map.tscn")

@@ -14,7 +14,7 @@ func create_button(text, callback):
 	$ButtonContainer.add_child(button)
 
 func _on_play_pressed():
-	get_tree().change_scene_to_file("res://Scenes/map.tscn")
+	get_tree().change_scene_to_file("res://Scenes/CharacterSelect.tscn")
 
 func _on_settings_pressed():
 	print("Settings later")

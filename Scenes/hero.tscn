@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://c2387nc0amm61" path="res://Assets/Hero.png" id="2_stlmo"]
 
 [node name="Hero" type="Sprite2D" unique_id=448655595]
-scale = Vector2(0.15, 0.15)
+scale = Vector2(0.25, 0.25)
 texture = ExtResource("2_stlmo")
 script = ExtResource("1_qhmnl")
 

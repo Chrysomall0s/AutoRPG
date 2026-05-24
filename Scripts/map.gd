@@ -6,43 +6,44 @@ const BRIDGE_SCENE = preload("res://Scenes/MapBridge.tscn")
 
 @onready var player_token = $Hero 
 
-# Grid Spacing Adjustments for Staggered Rows
-const TILE_X_SPACING: float = 280.0 
-const TILE_Y_SPACING: float = 160.0  
-const ROW_X_OFFSET: float = 140.0    
-const GRID_OFFSET: Vector2 = Vector2(80, 250)
+# Grid Layout / Spacing Configurations
+const TILE_X_SPACING: float = 560.0 
+const TILE_Y_SPACING: float = 320.0  
+const ROW_X_OFFSET: float = 280.0    
+const GRID_OFFSET: Vector2 = Vector2(160, 500)
 
 var tiles: Dictionary = {}
-var current_tile_id: int = 4 
+
+# Intercept positional modifications and pipe them directly into GameManager memory
+var current_tile_id: int:
+	get:
+		if "current_tile_id" in GameManager:
+			return GameManager.current_tile_id
+		return 4
+	set(value):
+		if "current_tile_id" in GameManager:
+			GameManager.current_tile_id = value
 
 # Maps your 12 tiles to your exact ASCII layout map (Column, Row)
 var tile_layout: Dictionary = {
-	# Row 0 (Indented)
 	1: Vector2i(0, 0), 2: Vector2i(1, 0),
-	
-	# Row 1 (Left aligned)
 	3: Vector2i(0, 1), 4: Vector2i(1, 1), 5: Vector2i(2, 1),
-	
-	# Row 2 (Indented)
 	6: Vector2i(0, 2), 7: Vector2i(1, 2),
-	
-	# Row 3 (Left aligned)
 	8: Vector2i(0, 3), 9: Vector2i(1, 3), 10: Vector2i(2, 3),
-	
-	# Row 4 (Indented)
 	11: Vector2i(0, 4), 12: Vector2i(1, 4)
 }
 
-# Explicit assignments for Event tiles
+# Node classifications setup
 var tile_assignments: Dictionary = {
 	3: MapTile.TileType.MONSTER,
 	5: MapTile.TileType.SHOP,
 	7: MapTile.TileType.MONSTER,
 	10: MapTile.TileType.MONSTER,
+	11: MapTile.TileType.STAIRWELL, # Progressive transition node
 	12: MapTile.TileType.SHOP
 }
 
-# The 16 physical connection links between those staggered points
+# The 16 connections between staggered grid coordinates
 var bridge_definitions: Array = [
 	{"id": 1,  "from": 1,  "to": 3,  "visible": true},
 	{"id": 2,  "from": 1,  "to": 4,  "visible": true},
@@ -52,10 +53,10 @@ var bridge_definitions: Array = [
 	{"id": 6,  "from": 4,  "to": 6,  "visible": true},
 	{"id": 7,  "from": 4,  "to": 7,  "visible": true},
 	{"id": 8,  "from": 5,  "to": 7,  "visible": true},
-	{"id": 9,  "from": 6,  "to": 8,  "visible": true},   # Normal diagonal (\)
-	{"id": 10, "from": 6,  "to": 9,  "visible": true},   # Mirrored diagonal (/)
-	{"id": 11, "from": 7,  "to": 9,  "visible": true},   # Normal diagonal (\)
-	{"id": 12, "from": 7,  "to": 10, "visible": true},  # Mirrored diagonal (/)
+	{"id": 9,  "from": 6,  "to": 8,  "visible": true},   
+	{"id": 10, "from": 6,  "to": 9,  "visible": true},   
+	{"id": 11, "from": 7,  "to": 9,  "visible": true},   
+	{"id": 12, "from": 7,  "to": 10, "visible": true},  
 	{"id": 13, "from": 8,  "to": 11, "visible": true},
 	{"id": 14, "from": 9,  "to": 11, "visible": true},
 	{"id": 15, "from": 9,  "to": 12, "visible": true},
@@ -63,12 +64,17 @@ var bridge_definitions: Array = [
 ]
 
 func _ready():
+	var display_floor = 1
+	if "current_floor" in GameManager:
+		display_floor = GameManager.current_floor
+	print("--- NOW ENTERING FLOOR ", display_floor, " ---")
+	
 	generate_map()
 	spawn_and_connect_bridges()
 	snap_player_to_tile(current_tile_id)
 	
-	# Pull the Hero token to the absolute front layer after building the map layout
-	move_child(player_token, get_child_count() - 1)
+	if player_token:
+		move_child(player_token, get_child_count() - 1)
 
 func generate_map():
 	for tile_id in tile_layout:
@@ -86,8 +92,12 @@ func generate_map():
 		new_tile.position = pixel_position
 		new_tile.tile_clicked.connect(_on_tile_clicked)
 		
-		# Set if it's a shop, monster, or generic layout node
-		if tile_assignments.has(tile_id):
+		# Build status layout based on your cleared state lists
+		var is_cleared = "cleared_tiles" in GameManager and GameManager.cleared_tiles.has(tile_id)
+		
+		if is_cleared:
+			new_tile.set_tile_type(MapTile.TileType.NORMAL)
+		elif tile_assignments.has(tile_id):
 			new_tile.set_tile_type(tile_assignments[tile_id])
 		else:
 			new_tile.set_tile_type(MapTile.TileType.NORMAL)
@@ -95,24 +105,18 @@ func generate_map():
 		add_child(new_tile)
 		tiles[tile_id] = new_tile
 		
-		# Floating Number label setup
 		var label = Label.new()
 		label.text = str(tile_id)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.position = Vector2(-12, -12)
-		
-		# CRITICAL: Keeps label UI hierarchy from capturing mouse events
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE 
-		
 		new_tile.add_child(label)
 
 func spawn_and_connect_bridges():
 	for bridge in bridge_definitions:
 		var t1 = bridge["from"]
 		var t2 = bridge["to"]
-		
-		if not (tiles.has(t1) and tiles.has(t2)):
-			continue
+		if not (tiles.has(t1) and tiles.has(t2)): continue
 			
 		var pos_a = tiles[t1].position
 		var pos_b = tiles[t2].position
@@ -121,12 +125,10 @@ func spawn_and_connect_bridges():
 		bridge_instance.name = "Bridge" + str(bridge["id"])
 		bridge_instance.position = (pos_a + pos_b) / 2.0
 		
-		# Slope checker detector logic
 		var is_mirrored = false
 		if (pos_b.x > pos_a.x and pos_b.y < pos_a.y) or (pos_b.x < pos_a.x and pos_b.y > pos_a.y):
 			is_mirrored = true
 			
-		# Safe horizontal threshold alignment configuration
 		if abs(pos_a.y - pos_b.y) < 5.0:
 			is_mirrored = false
 			
@@ -136,7 +138,7 @@ func spawn_and_connect_bridges():
 			bridge_instance.scale.x = 1.0
 
 		add_child(bridge_instance)
-		move_child(bridge_instance, 0) # Sends bridges to the back layer
+		move_child(bridge_instance, 0)
 		
 		if not bridge["visible"]:
 			bridge_instance.visible = false
@@ -146,6 +148,7 @@ func spawn_and_connect_bridges():
 		tiles[t2].connected_tiles.append(t1)
 
 func _on_tile_clicked(clicked_tile: MapTile):
+	if not tiles.has(current_tile_id): return
 	var current_tile = tiles[current_tile_id]
 	
 	print("Attempting move: From Tile ", current_tile_id, " -> To Tile ", clicked_tile.tile_id)
@@ -160,7 +163,7 @@ func _on_tile_clicked(clicked_tile: MapTile):
 		print("Can't move! No open bridge connects Tile ", current_tile_id, " to Tile ", clicked_tile.tile_id)
 
 func move_player_to_tile(target_tile: MapTile):
-	current_tile_id = target_tile.tile_id
+	current_tile_id = target_tile.tile_id 
 	var tween = create_tween()
 	tween.tween_property(player_token, "position", target_tile.position, 0.25)
 	await tween.finished
@@ -179,6 +182,12 @@ func handle_tile_event(type: MapTile.TileType):
 		MapTile.TileType.SHOP:
 			print("Entering the merchant shop...")
 			get_tree().change_scene_to_file("res://Scenes/Store.tscn")
+			
+		MapTile.TileType.STAIRWELL:
+			print("Climbing the stairs to the next floor...")
+			if GameManager.has_method("advance_to_next_floor"):
+				GameManager.advance_to_next_floor()
+			get_tree().reload_current_scene()
 			
 		MapTile.TileType.NORMAL:
 			print("Arrived safely on a standard layout tile.")
