@@ -1,54 +1,41 @@
 # =================================================================
 # res://Scenes/Hero.gd
 # =================================================================
-extends Sprite2D # Or Sprite2D, depending on your original Hero node type
+extends Sprite2D
 
-@onready var layers = $UpgradeLayers
+@onready var layers: Node2D = $UpgradeLayers
 
 func _ready() -> void:
 	load_upgrade_sprites()
 
 func load_upgrade_sprites() -> void:
-	# Clear any editor placeholder visuals safely
+	# Clean up existing sprites safely
 	for child in layers.get_children():
-		child.queue_free()
+		layers.remove_child(child) # Instantly detach so get_children() reflects a clean slate immediately
+		child.queue_free()         # Safely delete from memory at the end of the frame
 
-	# Process owned upgrades
-	for upgrade in GameManager.owned_upgrades:
-		if not upgrade or not upgrade.has("icon"):
-			continue
+	# Process general owned passive upgrades (Armor, Boots, Capes, etc.)
+	if "owned_upgrades" in GameManager and GameManager.owned_upgrades:
+		for upgrade in GameManager.owned_upgrades:
+			# Safety check to ensure it's a valid data entry
+			if not upgrade or not upgrade.has("icon") or not upgrade.has("name"):
+				continue
+			
+			# OPTIONAL CHOP: If you track "is_equip" for weapons in your upgrades database, 
+			# we can skip them here so they don't get glued to the hero's body texturing.
+			if upgrade.get("is_equip", false) == true:
+				continue
 
-		var sprite = Sprite2D.new()
-		sprite.texture = load(upgrade["icon"])
-		sprite.name = upgrade["name"]
+			# Ensure the asset path is valid before trying to load it
+			if ResourceLoader.exists(upgrade["icon"]):
+				var sprite = Sprite2D.new()
+				sprite.texture = load(upgrade["icon"])
+				sprite.name = upgrade["name"]
 
-		if upgrade.has("layer"):
-			sprite.z_index = upgrade["layer"]
+				# Stack the visuals correctly (e.g., cape behind body, armor in front)
+				if upgrade.has("layer"):
+					sprite.z_index = clamp(upgrade["layer"], -4096, 4096)
 
-		layers.add_child(sprite)
-	
-	# Process equipped slots
-	for slot_name in GameManager.equipped_slots:
-		var upgrade = GameManager.equipped_slots[slot_name]
-
-		if not upgrade or not upgrade.has("icon"):
-			continue
-
-		var sprite = Sprite2D.new()
-		var icon_suffix = upgrade["icon"]
-		
-		match slot_name:
-			"Left":
-				icon_suffix += "/L.png"
-			"Middle":
-				icon_suffix += "/M.png"
-			"Right":
-				icon_suffix += "/R.png"
-				
-		sprite.texture = load(icon_suffix)
-		sprite.name = upgrade["name"]
-
-		if upgrade.has("layer"):
-			sprite.z_index = upgrade["layer"]
-
-		layers.add_child(sprite)
+				layers.add_child(sprite)
+			else:
+				push_warning("Failed to load general upgrade texture at: " + upgrade["icon"])

@@ -1,83 +1,42 @@
 # GameManager.gd
 extends Node
 
-var equipped_slots = {
-	"Left": null,
-	"Middle": null,
-	"Right": null
-}
-var right_slot_unlocked = false
-var owned_upgrades: Array = []
+# Each weapon position now carries its own unique parameters
+var equipped_weapons: Array = [
+	{ "name": "Basic Dagger", "icon": "res://icon.svg", "damage": 8, "speed": 6 },
+	{ "name": "Iron Sword",   "icon": "res://icon.svg", "damage": 15, "speed": 3 },
+	{ "name": "Magic Wand",   "icon": "res://icon.svg", "damage": 12, "speed": 4 },
+	null, # Empty slot
+	null, # Empty slot
+	null  # Empty slot
+]
 
+var owned_upgrades: Array = []
 var selected_character = ""
 var selected_difficulty = 1
-var selected_weapon = ""
 
 # --------------------------
-# PLAYER STATS
+# GLOBAL PLAYER & ENEMY STATS
 # --------------------------
 var player_hp = 100
 var player_mp = 100
-var player_damage = 10
-var spellslot1 = -1
-var spellslot2 = -1
-var spellslot3 = -1
-var enemy_dmg = 3
-
-# --------------------------
-# OTHER
-# --------------------------
+var enemy_dmg = 4
 var enemy_hp = 100
-var gold = 0
+
+var gold = 100
 var max_player_hp := 100
-var max_enemy_hp := 30
-var player_speed := 1
-var enemy_speed := 5
+var max_enemy_hp := 50
+var enemy_speed := 5 # Ticks required for the enemy to strike back
 
 # --------------------------
 # MAP PERSISTENCE STATS 
 # --------------------------
-var current_tile_id: int = 4              # Track where the hero is standing
-var cleared_tiles: Array[int] = []         # Track which monster tiles are dead
-var current_floor: int = 1                # Track current floor depth
+var current_tile_id: int = 4              
+var cleared_tiles: Array[int] = []         
+var current_floor: int = 1                
 
-# Call this function from your map script when stepping on a stairwell
 func advance_to_next_floor() -> void:
 	current_floor += 1
-	cleared_tiles.clear()                 # Reset enemy tracking for the next layout
-	current_tile_id = 4                   # Put player back at start tile for new floor
+	cleared_tiles.clear()                 
+	current_tile_id = 4                   
 	print("Floor advanced! Welcome to Floor: ", current_floor)
-
-# --------------------------
-# MODULAR STORE STATS PANEL
-# --------------------------
-var store_stats = [
-	{
-		"label": "Your HP",
-		"get_value": func(): return player_hp
-	},
-	{
-		"label": "Your MP",
-		"get_value": func(): return player_mp
-	},
-	{
-		"label": "Your Damage",
-		"get_value": func(): return player_damage
-	},
-	{
-		"label": "Gold",
-		"get_value": func(): return gold
-	},
-	{
-		"label": "Difficulty",
-		"get_value": func(): return selected_difficulty
-	},
-	{
-		"label": "Character",
-		"get_value": func(): return selected_character
-	},
-	{
-		"label": "Weapon",
-		"get_value": func(): return selected_weapon
-	}
-]
