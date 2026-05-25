@@ -1,13 +1,22 @@
 [gd_scene format=3 uid="uid://poo16e663vcx"]
 
 [ext_resource type="Script" uid="uid://di4aw6jdu4e5c" path="res://Scripts/maptile.gd" id="1_3riqe"]
-[ext_resource type="Texture2D" uid="uid://jukus0gl0bxr" path="res://Assets/Seat.png" id="2_kb3fr"]
+[ext_resource type="Texture2D" uid="uid://dgf5eyaa5t3mb" path="res://Assets/tiles/tile.png" id="2_45ro4"]
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_45ro4"]
+points = PackedVector2Array(2.6785715, -104.91071, 172, -3.5, 172, 83.5, 3, 178.5, -171, 83.5, -170, -6.5)
 
 [node name="MapTile" type="Area2D" unique_id=347699491]
 script = ExtResource("1_3riqe")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=854023007]
+position = Vector2(-2, -43.5)
+scale = Vector2(1.06, 1.06)
+shape = SubResource("ConvexPolygonShape2D_45ro4")
 
-[node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D" unique_id=200463969]
-scale = Vector2(1, 0.948)
-texture = ExtResource("2_kb3fr")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=200463969]
+position = Vector2(1, -10)
+scale = Vector2(1.1800001, 1.1433333)
+texture = ExtResource("2_45ro4")
+
+[connection signal="input_event" from="." to="." method="_on_input_event"]

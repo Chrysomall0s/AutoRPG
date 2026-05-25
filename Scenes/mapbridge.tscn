@@ -1,11 +1,12 @@
 [gd_scene format=3 uid="uid://dem21yokdsry2"]
 
-[ext_resource type="Texture2D" uid="uid://bp1xntkd18lxs" path="res://Assets/Audience.png" id="1_pf2at"]
+[ext_resource type="Texture2D" uid="uid://byl0awql5niyl" path="res://Assets/tiles/bridge.png" id="1_pf2at"]
 
 [node name="MapBridge" type="Area2D" unique_id=347699491]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=854023007]
 
 [node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D" unique_id=200463969]
-scale = Vector2(1, 0.948)
+position = Vector2(23.85, -71)
+scale = Vector2(1.0183333, 0.9053333)
 texture = ExtResource("1_pf2at")

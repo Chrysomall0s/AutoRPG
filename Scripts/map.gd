@@ -4,13 +4,16 @@ extends Node2D
 const TILE_SCENE = preload("res://Scenes/MapTile.tscn")
 const BRIDGE_SCENE = preload("res://Scenes/MapBridge.tscn")
 
+# CHANGED: Flipped Y to negative so the player is shifted higher up, not lower down
+const PLAYER_OFFSET: Vector2 = Vector2(0, -150)
+
 @onready var player_token = $Hero 
 
 # Grid Layout / Spacing Configurations
-const TILE_X_SPACING: float = 560.0 
-const TILE_Y_SPACING: float = 320.0  
-const ROW_X_OFFSET: float = 280.0    
-const GRID_OFFSET: Vector2 = Vector2(160, 500)
+const TILE_X_SPACING: float = 540.0 
+const TILE_Y_SPACING: float = 210.0  
+const ROW_X_OFFSET: float = 300.0    
+const GRID_OFFSET: Vector2 = Vector2(180, 1200)
 
 var tiles: Dictionary = {}
 
@@ -60,7 +63,7 @@ var bridge_definitions: Array = [
 	{"id": 13, "from": 8,  "to": 11, "visible": true},
 	{"id": 14, "from": 9,  "to": 11, "visible": true},
 	{"id": 15, "from": 9,  "to": 12, "visible": true},
-	{"id": 16, "from": 10, "to": 12, "visible": true},
+	{"id": 16, "to": 12, "from": 10, "visible": true},
 ]
 
 func _ready():
@@ -69,10 +72,15 @@ func _ready():
 		display_floor = GameManager.current_floor
 	print("--- NOW ENTERING FLOOR ", display_floor, " ---")
 	
+	# FIRST: Generate all tiles so they are drawn in the background
 	generate_map()
+	
+	# SECOND: Spawn all bridges so they render on top of the tiles
 	spawn_and_connect_bridges()
+	
 	snap_player_to_tile(current_tile_id)
 	
+	# FINALLY: Keep player token above both tiles and bridges
 	if player_token:
 		move_child(player_token, get_child_count() - 1)
 
@@ -92,7 +100,6 @@ func generate_map():
 		new_tile.position = pixel_position
 		new_tile.tile_clicked.connect(_on_tile_clicked)
 		
-		# Build status layout based on your cleared state lists
 		var is_cleared = "cleared_tiles" in GameManager and GameManager.cleared_tiles.has(tile_id)
 		
 		if is_cleared:
@@ -138,7 +145,6 @@ func spawn_and_connect_bridges():
 			bridge_instance.scale.x = 1.0
 
 		add_child(bridge_instance)
-		move_child(bridge_instance, 0)
 		
 		if not bridge["visible"]:
 			bridge_instance.visible = false
@@ -165,13 +171,18 @@ func _on_tile_clicked(clicked_tile: MapTile):
 func move_player_to_tile(target_tile: MapTile):
 	current_tile_id = target_tile.tile_id 
 	var tween = create_tween()
-	tween.tween_property(player_token, "position", target_tile.position, 0.25)
+	
+	# CHANGED: Added PLAYER_OFFSET here so the move tween targets the shifted location
+	var target_position = target_tile.position + PLAYER_OFFSET
+	tween.tween_property(player_token, "position", target_position, 0.25)
+	
 	await tween.finished
 	handle_tile_event(target_tile.tile_type)
 
 func snap_player_to_tile(tile_id: int):
 	if tiles.has(tile_id):
-		player_token.position = tiles[tile_id].position
+		# CHANGED: Uses corrected PascalCase constant naming convention
+		player_token.position = tiles[tile_id].position + PLAYER_OFFSET
 
 func handle_tile_event(type: MapTile.TileType):
 	match type:
