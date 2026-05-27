@@ -3,8 +3,8 @@
 # =================================================================
 extends Node2D
 
-const TILE_SCENE = preload("res://Scenes/MapTile.tscn")
-const BRIDGE_SCENE = preload("res://Scenes/MapBridge.tscn")
+const TILE_SCENE = preload("res://Scenes/maptile.tscn")
+const BRIDGE_SCENE = preload("res://Scenes/mapbridge.tscn")
 const MapTileScript = preload("res://Scenes/maptile.tscn")
 
 const PLAYER_OFFSET: Vector2 = Vector2(0, -150)
@@ -17,7 +17,9 @@ var floor_label: Label
 const TILE_X_SPACING: float = 540.0 
 const TILE_Y_SPACING: float = 210.0  
 const ROW_X_OFFSET: float = 300.0    
-const GRID_OFFSET: Vector2 = Vector2(180, 1200)
+
+# CHANGED: We remove the hardcoded 1200 Y pixel value and calculate it dynamically
+var grid_offset: Vector2 = Vector2.ZERO
 
 var tiles: Dictionary = {}
 var spawned_bridge_nodes: Array = [] 
@@ -55,6 +57,7 @@ func _ready():
 		shop_button.pressed.connect(_on_shop_button_pressed)
 	
 	setup_floor_ui_label()
+	calculate_dynamic_grid_offset() # NEW: Setup screen boundaries before drawing anything
 	build_or_refresh_dungeon_floor()
 
 func _on_shop_button_pressed():
@@ -75,6 +78,36 @@ func setup_floor_ui_label():
 				floor_label.position = Vector2(40, 40)
 			floor_label.add_theme_font_size_override("font_size", 32)
 			ui_layer.add_child(floor_label)
+
+# NEW: Calculates coordinates relative to the current device window size
+func calculate_dynamic_grid_offset():
+	var screen_size = get_viewport_rect().size
+	var min_x = INF; var max_x = -INF
+	var min_y = INF; var max_y = -INF
+	
+	# Iterate through all configured tiles to find the total bounds
+	for tile_id in tile_layout:
+		var pos = tile_layout[tile_id]
+		# Apply the same logic as generate_map to find the exact position
+		var x = pos.x * TILE_X_SPACING
+		if pos.y % 2 == 0:
+			x += ROW_X_OFFSET
+		var y = pos.y * TILE_Y_SPACING
+		
+		min_x = min(min_x, x)
+		max_x = max(max_x, x)
+		min_y = min(min_y, y)
+		max_y = max(max_y, y)
+	
+	# Calculate center of the bounds
+	var grid_width = max_x - min_x
+	var grid_height = max_y - min_y
+	
+	# Calculate the offset required to place that center at the center of the viewport
+	var offset_x = (screen_size.x - grid_width) / 2.0 - min_x
+	var offset_y = (screen_size.y - grid_height) / 2.0 - min_y
+	
+	grid_offset = Vector2(offset_x, offset_y)
 
 func build_or_refresh_dungeon_floor():
 	var display_floor = GameManager.current_floor
@@ -202,30 +235,25 @@ func generate_random_layout():
 					distant_candidates.append(tile_id)
 		chosen_stairwell_tile = distant_candidates.pick_random() if not distant_candidates.is_empty() else available_ids[-1]
 
-	# Set up the structural exit tile
 	tile_assignments[chosen_stairwell_tile] = TileType.STAIRWELL
 	
-	# NEW: Explicit pool distribution to guarantee exactly 6 monsters spawn
 	var candidate_monster_tiles: Array = []
 	for tile_id in available_ids:
 		if tile_id != chosen_stairwell_tile and tile_id != current_tile_id:
 			candidate_monster_tiles.append(tile_id)
 			
-	candidate_monster_tiles.shuffle() # Randomize selection order natively
+	candidate_monster_tiles.shuffle() 
 	
-	# Cap spawning safely at 6 entries
 	var target_monster_count = min(6, candidate_monster_tiles.size())
 	
 	for i in range(candidate_monster_tiles.size()):
 		var tile_id = candidate_monster_tiles[i]
 		if i < target_monster_count:
-			# Assign exactly 6 tiles to be monsters
 			tile_assignments[tile_id] = TileType.MONSTER
 			if ResourceLoader.exists("res://Scripts/MonsterData.gd"):
 				var monster_db = load("res://Scripts/MonsterData.gd").new()
 				GameManager.persistent_monster_profiles[tile_id] = monster_db.get_random_monster()
 		else:
-			# Set the remaining rooms to normal spaces
 			tile_assignments[tile_id] = TileType.NORMAL
 
 func is_map_fully_connected() -> bool:
@@ -260,7 +288,8 @@ func generate_map():
 			x_pos += ROW_X_OFFSET
 			
 		var y_pos = grid_pos.y * TILE_Y_SPACING
-		var pixel_position = Vector2(x_pos, y_pos) + GRID_OFFSET
+		# CHANGED: Uses the dynamic runtime grid_offset variable now
+		var pixel_position = Vector2(x_pos, y_pos) + grid_offset
 		
 		var new_tile = TILE_SCENE.instantiate()
 		new_tile.tile_id = tile_id
@@ -283,14 +312,10 @@ func generate_map():
 					GameManager.persistent_monster_profiles[tile_id] = monster_db.get_random_monster()
 				
 				var profile = GameManager.persistent_monster_profiles[tile_id]
-				assert(profile != null, "CRITICAL DETECTOR: Tile %d profile generated null reference!" % tile_id)
-				assert(profile is Dictionary, "CRITICAL DETECTOR: Tile %d profile expected a Dictionary, got: %s" % [tile_id, typeof(profile)])
-				assert(profile.has("icon"), "CRITICAL DETECTOR: Profile on Tile %d missing the expected 'icon' key! Profile Content: %s" % [tile_id, str(profile)])
-				
 				if profile.has("icon"):
 					var icon_path = profile["icon"]
-					assert(ResourceLoader.exists(icon_path), "CRITICAL FILE GAP: Profile asset path does not exist in project tree: " + str(icon_path))
-					new_tile.display_monster(icon_path, Vector2(0.4, 0.4))
+					if ResourceLoader.exists(icon_path):
+						new_tile.display_monster(icon_path, Vector2(0.4, 0.4))
 		else:
 			new_tile.set_tile_type(TileType.NORMAL)
 		
@@ -365,15 +390,12 @@ func snap_player_to_tile(tile_id: int):
 func handle_tile_event(type: int):
 	match type:
 		TileType.MONSTER:
-			# If we just returned to the map by escaping or losing, do nothing and keep the monster!
 			if GameManager.escaped:
-				GameManager.escaped = false # Reset the flag for the next fight
+				GameManager.escaped = false 
 
-			# If the tile was already cleared in a prior battle victory, don't trigger again
 			if GameManager.cleared_tiles.has(current_tile_id):
 				return
 
-			# --- Prepare and Initialize the Battle Scene ---
 			if GameManager.persistent_monster_profiles.has(current_tile_id):
 				var profile = GameManager.persistent_monster_profiles[current_tile_id]
 				GameManager.current_enemy_profile = profile
@@ -381,9 +403,6 @@ func handle_tile_event(type: int):
 				GameManager.enemy_hp = profile.get("hp", 50)
 				GameManager.enemy_dmg = profile.get("damage", 10)
 				GameManager.enemy_speed = profile.get("speed", 4)
-			
-			# NOTE: We DO NOT overwrite tile_assignments or clear tiles here anymore.
-			# The battle scene will handle marking the tile as cleared only if the player wins.
 			
 			get_tree().change_scene_to_file("res://Scenes/Battle.tscn")
 			

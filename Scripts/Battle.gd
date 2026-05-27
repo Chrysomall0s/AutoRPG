@@ -5,7 +5,7 @@ extends Control
 # =================================================================
 @export_group("Floating Rainbow Weapons Settings")
 @export var rainbow_radius_x: float = 150.0
-@export var rainbow_offset := Vector2(0, -80)
+@export var rainbow_offset := Vector2(-150, -80)
 @export var rainbow_radius_y: float = 150.0
 @export var rainbow_y_offset: float = 45.0
 @export var global_weapon_tick_delay: float = 0.45
@@ -458,4 +458,4 @@ func _on_continue_pressed():
 		# Safe clean global fallback routing reset
 		if not escape_sequence_triggered:
 			GameManager.escaped = false 
-		get_tree().change_scene_to_file("res://Scenes/Map.tscn")
+		get_tree().change_scene_to_file("res://Scenes/map.tscn")

@@ -24,7 +24,7 @@ GameManager="*uid://bif2nyd620gfx"
 window/size/viewport_width=1440
 window/size/viewport_height=2400
 window/size/initial_position=Vector2i(0, 100)
-window/stretch/mode="viewport"
+window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
 
