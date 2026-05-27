@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://di4aw6jdu4e5c" path="res://Scripts/maptile.gd" id="1_3riqe"]
 [ext_resource type="Texture2D" uid="uid://dgf5eyaa5t3mb" path="res://Assets/tiles/tile.png" id="2_45ro4"]
+[ext_resource type="Texture2D" uid="uid://c64cusyauid1o" path="res://Assets/Foe3.png" id="3_esr2i"]
 
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_45ro4"]
 points = PackedVector2Array(2.6785715, -104.91071, 172, -3.5, 172, 83.5, 3, 178.5, -171, 83.5, -170, -6.5)
@@ -18,5 +19,12 @@ shape = SubResource("ConvexPolygonShape2D_45ro4")
 position = Vector2(1, -10)
 scale = Vector2(1.1800001, 1.1433333)
 texture = ExtResource("2_45ro4")
+
+[node name="MonsterContainer" type="Node2D" parent="." unique_id=242119201]
+
+[node name="MonsterSprite" type="Sprite2D" parent="MonsterContainer" unique_id=408866915]
+position = Vector2(-16, -132)
+scale = Vector2(1.1123918, 1.1693292)
+texture = ExtResource("3_esr2i")
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]

@@ -1,3 +1,6 @@
+# =================================================================
+# res://Scenes/Battle.gd
+# =================================================================
 extends Control
 
 # =================================================================
@@ -25,13 +28,13 @@ extends Control
 @export var speed_buttons_x_offset_ratio: float = 0.06  
 @export var speed_buttons_y_offset_ratio: float = 0.02  
 @export var gap_between_buttons_ratio: float = 0.24   
-@export var speed_button_width_ratio: float = 0.15     
+@export var speed_button_width_ratio: float = 0.15       
 @export var speed_button_height_ratio: float = 0.07   
 
 @export_group("Audience Stadium Positioning")
 @export var audience_center_x_ratio: float = 0.5  
 @export var audience_center_y_ratio: float = 0.7  
-@export var audience_width_ratio: float = 1.1     
+@export var audience_width_ratio: float = 1.1      
 @export var audience_height_ratio: float = 0.4    
 
 @export_subgroup("Audience Grid Details")
@@ -80,6 +83,16 @@ func _ready():
 	player_base_pos = player_sprite.position
 	enemy_base_pos = enemy_sprite.position
 	
+	if GameManager.current_enemy_profile.has("icon"):
+		var enemy_texture_path = GameManager.current_enemy_profile["icon"]
+		if ResourceLoader.exists(enemy_texture_path):
+			enemy_sprite.texture = load(enemy_texture_path)
+			print("Successfully loaded foe sprite: ", enemy_texture_path)
+		else:
+			print("Warning: Enemy sprite missing at path: ", enemy_texture_path, ". Using fallback.")
+	else:
+		print("Notice: No active enemy profile loaded into GameManager. Using editor default.")
+	
 	player_hp_bar = create_health_bar()
 	enemy_hp_bar = create_health_bar()
 
@@ -106,7 +119,6 @@ func spawn_floating_weapons():
 		weapon.scale = Vector2(0.3, 0.3) 
 		add_child(weapon)
 		
-		# Set metadata parameters safely from weapon schema
 		weapon.set_meta("weapon_type", weapon_data.get("type", "damage"))
 		weapon.set_meta("damage", weapon_data.get("damage", 0))
 		weapon.set_meta("heal_value", weapon_data.get("heal_value", 0))
@@ -197,9 +209,6 @@ func setup_battle_timer():
 	$Timer.timeout.connect(_on_timer_timeout)
 	$Timer.start()
 
-# ---------------------------------
-# DECOUPLED COMBAT LOOP ENGINE
-# ---------------------------------
 func _on_timer_timeout():
 	if battle_over: return
 
@@ -219,7 +228,6 @@ func _on_timer_timeout():
 			var weapon_type = weapon.get_meta("weapon_type")
 			execute_single_weapon_strike(weapon, weapon_type)
 			
-			# Apply damage or support logic conditionally
 			if weapon_type == "heal":
 				var heal = weapon.get_meta("heal_value")
 				GameManager.player_hp = clamp(GameManager.player_hp + heal, 0, GameManager.max_player_hp)
@@ -241,34 +249,28 @@ func _on_timer_timeout():
 		enemy_turn_counter = 0
 		animate_attack(enemy_sprite, enemy_base_pos, Vector2(-horizontal_dash_distance, 0))
 		
-		var dmg = GameManager.enemy_dmg if "enemy_dmg" in GameManager else randi_range(5, 12)
+		var monster_name = GameManager.current_enemy_profile.get("name", "Enemy")
+		var dmg = GameManager.enemy_dmg
 		GameManager.player_hp -= dmg
-		print("ENEMY attacks for:", dmg)
+		print(monster_name, " attacks for: ", dmg)
 
 	GameManager.player_hp = clamp(GameManager.player_hp, 0, GameManager.max_player_hp)
 	update_bars()
 	check_game_state()
 
-# ---------------------------------
-# DYNAMIC WEAPON STRIKE ANIMATION
-# ---------------------------------
 func execute_single_weapon_strike(weapon: Sprite2D, weapon_type: String):
 	if battle_over or not is_instance_valid(weapon): return
 	
 	weapon.set_meta("is_attacking", true)
 	var tween = create_tween().set_parallel(false)
 	
-	# CONDITION BOUNDS: If the weapon type matches support parameters, 
-	# fly down directly into the center of the player's sprite instead of the enemy.
 	var target_position = enemy_sprite.position
 	if weapon_type == "heal" or weapon_type == "shield":
 		target_position = player_sprite.position
 	
-	# Attack phase
 	tween.tween_property(weapon, "position", target_position, weapon_strike_duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(weapon, "rotation", deg_to_rad(360), weapon_strike_duration * 0.5)
 	
-	# Return phase
 	var return_tween = tween.tween_property(weapon, "position", weapon.position, weapon_return_duration)
 	return_tween.finished.connect(func():
 		if is_instance_valid(weapon):
@@ -286,9 +288,6 @@ func animate_attack(sprite, base_pos: Vector2, move_offset: Vector2):
 	tween.tween_property(sprite, "position", base_pos + move_offset, 0.12)
 	tween.tween_property(sprite, "position", base_pos, 0.18)
 
-# ---------------------------------
-# UI / GAME OVER STATE
-# ---------------------------------
 func update_bars():
 	player_hp_bar.value = GameManager.player_hp
 	enemy_hp_bar.value = GameManager.enemy_hp
@@ -330,5 +329,7 @@ func show_win_popup():
 	
 func _on_continue_pressed():
 	Engine.time_scale = 1
-	if not won: get_tree().change_scene_to_file("res://Scenes/DeathScreen.tscn")
-	else: get_tree().change_scene_to_file("res://Scenes/Map.tscn")
+	if not won: 
+		get_tree().change_scene_to_file("res://Scenes/DeathScreen.tscn")
+	else: 
+		get_tree().change_scene_to_file("res://Scenes/Map.tscn")

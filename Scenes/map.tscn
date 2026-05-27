@@ -9,3 +9,21 @@ script = ExtResource("1_26yhd")
 [node name="Hero" parent="." unique_id=448655595 instance=ExtResource("2_myvm1")]
 position = Vector2(96.00001, -88)
 scale = Vector2(0.17, 0.183)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1425182496]
+
+[node name="ShopButton" type="Button" parent="CanvasLayer" unique_id=961961724]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -269.99994
+offset_top = 271.99997
+offset_right = -201.95496
+offset_bottom = 302.99997
+grow_horizontal = 2
+scale = Vector2(7.87, 7.87)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Store"
+
+[connection signal="pressed" from="CanvasLayer/ShopButton" to="." method="_on_button_pressed"]

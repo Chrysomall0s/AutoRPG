@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b2jfxrl34sxfk" path="res://Scripts/Store.gd" id="1_voxcw"]
 [ext_resource type="Texture2D" uid="uid://by05jlnt357b8" path="res://Assets/Backstage.png" id="2_2s633"]
+[ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="3_fy3ub"]
 
 [node name="Store" type="Control" unique_id=480470293]
 layout_mode = 3
@@ -19,3 +20,7 @@ texture = ExtResource("2_2s633")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="Hero" parent="." unique_id=448655595 instance=ExtResource("3_fy3ub")]
+position = Vector2(675.75, 930.12494)
+scale = Vector2(0.38376862, 0.41596535)
