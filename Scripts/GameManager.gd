@@ -3,14 +3,15 @@ extends Node
 
 # Each weapon position now carries its own unique parameters
 var equipped_weapons: Array = [
-	{ "name": "Basic Dagger", "icon": "res://icon.svg", "damage": 8, "speed": 6 },
-	{ "name": "Iron Sword",   "icon": "res://icon.svg", "damage": 15, "speed": 3 },
-	{ "name": "Magic Wand",   "icon": "res://icon.svg", "damage": 12, "speed": 4 },
+	null,
+	null,
+	null,
 	null, # Empty slot
 	null, # Empty slot
 	null  # Empty slot
 ]
-
+var battle_over: bool = false
+var escaped: bool = false
 # Place these variables inside your global auto-load script (e.g., res://Scripts/GameManager.gd)
 var map_layout_initialized: bool = false
 var current_floor: int = 1

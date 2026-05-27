@@ -1,6 +1,3 @@
-# =================================================================
-# res://Scenes/Battle.gd
-# =================================================================
 extends Control
 
 # =================================================================
@@ -34,7 +31,7 @@ extends Control
 @export_group("Audience Stadium Positioning")
 @export var audience_center_x_ratio: float = 0.5  
 @export var audience_center_y_ratio: float = 0.7  
-@export var audience_width_ratio: float = 1.1      
+@export var audience_width_ratio: float = 1.1     
 @export var audience_height_ratio: float = 0.4    
 
 @export_subgroup("Audience Grid Details")
@@ -42,6 +39,16 @@ extends Control
 @export var audience_rows: int = 6
 @export var original_sprite_width: float = 44.0   
 @export var original_sprite_height: float = 44.0  
+
+@export_group("Visual Gold Drop Engine")
+@export var coin_texture_path: String = "res://icon.svg" 
+@export var coin_scale: Vector2 = Vector2(0.15, 0.15)
+@export var total_animated_coins: int = 12
+
+@export_group("Exposed Match Timer Engine")
+@export var max_battle_duration: float = 20.0
+@export var timer_font_size_ratio: float = 0.045
+@export var timer_y_offset_ratio: float = 0.02
 # =================================================================
 
 var player_hp_bar: ProgressBar
@@ -65,8 +72,23 @@ var enemy_base_pos := Vector2()
 var weapon_sprites: Array[Sprite2D] = []
 var floating_time := 0.0
 
+# HUD parameters for visual gold increment counters
+var hud_gold_label: Label = null
+var current_displayed_gold: int = 0
+
+# Match length variables
+var match_countdown_clock: float = 20.0
+var hud_timer_label: Label = null
+var escape_sequence_triggered := false
+
 func _ready():
 	var screen_size = get_viewport_rect().size
+	match_countdown_clock = max_battle_duration
+	
+	# Cache initial clean gold counters matching baseline memory profiles
+	current_displayed_gold = GameManager.gold
+	setup_gold_hud_display()
+	setup_countdown_timer_hud()
 	
 	var speed_buttons_start_pos = Vector2(
 		screen_size.x * speed_buttons_x_offset_ratio, 
@@ -106,6 +128,30 @@ func _ready():
 	setup_battle_timer()
 	spawn_audience()
 	spawn_floating_weapons()
+
+func setup_gold_hud_display():
+	var screen_size = get_viewport_rect().size
+	hud_gold_label = Label.new()
+	hud_gold_label.text = "Gold: " + str(current_displayed_gold)
+	hud_gold_label.position = Vector2(screen_size.x * 0.04, screen_size.y * 0.11)
+	hud_gold_label.add_theme_font_size_override("font_size", int(screen_size.y * 0.028))
+	add_child(hud_gold_label)
+
+func setup_countdown_timer_hud():
+	var screen_size = get_viewport_rect().size
+	hud_timer_label = Label.new()
+	hud_timer_label.text = str(ceil(match_countdown_clock))
+	
+	# Set anchors up to lock top-middle layout formatting
+	hud_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hud_timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hud_timer_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	
+	var font_sz = int(screen_size.y * timer_font_size_ratio)
+	hud_timer_label.add_theme_font_size_override("font_size", font_sz)
+	hud_timer_label.position.y = screen_size.y * timer_y_offset_ratio
+	
+	add_child(hud_timer_label)
 
 func spawn_floating_weapons():
 	weapon_sprites.clear()
@@ -195,6 +241,18 @@ func create_health_bar() -> ProgressBar:
 
 func _process(delta):
 	if battle_over: return
+	
+	# Handle dynamic system countdown ticking
+	if match_countdown_clock > 0.0:
+		match_countdown_clock -= delta * Engine.time_scale
+		hud_timer_label.text = str(max(0, ceil(match_countdown_clock)))
+		
+		if match_countdown_clock <= 0.0:
+			match_countdown_clock = 0.0
+			escape_sequence_triggered = true
+			check_game_state()
+			return
+
 	update_health_bar_positions()
 	update_weapon_positions(delta)
 
@@ -292,18 +350,79 @@ func update_bars():
 	player_hp_bar.value = GameManager.player_hp
 	enemy_hp_bar.value = GameManager.enemy_hp
 
+# ---------------------------------
+# VISUAL COIN DROP ENGINE
+# ---------------------------------
+func execute_visual_gold_drop(reward_amount: int):
+	var gold_per_coin = int(max(1, float(reward_amount) / float(total_animated_coins)))
+	var target_ui_position = hud_gold_label.position + (hud_gold_label.size / 2.0)
+	
+	for i in range(total_animated_coins):
+		await get_tree().create_timer(randf_range(0.02, 0.06)).timeout
+		if not is_instance_valid(enemy_sprite) or not is_instance_valid(hud_gold_label): break
+		
+		var coin = Sprite2D.new()
+		coin.texture = load(coin_texture_path)
+		coin.scale = coin_scale
+		coin.position = enemy_sprite.position
+		add_child(coin)
+		
+		var random_spread = Vector2(randf_range(-90, 90), randf_range(-120, -30))
+		var peak_fountain_pos = enemy_sprite.position + random_spread
+		
+		var coin_tween = create_tween().set_parallel(false)
+		
+		coin_tween.tween_property(coin, "position", peak_fountain_pos, 0.35)\
+			.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+			
+		coin_tween.tween_property(coin, "position", target_ui_position, 0.55)\
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
+			
+		coin_tween.finished.connect(func():
+			coin.queue_free()
+			current_displayed_gold += gold_per_coin
+			hud_gold_label.text = "Gold: " + str(current_displayed_gold)
+			
+			var pop_tween = create_tween()
+			pop_tween.tween_property(hud_gold_label, "scale", Vector2(1.15, 1.15), 0.05)
+			pop_tween.tween_property(hud_gold_label, "scale", Vector2(1.0, 1.0), 0.05)
+		)
+
 func check_game_state():
+	if escape_sequence_triggered:
+		won = true # Flag true so continue button routes back to map scene safely
+		GameManager.escaped = true # Let map script know to preserve this tile
+		$Timer.stop()
+		show_win_popup()
+		return
+
 	if GameManager.enemy_hp <= 0:
 		won = true
 		battle_over = true
+		$Timer.stop()
+		
+		# --- NEW: Explicitly clear the monster from layout memory now that it's verified dead ---
+		if not GameManager.cleared_tiles.has(GameManager.current_tile_id):
+			GameManager.cleared_tiles.append(GameManager.current_tile_id)
+		GameManager.persistent_tile_assignments[GameManager.current_tile_id] = 0 # 0 = TileType.NORMAL
+		
 		var gold_reward = randi_range(15, 30) + (GameManager.selected_difficulty * 10)
 		if "current_floor" in GameManager:
 			gold_reward += (GameManager.current_floor * 5)
+			
 		GameManager.gold += gold_reward
+		execute_visual_gold_drop(gold_reward)
+		
+		await get_tree().create_timer(1.2).timeout
+		
+		current_displayed_gold = GameManager.gold
+		hud_gold_label.text = "Gold: " + str(current_displayed_gold)
 		show_win_popup()
+		
 	elif GameManager.player_hp <= 0:
 		won = false
 		battle_over = true
+		$Timer.stop()
 		show_win_popup()
 
 func update_popup_text_scale():
@@ -321,9 +440,13 @@ func show_win_popup():
 	$WinPopup/Panel.size = dynamic_panel_size
 	win_popup.global_position = (screen_size - dynamic_panel_size) / 2.0
 	
-	$Timer.stop()
 	Engine.time_scale = 1
-	result_label.text = "YOU WON" if won else "YOU LOST"
+	
+	if escape_sequence_triggered:
+		result_label.text = "YOU ESCAPED"
+	else:
+		result_label.text = "YOU WON" if won else "YOU LOST"
+		
 	win_popup.visible = true
 	update_popup_text_scale()
 	
@@ -332,4 +455,7 @@ func _on_continue_pressed():
 	if not won: 
 		get_tree().change_scene_to_file("res://Scenes/DeathScreen.tscn")
 	else: 
+		# Safe clean global fallback routing reset
+		if not escape_sequence_triggered:
+			GameManager.escaped = false 
 		get_tree().change_scene_to_file("res://Scenes/Map.tscn")

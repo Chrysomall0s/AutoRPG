@@ -17,15 +17,13 @@ func _on_retry_pressed():
 	# reset player stats
 	GameManager.player_hp = 100
 	GameManager.enemy_hp = 100
-	GameManager.player_damage = 10
 
-	get_tree().change_scene_to_file("res://Scenes/Battle.tscn")
+	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 
 func _on_menu_pressed():
 	# full reset (optional but recommended)
 	GameManager.player_hp = 100
 	GameManager.enemy_hp = 100
-	GameManager.player_damage = 10
 
 	get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")

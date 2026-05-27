@@ -12,6 +12,8 @@ const PLAYER_OFFSET: Vector2 = Vector2(0, -150)
 @onready var player_token = $Hero 
 @onready var shop_button = $CanvasLayer/ShopButton
 
+var floor_label: Label
+
 const TILE_X_SPACING: float = 540.0 
 const TILE_Y_SPACING: float = 210.0  
 const ROW_X_OFFSET: float = 300.0    
@@ -51,16 +53,35 @@ var tile_assignments: Dictionary:
 func _ready():
 	if shop_button:
 		shop_button.pressed.connect(_on_shop_button_pressed)
-		
+	
+	setup_floor_ui_label()
 	build_or_refresh_dungeon_floor()
 
 func _on_shop_button_pressed():
 	print("Opening persistent global shop scene...")
 	get_tree().change_scene_to_file("res://Scenes/Store.tscn")
 
+func setup_floor_ui_label():
+	var ui_layer = get_node_or_null("CanvasLayer")
+	if ui_layer:
+		if ui_layer.has_node("FloorLabel"):
+			floor_label = ui_layer.get_node("FloorLabel") as Label
+		else:
+			floor_label = Label.new()
+			floor_label.name = "FloorLabel"
+			if shop_button:
+				floor_label.position = shop_button.position + Vector2(0, -50)
+			else:
+				floor_label.position = Vector2(40, 40)
+			floor_label.add_theme_font_size_override("font_size", 32)
+			ui_layer.add_child(floor_label)
+
 func build_or_refresh_dungeon_floor():
 	var display_floor = GameManager.current_floor
 	print("--- NOW ENTERING FLOOR ", display_floor, " ---")
+	
+	if floor_label:
+		floor_label.text = "FLOOR: " + str(display_floor)
 	
 	clear_current_map_nodes()
 	
@@ -112,37 +133,100 @@ func generate_random_layout():
 	GameManager.persistent_monster_profiles.clear()
 	var available_ids = tile_layout.keys()
 	
-	var potential_stairwells = available_ids.duplicate()
-	potential_stairwells.erase(current_tile_id)
-	var stairwell_tile = potential_stairwells.pick_random()
-	tile_assignments[stairwell_tile] = TileType.STAIRWELL
-	
-	for tile_id in available_ids:
-		if tile_id == stairwell_tile or tile_id == current_tile_id:
-			continue
+	if current_tile_id not in available_ids:
+		current_tile_id = available_ids[0]
 		
-		var roll = randf()
-		if roll < 0.30:
+	var start_grid_pos = tile_layout[current_tile_id]
+	var loop_success = false
+	var chosen_stairwell_tile = -1
+
+	var attempts = 0
+	while attempts < 2000: 
+		attempts += 1
+		for bridge in bridge_definitions:
+			bridge["visible"] = randf() > 0.55
+			
+		if is_map_fully_connected():
+			var connection_counts = {}
+			for tile_id in available_ids:
+				connection_counts[tile_id] = 0
+			for bridge in bridge_definitions:
+				if bridge["visible"]:
+					connection_counts[bridge["from"]] += 1
+					connection_counts[bridge["to"]] += 1
+			
+			var distant_candidates = []
+			for tile_id in available_ids:
+				if tile_id == current_tile_id:
+					continue
+				var grid_pos = tile_layout[tile_id]
+				var dist = max(abs(grid_pos.x - start_grid_pos.x), abs(grid_pos.y - start_grid_pos.y))
+				if dist >= 3:
+					distant_candidates.append(tile_id)
+			
+			if distant_candidates.is_empty():
+				continue 
+				
+			var absolute_dead_ends = []
+			for tile_id in distant_candidates:
+				if connection_counts[tile_id] == 1:
+					absolute_dead_ends.append(tile_id)
+					
+			if not absolute_dead_ends.is_empty():
+				chosen_stairwell_tile = absolute_dead_ends.pick_random()
+			else:
+				var min_connections = 99
+				var best_alternatives = []
+				for tile_id in distant_candidates:
+					if connection_counts[tile_id] < min_connections:
+						min_connections = connection_counts[tile_id]
+						best_alternatives = [tile_id]
+					elif connection_counts[tile_id] == min_connections:
+						best_alternatives.append(tile_id)
+				chosen_stairwell_tile = best_alternatives.pick_random()
+				
+			print("Valid procedural graph with functional stairwell assignment verified at Tile ", chosen_stairwell_tile, " in ", attempts, " loops.")
+			loop_success = true
+			break
+			
+	if not loop_success:
+		print("Warning: Fallback absolute map connectivity forced.")
+		for bridge in bridge_definitions:
+			bridge["visible"] = true
+		
+		var distant_candidates = []
+		for tile_id in available_ids:
+			if tile_id != current_tile_id:
+				var grid_pos = tile_layout[tile_id]
+				if max(abs(grid_pos.x - start_grid_pos.x), abs(grid_pos.y - start_grid_pos.y)) >= 3:
+					distant_candidates.append(tile_id)
+		chosen_stairwell_tile = distant_candidates.pick_random() if not distant_candidates.is_empty() else available_ids[-1]
+
+	# Set up the structural exit tile
+	tile_assignments[chosen_stairwell_tile] = TileType.STAIRWELL
+	
+	# NEW: Explicit pool distribution to guarantee exactly 6 monsters spawn
+	var candidate_monster_tiles: Array = []
+	for tile_id in available_ids:
+		if tile_id != chosen_stairwell_tile and tile_id != current_tile_id:
+			candidate_monster_tiles.append(tile_id)
+			
+	candidate_monster_tiles.shuffle() # Randomize selection order natively
+	
+	# Cap spawning safely at 6 entries
+	var target_monster_count = min(6, candidate_monster_tiles.size())
+	
+	for i in range(candidate_monster_tiles.size()):
+		var tile_id = candidate_monster_tiles[i]
+		if i < target_monster_count:
+			# Assign exactly 6 tiles to be monsters
 			tile_assignments[tile_id] = TileType.MONSTER
 			if ResourceLoader.exists("res://Scripts/MonsterData.gd"):
 				var monster_db = load("res://Scripts/MonsterData.gd").new()
 				GameManager.persistent_monster_profiles[tile_id] = monster_db.get_random_monster()
 		else:
+			# Set the remaining rooms to normal spaces
 			tile_assignments[tile_id] = TileType.NORMAL
-
-	var attempts = 0
-	while attempts < 1000:
-		attempts += 1
-		for bridge in bridge_definitions:
-			bridge["visible"] = randf() > 0.35
-			
-		if is_map_fully_connected():
-			print("Valid layout generated in ", attempts, " loops.")
-			return
-			
-	print("Warning: Fallback map connectivity forced.")
-	for bridge in bridge_definitions:
-		bridge["visible"] = true
 
 func is_map_fully_connected() -> bool:
 	var adjacency_list: Dictionary = {}
@@ -198,20 +282,14 @@ func generate_map():
 					var monster_db = load("res://Scripts/MonsterData.gd").new()
 					GameManager.persistent_monster_profiles[tile_id] = monster_db.get_random_monster()
 				
-				# ASSERT 1: Ensure profile generation is generating valid data
 				var profile = GameManager.persistent_monster_profiles[tile_id]
 				assert(profile != null, "CRITICAL DETECTOR: Tile %d profile generated null reference!" % tile_id)
 				assert(profile is Dictionary, "CRITICAL DETECTOR: Tile %d profile expected a Dictionary, got: %s" % [tile_id, typeof(profile)])
-				
-				# ASSERT 2: Ensure data keys map to your profile call expectations
 				assert(profile.has("icon"), "CRITICAL DETECTOR: Profile on Tile %d missing the expected 'icon' key! Profile Content: %s" % [tile_id, str(profile)])
 				
 				if profile.has("icon"):
 					var icon_path = profile["icon"]
-					
-					# ASSERT 3: Warn right away if image tracking files are breaking inside ResourceLoader paths
 					assert(ResourceLoader.exists(icon_path), "CRITICAL FILE GAP: Profile asset path does not exist in project tree: " + str(icon_path))
-					
 					new_tile.display_monster(icon_path, Vector2(0.4, 0.4))
 		else:
 			new_tile.set_tile_type(TileType.NORMAL)
@@ -287,9 +365,15 @@ func snap_player_to_tile(tile_id: int):
 func handle_tile_event(type: int):
 	match type:
 		TileType.MONSTER:
-			if tiles.has(current_tile_id):
-				tiles[current_tile_id].set_tile_type(TileType.NORMAL)
-			
+			# If we just returned to the map by escaping or losing, do nothing and keep the monster!
+			if GameManager.escaped:
+				GameManager.escaped = false # Reset the flag for the next fight
+
+			# If the tile was already cleared in a prior battle victory, don't trigger again
+			if GameManager.cleared_tiles.has(current_tile_id):
+				return
+
+			# --- Prepare and Initialize the Battle Scene ---
 			if GameManager.persistent_monster_profiles.has(current_tile_id):
 				var profile = GameManager.persistent_monster_profiles[current_tile_id]
 				GameManager.current_enemy_profile = profile
@@ -298,15 +382,20 @@ func handle_tile_event(type: int):
 				GameManager.enemy_dmg = profile.get("damage", 10)
 				GameManager.enemy_speed = profile.get("speed", 4)
 			
-			tile_assignments[current_tile_id] = TileType.NORMAL
-			if not GameManager.cleared_tiles.has(current_tile_id):
-				GameManager.cleared_tiles.append(current_tile_id)
+			# NOTE: We DO NOT overwrite tile_assignments or clear tiles here anymore.
+			# The battle scene will handle marking the tile as cleared only if the player wins.
 			
 			get_tree().change_scene_to_file("res://Scenes/Battle.tscn")
 			
 		TileType.STAIRWELL:
+			var preserved_spawn_tile_id = current_tile_id
+			
 			if GameManager.has_method("advance_to_next_floor"):
 				GameManager.advance_to_next_floor()
+				
 			GameManager.cleared_tiles.clear()
 			GameManager.map_layout_initialized = false
+			
+			current_tile_id = preserved_spawn_tile_id
+			
 			build_or_refresh_dungeon_floor()

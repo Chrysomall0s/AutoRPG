@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bna3rkm4ldjfl" path="res://Scripts/MainMenu.gd" id="1_tt5f1"]
 [ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_8saeu"]
-[ext_resource type="Texture2D" uid="uid://c2387nc0amm61" path="res://Assets/Hero.png" id="3_ghw46"]
+[ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="3_8saeu"]
 
 [node name="MainMenu" type="Control" unique_id=1180344965]
 layout_mode = 3
@@ -24,7 +24,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 alignment = 1
 
-[node name="Sprite2D2" type="Sprite2D" parent="." unique_id=1293207957]
-position = Vector2(714, 792)
-scale = Vector2(0.39197758, 0.41336632)
-texture = ExtResource("3_ghw46")
+[node name="Hero" parent="." unique_id=448655595 instance=ExtResource("3_8saeu")]
+position = Vector2(722, 889.99994)
+scale = Vector2(0.3835821, 0.40321782)

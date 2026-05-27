@@ -16,7 +16,7 @@ var upgrades = [
 	{"name": "Staff", "category": "weapon","type": "heal", "weight": 20, "cost": 2, "icon": "res://Assets/Weapons/Staff.png", "heal_value": 14, "speed": 3, "level": 1},
 	
 	# --- WEAPON MODS / UPGRADES (Must be dropped on matching weapon type to level up) ---
-	{"name": "Whetstone",      "category": "weapon_mod", "target_weapon": "Sword", "damage_bonus": 5, "speed_bonus": 0, "weight": 30, "cost": 1, "icon": "res://icon.svg"},
-	{"name": "Reinforced Bowstring", "category": "weapon_mod", "target_weapon": "Bow",   "damage_bonus": 3, "speed_bonus": 1, "weight": 30, "cost": 1, "icon": "res://icon.svg"},
-	{"name": "Focus Crystal",  "category": "weapon_mod", "target_weapon": "Staff", "damage_bonus": 6, "speed_bonus": 0, "weight": 30, "cost": 1, "icon": "res://icon.svg"}
+	{"name": "Cha1", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/Mods/Faces/Character1.png", "layer": 6000},
+	{"name": "Cha2", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/Mods/Faces/Character2.png", "layer": 6000},
+
 ]

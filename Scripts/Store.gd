@@ -27,7 +27,7 @@ extends Control
 
 @export_group("Floating Rainbow Weapons Settings")
 @export var rainbow_radius_x: float = 150.0
-@export var rainbow_offset := Vector2(0, -80)
+@export var rainbow_offset := Vector2(-150, -80)
 @export var rainbow_radius_y: float = 150.0
 @export var rainbow_y_offset: float = 45.0
 @export var float_amplitude: float = 4.0
