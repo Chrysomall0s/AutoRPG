@@ -23,7 +23,7 @@ var monsters = [
 		"hp": 40,
 		"damage": 9,
 		"speed": 3, # Attacks every 3 ticks
-		"icon": "res://Assets/Foe1.png"
+		"icon": "res://Assets/Foe3.png"
 	}
 ]
 

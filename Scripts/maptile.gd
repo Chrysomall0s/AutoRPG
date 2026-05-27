@@ -22,6 +22,7 @@ func _ready():
 func _ensure_container_exists():
 	if has_node("MonsterContainer"):
 		monster_container = get_node("MonsterContainer") as Node2D
+		monster_container.z_index = 2 # <-- FORCE existing containers to draw on top!
 		if monster_container.has_node("MonsterSprite"):
 			monster_sprite = monster_container.get_node("MonsterSprite") as Sprite2D
 			return
@@ -30,6 +31,7 @@ func _ensure_container_exists():
 		monster_container = Node2D.new()
 		monster_container.name = "MonsterContainer"
 		monster_container.position = Vector2(0, -60)
+		monster_container.z_index = 2 # <-- FORCE newly created containers to draw on top!
 		add_child(monster_container)
 		
 	if not monster_sprite:

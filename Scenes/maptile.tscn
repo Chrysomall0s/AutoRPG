@@ -21,10 +21,11 @@ scale = Vector2(1.1800001, 1.1433333)
 texture = ExtResource("2_45ro4")
 
 [node name="MonsterContainer" type="Node2D" parent="." unique_id=242119201]
+scale = Vector2(2.25, 2.25)
 
 [node name="MonsterSprite" type="Sprite2D" parent="MonsterContainer" unique_id=408866915]
-position = Vector2(-16, -132)
-scale = Vector2(1.1123918, 1.1693292)
+position = Vector2(-21.333336, -61.77778)
+scale = Vector2(0.532, 0.559)
 texture = ExtResource("3_esr2i")
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]

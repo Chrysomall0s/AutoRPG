@@ -198,9 +198,21 @@ func generate_map():
 					var monster_db = load("res://Scripts/MonsterData.gd").new()
 					GameManager.persistent_monster_profiles[tile_id] = monster_db.get_random_monster()
 				
+				# ASSERT 1: Ensure profile generation is generating valid data
 				var profile = GameManager.persistent_monster_profiles[tile_id]
+				assert(profile != null, "CRITICAL DETECTOR: Tile %d profile generated null reference!" % tile_id)
+				assert(profile is Dictionary, "CRITICAL DETECTOR: Tile %d profile expected a Dictionary, got: %s" % [tile_id, typeof(profile)])
+				
+				# ASSERT 2: Ensure data keys map to your profile call expectations
+				assert(profile.has("icon"), "CRITICAL DETECTOR: Profile on Tile %d missing the expected 'icon' key! Profile Content: %s" % [tile_id, str(profile)])
+				
 				if profile.has("icon"):
-					new_tile.display_monster(profile["icon"], Vector2(0.4, 0.4))
+					var icon_path = profile["icon"]
+					
+					# ASSERT 3: Warn right away if image tracking files are breaking inside ResourceLoader paths
+					assert(ResourceLoader.exists(icon_path), "CRITICAL FILE GAP: Profile asset path does not exist in project tree: " + str(icon_path))
+					
+					new_tile.display_monster(icon_path, Vector2(0.4, 0.4))
 		else:
 			new_tile.set_tile_type(TileType.NORMAL)
 		
