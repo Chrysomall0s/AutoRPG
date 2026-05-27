@@ -125,12 +125,9 @@ func replace_timer_with_flee_button():
 	
 	var btn = Button.new()
 	btn.text = "Flee"
-	btn.custom_minimum_size = Vector2(120, 50)
-	btn.anchor_left = 0.5
-	btn.anchor_right = 0.5
-	btn.anchor_top = 0.0
-	btn.anchor_bottom = 0.0
-	btn.position = Vector2(-60, get_viewport_rect().size.y * 0.02)
+	btn.custom_minimum_size = Vector2(100, 40)
+	# Use the same coordinates as the timer
+	btn.position = Vector2(get_viewport_rect().size.x * 0.04, get_viewport_rect().size.y * 0.17)
 	
 	btn.pressed.connect(func():
 		escape_sequence_triggered = true
@@ -179,10 +176,10 @@ func setup_countdown_timer_hud():
 	var screen_size = get_viewport_rect().size
 	hud_timer_label = Label.new()
 	hud_timer_label.text = str(int(flee_button_unlock_time))
-	hud_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	hud_timer_label.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	hud_timer_label.add_theme_font_size_override("font_size", int(screen_size.y * 0.045))
-	hud_timer_label.position.y = screen_size.y * 0.02
+	# Align with gold label (x=0.04, y=0.11)
+	# Positioning slightly below gold label
+	hud_timer_label.position = Vector2(screen_size.x * 0.04, screen_size.y * 0.17)
+	hud_timer_label.add_theme_font_size_override("font_size", int(screen_size.y * 0.035))
 	add_child(hud_timer_label)
 
 func spawn_floating_weapons():
