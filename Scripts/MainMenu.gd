@@ -58,7 +58,7 @@ var character_starting_loadouts: Dictionary = {
 	},
 	"char_slot2": {
 		"passives": ["Cha2", "Gauntlets"],
-		"weapons": ["Axe", "Bow"],
+		"weapons": ["Bow", "CurseStaff"],
 		"audience": ["Blue Fan", "Yellow Fan"]
 	},
 	"char_slot3": {
