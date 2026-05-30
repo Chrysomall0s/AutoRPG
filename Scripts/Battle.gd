@@ -25,20 +25,8 @@ extends Control
 @export var speed_buttons_x_offset_ratio: float = 0.06  
 @export var speed_buttons_y_offset_ratio: float = 0.02  
 @export var gap_between_buttons_ratio: float = 0.24   
-@export var speed_button_width_ratio: float = 0.15       
-@export var speed_button_height_ratio: float = 0.07   
-
-@export_group("Audience Stadium Positioning")
-@export var audience_center_x_ratio: float = 0.5  
-@export var audience_center_y_ratio: float = 0.7  
-@export var audience_width_ratio: float = 1.1     
-@export var audience_height_ratio: float = 0.4    
-
-@export_subgroup("Audience Grid Details")
-@export var audience_columns: int = 11
-@export var audience_rows: int = 6
-@export var original_sprite_width: float = 44.0   
-@export var original_sprite_height: float = 44.0  
+@export var speed_button_width_ratio: float = 0.15        
+@export var speed_button_height_ratio: float = 0.07    
 
 @export_group("Visual Gold Drop Engine")
 @export var coin_texture_path: String = "res://icon.svg" 
@@ -54,7 +42,6 @@ var enemy_hp_bar: ProgressBar
 @onready var win_popup = $WinPopup
 @onready var player_sprite = $Hero 
 @onready var enemy_sprite = $Foe
-@onready var AudienceScene = preload("res://Scenes/Audience.tscn")
 @onready var audience_container = $AudienceContainer
 @onready var result_label = $WinPopup/Panel/Label
 
@@ -103,7 +90,11 @@ func _ready():
 	
 	update_bars()
 	setup_battle_timer()
-	spawn_audience()
+	
+	# Audience logic is now handled by the script attached to AudienceContainer
+	if audience_container.has_method("populate_audience"):
+		audience_container.populate_audience()
+		
 	spawn_floating_weapons()
 
 func _process(delta):
@@ -126,7 +117,6 @@ func replace_timer_with_flee_button():
 	var btn = Button.new()
 	btn.text = "Flee"
 	btn.custom_minimum_size = Vector2(100, 40)
-	# Use the same coordinates as the timer
 	btn.position = Vector2(get_viewport_rect().size.x * 0.04, get_viewport_rect().size.y * 0.17)
 	
 	btn.pressed.connect(func():
@@ -176,8 +166,6 @@ func setup_countdown_timer_hud():
 	var screen_size = get_viewport_rect().size
 	hud_timer_label = Label.new()
 	hud_timer_label.text = str(int(flee_button_unlock_time))
-	# Align with gold label (x=0.04, y=0.11)
-	# Positioning slightly below gold label
 	hud_timer_label.position = Vector2(screen_size.x * 0.04, screen_size.y * 0.17)
 	hud_timer_label.add_theme_font_size_override("font_size", int(screen_size.y * 0.035))
 	add_child(hud_timer_label)
@@ -226,23 +214,6 @@ func _pause_game(): Engine.time_scale = 0.0
 func _slow_game(): Engine.time_scale = 0.5
 func _normal_game(): Engine.time_scale = 1.0
 func _fast_game(): Engine.time_scale = 2.0
-
-func spawn_audience():
-	randomize()
-	var screen_size = get_viewport_rect().size
-	var zone_size = Vector2(screen_size.x * audience_width_ratio, screen_size.y * audience_height_ratio)
-	var zone_center = Vector2(screen_size.x * audience_center_x_ratio, screen_size.y * audience_center_y_ratio)
-	var zone_top_left = zone_center - (zone_size / 2.0)
-	var spacing_x = zone_size.x / audience_columns
-	var spacing_y = zone_size.y / audience_rows
-	var uniform_scale = min((spacing_x / original_sprite_width) * 0.9, (spacing_y / original_sprite_height) * 0.9)
-	for y in range(audience_rows):
-		for x in range(audience_columns):
-			var audience = AudienceScene.instantiate()
-			audience_container.add_child(audience)
-			audience.scale = Vector2(uniform_scale, uniform_scale)
-			audience.position = zone_top_left + Vector2((x * spacing_x) + (spacing_x * 0.5 if y % 2 == 1 else 0.0), y * spacing_y)
-			audience.set_filled(randf() < 0.7)
 
 func create_health_bar() -> ProgressBar:
 	var screen_size = get_viewport_rect().size

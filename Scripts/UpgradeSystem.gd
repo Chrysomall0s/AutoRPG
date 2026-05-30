@@ -12,7 +12,8 @@ func apply_upgrade(upgrade: Dictionary, target_destination: String):
 		"passive":
 			# Target destination is set to "character" via shop layout actions
 			process_character_stat_mod(upgrade)
-			
+		"viewer":
+			GameManager.audience_members.append(upgrade)	
 		"weapon":
 			# Direct weapon slot registration logic.
 			# target_destination is the weapon slot index (e.g., "0", "1", "2")

@@ -19,4 +19,9 @@ var upgrades = [
 	{"name": "Cha1", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/Mods/Faces/Character1.png", "layer": 6000},
 	{"name": "Cha2", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/Mods/Faces/Character2.png", "layer": 6000},
 
+	# --- AUDIENCE UPGRADES ---
+	{"name": "Yellow Fan", "category": "viewer", "type": "heal",   "value": 5,"weight": 3, "throw_chance": 0.005, "cost": 3, "icon": "res://Assets/Viewers/Yellow.png"},
+	{"name": "Blue Fan",   "category": "viewer", "type": "damage", "value": 10,"weight": 2, "throw_chance": 0.003, "cost": 3, "icon": "res://Assets/Viewers/Blue.png"},
+	{"name": "Violet Fan", "category": "viewer", "type": "damage", "value": 50,"weight": 1, "throw_chance": 0.001, "cost": 5, "icon": "res://Assets/Viewers/Violet.png"},
+	{"name": "Empty Fan", "category": "viewer", "type": "damage", "value": 0,"weight": 0, "throw_chance": 0.000, "cost": 5, "icon": "res://Assets/Viewers/Emptyfan.png"},
 ]
