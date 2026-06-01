@@ -144,7 +144,9 @@ func flip_stats_page():
     update_stats_display()
 
 func _process(delta: float) -> void:
-    update_weapon_positions(delta)
+    # 3. Delegate the movement calculations to the Hero node
+    if is_instance_valid(player_sprite) and player_sprite.has_method("update_weapon_movements"):
+        player_sprite.update_weapon_movements(delta, player_sprite.position)
 
 func adjust_layout_containers():
     var screen_size = get_viewport_rect().size
@@ -160,43 +162,13 @@ func adjust_layout_containers():
 # WEAPON ORBIT & REFRESH LOGIC
 # ---------------------------------
 func refresh_character_and_weapons():
-    if is_instance_valid(player_sprite) and player_sprite.has_method("load_upgrade_sprites"):
-        player_sprite.load_upgrade_sprites()
-    spawn_floating_weapons()
-
-func spawn_floating_weapons():
-    for old_weapon in weapon_sprites:
-        if is_instance_valid(old_weapon): old_weapon.queue_free()
-    weapon_sprites.clear()
+    # 1. Refresh the UI slots so the text matches the new weapon data
+    setup_six_slots_ui()
     
-    if not is_instance_valid(player_sprite): return
-    for i in range(GameManager.equipped_weapons.size()):
-        var weapon_data = GameManager.equipped_weapons[i]
-        if weapon_data == null or typeof(weapon_data) != TYPE_DICTIONARY: continue
-        var weapon = Sprite2D.new()
-        weapon.texture = load(weapon_data.get("icon", "res://icon.svg"))
-        weapon.scale = Vector2(0.3, 0.3) 
-        add_child(weapon)
-        weapon.set_meta("slot_index", i)
-        weapon.name = weapon_data.get("name", "Weapon")
-        weapon_sprites.append(weapon)
-    update_weapon_positions(0.0)
-
-func update_weapon_positions(delta: float):
-    if not is_instance_valid(player_sprite): return
-    floating_time += delta
-    for i in range(weapon_sprites.size()):
-        var weapon = weapon_sprites[i]
-        if not is_instance_valid(weapon): continue
-        var slot_idx = weapon.get_meta("slot_index")
-        var angle = float(slot_idx) * (PI / 5.0)
-        var float_offset = sin(floating_time * float_wave_speed + slot_idx) * float_amplitude
-        var target_pos = player_sprite.position + rainbow_offset + Vector2(
-            -cos(angle) * rainbow_radius_x, 
-            -sin(angle) * rainbow_radius_y + rainbow_y_offset + float_offset
-        )
-        if delta == 0.0: weapon.position = target_pos
-        else: weapon.position = weapon.position.lerp(target_pos, delta * weapon_follow_smoothness)
+    # 2. Delegate spawning and positioning to the Hero node
+    if is_instance_valid(player_sprite) and player_sprite.has_method("spawn_weapons"):
+        var weapons = GameManager.player_profile.get("weapons", [])
+        player_sprite.spawn_weapons(weapons)
 
 # ---------------------------------
 # SHOP LOGIC
@@ -269,13 +241,25 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
 
 func handle_passive_purchase(entry_ref: Dictionary):
     var upgrade_data = entry_ref["upgrade"]
-    if GameManager.gold < upgrade_data["cost"] or entry_ref["bought"]: return
+    if GameManager.gold < upgrade_data["cost"] or entry_ref["bought"]: 
+        return
+        
     GameManager.gold -= upgrade_data["cost"]
     
+    # Access the player_profile dictionary
+    var profile = GameManager.player_profile
+    
     if upgrade_data.get("category") == "viewer":
-        GameManager.audience_members.append(upgrade_data.duplicate())
+        # Ensure audience_members exists in the profile
+        if not profile.has("audience_members"): profile["audience_members"] = []
+        profile["audience_members"].append(upgrade_data.duplicate())
+        
     else:
-        GameManager.owned_upgrades.append(upgrade_data.duplicate())
+        # Ensure owned_upgrades exists in the profile
+        if not profile.has("owned_upgrades"): profile["owned_upgrades"] = []
+        profile["owned_upgrades"].append(upgrade_data.duplicate())
+        
+        # Apply the upgrade logic
         UpgradeSystem.apply_upgrade(upgrade_data, "character")
     
     finalize_item_purchase(entry_ref)
@@ -284,20 +268,30 @@ func handle_passive_purchase(entry_ref: Dictionary):
 
 func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int, entry_ref: Dictionary):
     if GameManager.gold < upgrade_data["cost"]: return
+    
     var category = upgrade_data.get("category", "")
-    var existing = GameManager.equipped_weapons[target_slot_index]
+    var weapons_list = GameManager.player_profile.get("weapons", [])
+    
+    # Ensure the list is long enough
+    if target_slot_index >= weapons_list.size(): return
+    
+    var existing = weapons_list[target_slot_index]
     
     if category == "weapon":
         GameManager.gold -= upgrade_data["cost"]
-        GameManager.equipped_weapons[target_slot_index] = upgrade_data.duplicate()
-        UpgradeSystem.apply_upgrade(upgrade_data, str(target_slot_index))
-    elif category == "weapon_mod":
-        if existing == null or existing.get("name") != upgrade_data.get("target_weapon"): return
-        GameManager.gold -= upgrade_data["cost"]
-        existing["level"] += 1
-        existing["damage"] += upgrade_data.get("damage_bonus", 0)
+        weapons_list[target_slot_index] = upgrade_data.duplicate()
         UpgradeSystem.apply_upgrade(upgrade_data, str(target_slot_index))
         
+    elif category == "weapon_mod":
+        # Check if existing weapon matches the mod's target
+        if typeof(existing) == TYPE_DICTIONARY and existing.get("name") == upgrade_data.get("target_weapon"):
+            GameManager.gold -= upgrade_data["cost"]
+            existing["level"] += 1
+            existing["damage"] = existing.get("damage", 0) + upgrade_data.get("damage_bonus", 0)
+            UpgradeSystem.apply_upgrade(upgrade_data, str(target_slot_index))
+        else:
+            return
+            
     finalize_item_purchase(entry_ref)
     update_gold()
     setup_six_slots_ui()
@@ -368,12 +362,29 @@ func setup_six_slots_ui():
 
 func update_slot_display_text(btn: Button, index: int):
     var base_font_size = int(get_viewport_rect().size.y * slot_button_font_ratio)
-    var weapon_data = GameManager.equipped_weapons[index]
-    if weapon_data != null and typeof(weapon_data) == TYPE_DICTIONARY:
-        btn.text = "Slot " + str(index + 1) + "\n" + str(weapon_data["name"]) + "\nLvl: " + str(weapon_data.get("level", 1))
-    else: btn.text = "Slot " + str(index + 1) + "\n(Empty)"
+    var weapons_list = GameManager.player_profile.get("weapons", [])
+    
+    if index < weapons_list.size() and weapons_list[index] != null:
+        var weapon_data = weapons_list[index]
+        
+        # Determine the name and level based on the type of weapon_data
+        var w_name = "Unknown"
+        var w_lvl = 1
+        
+        if typeof(weapon_data) == TYPE_DICTIONARY:
+            w_name = weapon_data.get("name", "Unknown")
+            w_lvl = weapon_data.get("level", 1)
+        elif typeof(weapon_data) == TYPE_STRING:
+            # If it's a string, it's just the name
+            w_name = weapon_data
+            w_lvl = 1
+            
+        btn.text = "Slot " + str(index + 1) + "\n" + str(w_name) + "\nLvl: " + str(w_lvl)
+    else: 
+        btn.text = "Slot " + str(index + 1) + "\n(Empty)"
+        
     btn.add_theme_font_size_override("font_size", base_font_size)
-
+    
 func update_gold():
     gold_label.text = "Gold: " + str(GameManager.gold)
     update_upgrade_colors()
@@ -386,7 +397,7 @@ func setup_gold_ui():
 
 func _play():
     GameManager.enemy_hp = 100 + (GameManager.selected_difficulty * 20)
-    get_tree().change_scene_to_file("res://Scenes/map.tscn")
+    get_tree().change_scene_to_file("res://Scenes/Battle.tscn")
 
 # ---------------------------------
 # CLASSES

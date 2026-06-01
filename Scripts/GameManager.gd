@@ -1,28 +1,21 @@
 # GameManager.gd
 extends Node
+# --- Profiles ---
+var player_profile = {
+	"passives": [],
+	"weapons": [],
+	"audience": []
+}
 
-# Each weapon position now carries its own unique parameters
-var equipped_weapons: Array = [
-	null,
-	null,
-	null,
-	null, # Empty slot
-	null, # Empty slot
-	null  # Empty slot
-]
+var current_enemy_profile = {
+	"passives": ["Cha1"],
+	"weapons": ["Sword"],
+	"audience": ["Yellow Fan"]
+}
 
-var audience_members = []
 var battle_over: bool = false
 var escaped: bool = false
 # Place these variables inside your global auto-load script (e.g., res://Scripts/GameManager.gd)
-var map_layout_initialized: bool = false
-var current_floor: int = 1
-var current_tile_id: int = 4
-
-var persistent_tile_assignments: Dictionary = {}
-var persistent_bridge_definitions: Array = []
-var cleared_tiles: Array[int] = []
-
 
 # GameManager.gd Additions
 var shop_initialized: bool = false
@@ -30,24 +23,18 @@ var persistent_shop_upgrades: Array = []  # Stores item dictionary states and "b
 var persistent_reroll_cost: int = 10
 var persistent_items_bought_this_turn: int = 0
 
-var owned_upgrades: Array = []
-var selected_character = ""
 var selected_difficulty = 1
 
-# --------------------------
-# GLOBAL PLAYER & ENEMY STATS
-# --------------------------
-var persistent_monster_profiles: Dictionary = {} # Maps tile_id -> Monster Dictionary
-var current_enemy_profile: Dictionary = {}       # Currently active monster profile
-
+var max_player_hp := 100
 var player_hp = 100
 var player_mp = 100
-var enemy_dmg = 4
+
+var max_enemy_hp := 50
 var enemy_hp = 100
+var enemy_dmg = 4
 
 var gold = 100
-var max_player_hp := 100
-var max_enemy_hp := 50
+
 var enemy_speed := 5 # Ticks required for the enemy to strike back
 
 # --------------------------
@@ -67,9 +54,3 @@ func initialize_seating(cols: int, rows: int):
 		if a.y != b.y: return a.y > b.y
 		return abs(a.x - center_x) < abs(b.x - center_x)
 	)
-	
-func advance_to_next_floor() -> void:
-	current_floor += 1
-	cleared_tiles.clear()                 
-	current_tile_id = 4                    
-	print("Floor advanced! Welcome to Floor: ", current_floor)

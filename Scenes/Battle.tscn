@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://c08idaerxvtaf" path="res://Scripts/Battle.gd" id="1_wvl2i"]
 [ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_1samx"]
-[ext_resource type="Texture2D" uid="uid://cntvp34md6ygy" path="res://Assets/Foe.png" id="3_p46lj"]
 [ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="4_1samx"]
 [ext_resource type="Script" uid="uid://btebqoe7vm7fj" path="res://Scripts/AudienceManager.gd" id="5_p46lj"]
 
@@ -18,56 +17,16 @@ position = Vector2(721.25, 1203.5)
 scale = Vector2(3.398345, 2.6648111)
 texture = ExtResource("2_1samx")
 
-[node name="Foe" type="Sprite2D" parent="." unique_id=1417752701]
-position = Vector2(987, 927)
-scale = Vector2(1.4464195, 1.4289312)
-texture = ExtResource("3_p46lj")
-
 [node name="Hero" parent="." unique_id=1923588313 instance=ExtResource("4_1samx")]
 position = Vector2(380, 867.99994)
-scale = Vector2(0.33507463, 0.3408416)
+scale = Vector2(1, 1)
+
+[node name="Foe" parent="." unique_id=448655595 instance=ExtResource("4_1samx")]
+position = Vector2(400, 0)
+scale = Vector2(-1, 1)
 
 [node name="Timer" type="Timer" parent="." unique_id=1833122652]
 autostart = true
 
 [node name="AudienceContainer" type="Node2D" parent="." unique_id=1109504530]
 script = ExtResource("5_p46lj")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1077303518]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="WinPopup" type="Control" parent="." unique_id=1539014339]
-visible = false
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Panel" type="Panel" parent="WinPopup" unique_id=1225407441]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="Label" type="Label" parent="WinPopup/Panel" unique_id=1769422121]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
-
-[node name="Continue" type="Button" parent="WinPopup" unique_id=1888588432]
-layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
-scale = Vector2(8.8, 8.8)
-text = "Continue"
-
-[node name="UIAnchor" type="Node2D" parent="." unique_id=623991233]
-position = Vector2(377, 1182)
-
-[node name="SpellBar" type="Control" parent="." unique_id=1344450403]
-anchors_preset = 0
-offset_top = 1100.0
-offset_right = 40.0
-offset_bottom = 1140.0
-
-[connection signal="pressed" from="WinPopup/Continue" to="." method="_on_continue_pressed"]

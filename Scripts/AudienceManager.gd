@@ -19,9 +19,10 @@ func populate_audience():
 	if GameManager.seat_priority_order.is_empty():
 		GameManager.initialize_seating(audience_columns, audience_rows)
 		
+	var player_audience = GameManager.player_profile.get("audience", [])
+	var enemy_audience = GameManager.current_enemy_profile.get("audience", [])
 	# 2. Local pool to track who gets a seat (Duplicate to avoid modifying global state)
-	var available_pool = GameManager.audience_members.duplicate()
-	
+	var available_pool = player_audience + enemy_audience
 	# 3. Setup positioning math
 	var screen_size = get_viewport_rect().size
 	var zone_size = Vector2(screen_size.x * 1.1, screen_size.y * 0.4)

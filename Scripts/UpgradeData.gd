@@ -11,16 +11,16 @@ var upgrades = [
 	{"name": "Helmet",      "category": "passive", "type": "heal",   "value": 0, "weight": 20,  "cost": 1, "icon": "res://Assets/Mods/Armour/Helmet.png",      "layer": 6000},
 	
 	# --- BASE WEAPONS (Equipped into any empty slot or replaces old weapon) ---
-	{"name": "Sword", "category": "weapon", "type": "damage","weight": 20, "cost": 2, "icon": "res://Assets/Weapons/Sword.png", "damage": 10, "speed": 4, "level": 1},
-	{"name": "Bow",   "category": "weapon", "type": "damage","weight": 20, "cost": 2, "icon": "res://Assets/Weapons/Bow.png",   "damage": 8,  "speed": 6, "level": 1},
-	{"name": "Staff", "category": "weapon","type": "heal", "weight": 20, "cost": 2, "icon": "res://Assets/Weapons/Staff.png", "heal_value": 14, "speed": 3, "level": 1},
-	{"name": "CurseStaff", "category": "weapon","type": "cursedamage", "weight": 20, "cost": 2, "icon": "res://Assets/Weapons/Staff.png", "speed": 3, "level": 1},
-	{"name": "Curse", "category": "weapon","type": "damage", "weight": 0, "cost": 2, "icon": "res://Assets/Weapons/Staff.png", "damage": 4, "speed": 3, "level": 1},
+	{"name": "Sword", "category": "weapon", "type": "damage","weight": 20, "cost": 2, "icon":           "res://Assets/atlas/leaf.tres","index": 0, "damage": 10, "speed": 4, "level": 1},
+	{"name": "Bow",   "category": "weapon", "type": "damage","weight": 20, "cost": 2, "icon":           "res://Assets/atlas/leaf.tres","index": 1,   "damage": 8,  "speed": 6, "level": 1},
+	{"name": "Staff", "category": "weapon","type": "heal", "weight": 20, "cost": 2, "icon":             "res://Assets/atlas/leaf.tres","index": 2, "heal_value": 14, "speed": 3, "level": 1},
+	{"name": "CurseStaff", "category": "weapon","type": "cursedamage", "weight": 20, "cost": 2, "icon": "res://Assets/atlas/leaf.tres","index": 3, "speed": 3, "level": 1},
+	{"name": "Curse", "category": "weapon","type": "damage", "weight": 0, "cost": 2, "icon":            "res://Assets/atlas/leaf.tres","index": 4, "damage": 4, "speed": 3, "level": 1},
 
 	
 	# --- WEAPON MODS / UPGRADES (Must be dropped on matching weapon type to level up) ---
-	{"name": "Cha1", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/Mods/Faces/Character1.png", "layer": 6000},
-	{"name": "Cha2", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/Mods/Faces/Character2.png", "layer": 6000},
+	{"name": "Cha1", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/atlas/fruit.tres","index": 0, "layer": 6000},
+	{"name": "Cha2", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/atlas/fruit.tres","index": 1, "layer": 6000},
 
 	# --- AUDIENCE UPGRADES ---
 	{"name": "Yellow Fan", "category": "viewer", "type": "heal",   "value": 5,"weight": 3, "throw_chance": 0.005, "cost": 3, "icon": "res://Assets/Viewers/Yellow.png"},

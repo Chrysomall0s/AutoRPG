@@ -26,4 +26,4 @@ alignment = 1
 
 [node name="Hero" parent="." unique_id=448655595 instance=ExtResource("3_8saeu")]
 position = Vector2(722, 889.99994)
-scale = Vector2(0.3835821, 0.40321782)
+scale = Vector2(1, 1)
