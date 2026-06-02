@@ -2,12 +2,25 @@
 extends Node
 # --- Profiles ---
 var player_profile = {
+	"stats": {
+		"maxhp": 100,
+		"hp": 100,
+		"maxmp": 100,
+		"mp": 100,
+		"gold": 100
+	},
 	"passives": [],
 	"weapons": [],
 	"audience": []
 }
 
 var current_enemy_profile = {
+	"stats": {
+		"maxhp": 50,
+		"hp": 50,
+		"dmg": 4,
+		"speed": 5,
+	},
 	"passives": ["Cha1"],
 	"weapons": ["Sword"],
 	"audience": ["Yellow Fan"]
@@ -24,19 +37,6 @@ var persistent_reroll_cost: int = 10
 var persistent_items_bought_this_turn: int = 0
 
 var selected_difficulty = 1
-
-var max_player_hp := 100
-var player_hp = 100
-var player_mp = 100
-
-var max_enemy_hp := 50
-var enemy_hp = 100
-var enemy_dmg = 4
-
-var gold = 100
-
-var enemy_speed := 5 # Ticks required for the enemy to strike back
-
 # --------------------------
 # MAP PERSISTENCE STATS 
 # --------------------------           

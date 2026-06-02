@@ -53,7 +53,4 @@ func apply_effect():
 	if viewer_data.name == "Empty Fan" or viewer_data.value == 0:
 		return
 
-	if viewer_data.type == "heal":
-		GameManager.player_hp = clamp(GameManager.player_hp + viewer_data.value, 0, GameManager.max_player_hp)
-	else:
-		GameManager.enemy_hp -= viewer_data.value
+	Stats.execute_weapon(viewer_data.type, viewer_data.value, GameManager.player_profile, GameManager.current_enemy_profile)

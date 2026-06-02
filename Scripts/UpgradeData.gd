@@ -11,12 +11,11 @@ var upgrades = [
 	{"name": "Helmet",      "category": "passive", "type": "heal",   "value": 0, "weight": 20,  "cost": 1, "icon": "res://Assets/Mods/Armour/Helmet.png",      "layer": 6000},
 	
 	# --- BASE WEAPONS (Equipped into any empty slot or replaces old weapon) ---
-	{"name": "Sword", "category": "weapon", "type": "damage","weight": 20, "cost": 2, "icon":           "res://Assets/atlas/leaf.tres","index": 0, "damage": 10, "speed": 4, "level": 1},
-	{"name": "Bow",   "category": "weapon", "type": "damage","weight": 20, "cost": 2, "icon":           "res://Assets/atlas/leaf.tres","index": 1,   "damage": 8,  "speed": 6, "level": 1},
-	{"name": "Staff", "category": "weapon","type": "heal", "weight": 20, "cost": 2, "icon":             "res://Assets/atlas/leaf.tres","index": 2, "heal_value": 14, "speed": 3, "level": 1},
-	{"name": "CurseStaff", "category": "weapon","type": "cursedamage", "weight": 20, "cost": 2, "icon": "res://Assets/atlas/leaf.tres","index": 3, "speed": 3, "level": 1},
-	{"name": "Curse", "category": "weapon","type": "damage", "weight": 0, "cost": 2, "icon":            "res://Assets/atlas/leaf.tres","index": 4, "damage": 4, "speed": 3, "level": 1},
-
+	{"name": "Sword","friendly":false, "category": "weapon", "type": "damage","weight": 20, "cost": 2, "icon":           "res://Assets/atlas/leaf.tres","index": 0, "amount": 10, "speed": 4, "level": 1},
+	{"name": "Bow","friendly":false,    "category": "weapon", "type": "damage","weight": 20, "cost": 2, "icon":           "res://Assets/atlas/leaf.tres","index": 1,   "amount": 8,  "speed": 6, "level": 1},
+	{"name": "Staff","friendly":true,  "category": "weapon","type": "heal", "weight": 20, "cost": 2, "icon":             "res://Assets/atlas/leaf.tres","index": 2, "amount": 14, "speed": 3, "level": 1},
+	{"name": "CurseStaff","friendly":false, "category": "weapon","type": "cursedamage", "weight": 20, "cost": 2, "icon": "res://Assets/atlas/leaf.tres","index": 3, "amount" : 1, "speed": 3, "level": 1},
+	{"name": "Curse","friendly":false, "category": "weapon","type": "damage", "weight": 0, "cost": 2, "icon":            "res://Assets/atlas/leaf.tres","index": 4, "amount": 4, "speed": 3, "level": 1},
 	
 	# --- WEAPON MODS / UPGRADES (Must be dropped on matching weapon type to level up) ---
 	{"name": "Cha1", "category": "passive", "type": "speed", "value": 0, "weight": 0, "cost": 0, "icon": "res://Assets/atlas/fruit.tres","index": 0, "layer": 6000},

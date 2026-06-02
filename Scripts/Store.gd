@@ -61,6 +61,18 @@ var stat_pages = [
 @export var statsbook_y_ratio: float = 0.15
 @export var statsbook_font_ratio: float = 0.02
 
+func get_gold() -> int:
+    return GameManager.player_profile["stats"]["gold"]
+
+func spend_gold(amount: int) -> bool:
+    if GameManager.player_profile["stats"]["gold"] < amount:
+        return false
+    GameManager.player_profile["stats"]["gold"] -= amount
+    return true
+
+func add_gold(amount: int) -> void:
+    GameManager.player_profile["stats"]["gold"] += amount
+
 func _ready():
     randomize()
     setup_gold_ui()
@@ -241,10 +253,10 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
 
 func handle_passive_purchase(entry_ref: Dictionary):
     var upgrade_data = entry_ref["upgrade"]
-    if GameManager.gold < upgrade_data["cost"] or entry_ref["bought"]: 
+    if get_gold() < upgrade_data["cost"] or entry_ref["bought"]: 
         return
         
-    GameManager.gold -= upgrade_data["cost"]
+    spend_gold(upgrade_data["cost"])
     
     # Access the player_profile dictionary
     var profile = GameManager.player_profile
@@ -267,7 +279,9 @@ func handle_passive_purchase(entry_ref: Dictionary):
     refresh_character_and_weapons()
 
 func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int, entry_ref: Dictionary):
-    if GameManager.gold < upgrade_data["cost"]: return
+
+    
+    if get_gold() < upgrade_data["cost"]: return
     
     var category = upgrade_data.get("category", "")
     var weapons_list = GameManager.player_profile.get("weapons", [])
@@ -278,14 +292,14 @@ func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int,
     var existing = weapons_list[target_slot_index]
     
     if category == "weapon":
-        GameManager.gold -= upgrade_data["cost"]
+        spend_gold(upgrade_data["cost"])
         weapons_list[target_slot_index] = upgrade_data.duplicate()
         UpgradeSystem.apply_upgrade(upgrade_data, str(target_slot_index))
         
     elif category == "weapon_mod":
         # Check if existing weapon matches the mod's target
         if typeof(existing) == TYPE_DICTIONARY and existing.get("name") == upgrade_data.get("target_weapon"):
-            GameManager.gold -= upgrade_data["cost"]
+            spend_gold(upgrade_data["cost"])
             existing["level"] += 1
             existing["damage"] = existing.get("damage", 0) + upgrade_data.get("damage_bonus", 0)
             UpgradeSystem.apply_upgrade(upgrade_data, str(target_slot_index))
@@ -337,13 +351,14 @@ func update_upgrade_colors():
         var button = entry["button"]
         var upgrade = entry["upgrade"]
         if entry["bought"]: continue
-        button.modulate = Color(1, 0.4, 0.4) if GameManager.gold < upgrade["cost"] else Color(1, 1, 1) 
+        button.modulate = Color(1, 0.4, 0.4) if get_gold() < upgrade["cost"] else Color(1, 1, 1) 
     if reroll_button:
-        reroll_button.modulate = Color(1, 0.4, 0.4) if GameManager.gold < GameManager.persistent_reroll_cost else Color(1, 1, 1)
+        reroll_button.modulate = Color(1, 0.4, 0.4) if get_gold() < GameManager.persistent_reroll_cost else Color(1, 1, 1)
 
 func reroll_shop():
-    if GameManager.gold < GameManager.persistent_reroll_cost: return
-    GameManager.gold -= GameManager.persistent_reroll_cost
+    if get_gold() < GameManager.persistent_reroll_cost: return
+    spend_gold(GameManager.persistent_reroll_cost)
+
     generate_fresh_shop_pool()
     draw_shop_from_persistent_memory()
     update_gold()
@@ -386,7 +401,7 @@ func update_slot_display_text(btn: Button, index: int):
     btn.add_theme_font_size_override("font_size", base_font_size)
     
 func update_gold():
-    gold_label.text = "Gold: " + str(GameManager.gold)
+    gold_label.text = "Gold: " + str(get_gold())
     update_upgrade_colors()
 
 func setup_gold_ui():
