@@ -1,5 +1,37 @@
 # GameManager.gd
 extends Node
+
+var stat_registry = {
+	"hp": {
+		"name": "Health",
+		"group": "Health Stats"
+	},
+	"maxhp": {
+		"name": "Max Health",
+		"group": "Health Stats"
+	},
+	"mp": {
+		"name": "Mana",
+		"group": "Resources"
+	},
+	"maxmp": {
+		"name": "Max Mana",
+		"group": "Resources"
+	},
+	"damage": {
+		"name": "Damage",
+		"group": "Combat Stats"
+	},
+	"crit": {
+		"name": "Critical Hit",
+		"group": "Combat Stats"
+	},
+	"attack_speed": {
+		"name": "Attack Speed",
+		"group": "Combat Stats"
+	}
+}
+
 # --- Profiles ---
 var player_profile = {
 	"stats": {
@@ -7,7 +39,9 @@ var player_profile = {
 		"hp": 100,
 		"maxmp": 100,
 		"mp": 100,
-		"gold": 100
+		"gold": 100,
+		"crit": 5,
+		"attack_speed": 2
 	},
 	"passives": [],
 	"weapons": [],
@@ -32,9 +66,8 @@ var escaped: bool = false
 
 # GameManager.gd Additions
 var shop_initialized: bool = false
-var persistent_shop_upgrades: Array = []  # Stores item dictionary states and "bought" statuses
+var shop_items: Array = []  # Stores item dictionary states and "bought" statuses
 var persistent_reroll_cost: int = 10
-var persistent_items_bought_this_turn: int = 0
 
 var selected_difficulty = 1
 # --------------------------

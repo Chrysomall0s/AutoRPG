@@ -56,7 +56,7 @@ func _process(delta):
 	if stats["hp"] <= 0:
 		check_game_state() 
 
-func _process_combat_ticks(target_stats: Dictionary, opponent_stats: Dictionary, attacker_node, target_node, delta):
+func _process_combat_ticks(opponent_stats: Dictionary, target_stats: Dictionary, attacker_node, target_node, delta):
 	for weapon in attacker_node.weapon_sprites:
 		if weapon.get_meta("is_attacking", false):
 			continue
@@ -69,7 +69,7 @@ func _process_combat_ticks(target_stats: Dictionary, opponent_stats: Dictionary,
 			var friendly = weapon.get_meta("friendly")
 
 			Stats.execute_weapon(type, amount, target_stats, opponent_stats)
-			if !friendly:
+			if friendly:
 				attacker_node.attack_target(
 				weapon,
 				attacker_node.global_position + Vector2(0, -50),
@@ -91,7 +91,7 @@ func _process_combat_ticks(target_stats: Dictionary, opponent_stats: Dictionary,
 func check_game_state():
 	if battle_over: return
 	battle_over = true
-	won = GameManager.player_profile["stats"]["hp"] <= 0
+	won = GameManager.current_enemy_profile["stats"]["hp"] <= 0
 	show_win_popup()
 
 func show_win_popup():
