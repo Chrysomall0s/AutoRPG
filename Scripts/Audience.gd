@@ -11,15 +11,16 @@ func setup_type(data: Dictionary):
 	is_filled = true
 	person.visible = true
 	
-	if data.has("icon") and ResourceLoader.exists(data.icon):
+	# Check if sprite_data exists for this audience member
+	if data.has("sprite_data"):
+		var s_data = data["sprite_data"]
+		person.hframes = 4
+		person.vframes = 4
+		person.texture = load(s_data["texture"])
+		person.frame = s_data["frame"]
+	# Fallback to old icon system
+	elif data.has("icon") and ResourceLoader.exists(data.icon):
 		person.texture = load(data.icon)
-
-	match data.name:
-		"Yellow Fan": person.modulate = Color(1, 1, 0)
-		"Blue Fan":   person.modulate = Color(0, 0, 1)
-		"Violet Fan": person.modulate = Color(0.5, 0, 0.5)
-		"Empty Fan":  person.modulate = Color(0.3, 0.3, 0.3, 0.5) # Semi-transparent grey
-		_:            person.modulate = Color(1, 1, 1)
 		
 func set_filled(value: bool):
 	is_filled = value
@@ -36,7 +37,13 @@ func perform_throw():
 	if not target: return
 	
 	var projectile = Sprite2D.new()
-	projectile.texture = person.texture # Toss the same icon
+	
+	# Set the same texture and region
+	projectile.texture = person.texture
+	projectile.hframes = 4
+	projectile.vframes = 4
+	projectile.frame = person.frame # Keep the same specific character
+	
 	projectile.scale = Vector2(0.15, 0.15)
 	projectile.global_position = person.global_position
 	get_tree().current_scene.add_child(projectile)

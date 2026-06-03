@@ -120,10 +120,10 @@ func buy_passive_upgrade(upgrade: Dictionary) -> bool:
 			profile["audience_members"] = []
 		profile["audience_members"].append(upgrade.duplicate())
 	else:
-		if not profile.has("owned_upgrades"):
-			profile["owned_upgrades"] = []
-		profile["owned_upgrades"].append(upgrade.duplicate())
+		if not profile.has("passives"):
+			profile["passives"] = []
+		profile["passives"].append(upgrade.duplicate())
 
-		UpgradeSystem.apply_upgrade(upgrade, "character")
+		UpgradeSystem.upgradeStats(upgrade.duplicate())
 
 	return true

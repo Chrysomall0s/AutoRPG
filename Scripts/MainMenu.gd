@@ -52,6 +52,7 @@ var floating_time := 0.0
 
 var character_starting_loadouts: Dictionary = {
 	"char_slot1": {
+		"sprite_data": {"texture": "res://Assets/atlas/fruit.tres", "frame": 1},
 		"stats": 
 		{
 		"maxhp": 100,
@@ -60,11 +61,12 @@ var character_starting_loadouts: Dictionary = {
 		"mp": 100,
 		"gold": 100
 		},
-		"passives": ["Cha1"],
+		"passives": [],
 		"weapons": ["Sword"],
 		"audience": ["Yellow Fan"]
 	},
 	"char_slot2": {
+		"sprite_data": {"texture": "res://Assets/atlas/fruit.tres", "frame": 0},
 		"stats": 
 		{
 		"maxhp": 100,
@@ -73,11 +75,12 @@ var character_starting_loadouts: Dictionary = {
 		"mp": 100,
 		"gold": 100
 		},
-		"passives": ["Cha2"],
+		"passives": ["up3"],
 		"weapons": ["Bow", "CurseStaff", "Sword","Sword","Sword","Sword" ],
 		"audience": ["Blue Fan", "Yellow Fan"]
 	},
 	"char_slot3": {
+		"sprite_data": {"texture": "res://Assets/atlas/fruit.tres", "frame": 2},
 		"stats": 
 		{
 		"maxhp": 100,
@@ -86,7 +89,7 @@ var character_starting_loadouts: Dictionary = {
 		"mp": 100,
 		"gold": 100
 		},
-		"passives": ["Cha1"],
+		"passives": ["up2","up1","up2","up1","up2","up1","up2","up1","up2","up1","up2","up1","up2","up1","up2","up1"],
 		"weapons": ["Staff"],
 		"audience": ["Violet Fan"]
 	}
@@ -168,13 +171,13 @@ func select_character(slot_name: String):
 		if data:
 			GameManager.player_profile["audience"].append(data.duplicate())
 	
+	GameManager.player_profile["sprite_data"] = loadout.get("sprite_data")
 	GameManager.player_profile["stats"] = loadout.get("stats", {}).duplicate()
 	refresh_character_and_weapons()
 	
 func refresh_character_and_weapons():
 	if is_instance_valid(player_sprite):
-		player_sprite.load_upgrade_sprites() # This will need to loop through profile["passives"]
-		player_sprite.spawn_weapons(GameManager.player_profile["weapons"])
+		player_sprite.refresh_character_and_weapons(GameManager.player_profile)
 
 func _find_upgrade_by_name(target_name: String) -> Dictionary:
 	for upgrade in UpgradeData.upgrades:

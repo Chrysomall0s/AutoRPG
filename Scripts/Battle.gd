@@ -24,10 +24,8 @@ func _ready():
 	player_sprite.position = Vector2(screen_size.x * 0.25, screen_size.y * 0.3)
 	enemy_sprite.position = Vector2(screen_size.x * 0.75, screen_size.y * 0.3)
 	
-	if player_sprite.has_method("spawn_weapons"):
-		player_sprite.spawn_weapons(GameManager.player_profile.get("weapons", []))
-	if enemy_sprite.has_method("spawn_weapons"):
-		enemy_sprite.spawn_weapons(GameManager.current_enemy_profile.get("weapons", []))
+	player_sprite.refresh_character_and_weapons(GameManager.player_profile)
+	enemy_sprite.refresh_character_and_weapons(GameManager.current_enemy_profile)
 		
 	if audience_container.has_method("populate_audience"):
 		audience_container.populate_audience()

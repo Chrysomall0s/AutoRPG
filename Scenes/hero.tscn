@@ -2,9 +2,13 @@
 
 [ext_resource type="Script" uid="uid://ux8hp21t7h6d" path="res://Scripts/hero.gd" id="1_qhmnl"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_qhmnl"]
+
 [node name="Hero" type="Sprite2D" unique_id=448655595]
 scale = Vector2(0.1, 0.1)
+texture = SubResource("AtlasTexture_qhmnl")
 script = ExtResource("1_qhmnl")
 
 [node name="UpgradeLayers" type="Node2D" parent="." unique_id=1340055554]
-scale = Vector2(0.5, 0.5)
+position = Vector2(0, -130)
+scale = Vector2(2, 2)

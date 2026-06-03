@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_8saeu"]
 [ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="3_8saeu"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_8saeu"]
+
 [node name="MainMenu" type="Control" unique_id=1180344965]
 layout_mode = 3
 anchors_preset = 0
@@ -27,3 +29,4 @@ alignment = 1
 [node name="Hero" parent="." unique_id=448655595 instance=ExtResource("3_8saeu")]
 position = Vector2(722, 889.99994)
 scale = Vector2(1, 1)
+texture = SubResource("AtlasTexture_8saeu")
