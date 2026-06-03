@@ -274,18 +274,42 @@ func draw_shop_from_persistent_memory():
 
 func create_upgrade_button(global_entry: Dictionary, position_index: int):
     var upgrade = global_entry["upgrade"]
-    var button = DragShopButton.new(upgrade, self)
-    
     var cat = upgrade.get("category")
+    var screen_size = get_viewport_rect().size
+    
+    var button = DragShopButton.new(upgrade, self)
+    button.custom_minimum_size = Vector2(screen_size.x * shop_item_width_ratio, screen_size.y * shop_item_height_ratio)
+    
+    var hbox = HBoxContainer.new()
+    hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+    hbox.add_theme_constant_override("separation", 15)
+    hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    button.add_child(hbox)
+    
+    # Larger Icon (occupies 80% of button height)
+    var tex_rect = TextureRect.new()
+    var icon_dim = screen_size.y * shop_item_height_ratio * 0.8
+    tex_rect.custom_minimum_size = Vector2(icon_dim, icon_dim)
+    tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    
+    if upgrade.has("icon"):
+        var atlas = AtlasTexture.new()
+        atlas.atlas = load(upgrade["icon"])
+        var idx = upgrade.get("index", 0)
+        atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
+        tex_rect.texture = atlas
+    hbox.add_child(tex_rect)
+    
+    # Larger Text
+    var label = Label.new()
     var action_hint = "\n[Drag to Slot]" if cat == "weapon" else "\n[Tap to Buy]"
     if cat == "weapon_mod": action_hint = "\n[Drag to Mod]"
-        
-    button.text = upgrade["name"] + " (" + str(upgrade["cost"]) + "G)" + action_hint
-    
-    var screen_size = get_viewport_rect().size
-    button.custom_minimum_size = Vector2(screen_size.x * shop_item_width_ratio, screen_size.y * shop_item_height_ratio)
-    button.add_theme_font_size_override("font_size", int(screen_size.y * shop_button_font_ratio))
-    button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    label.text = upgrade["name"] + " (" + str(upgrade["cost"]) + "G)" + action_hint
+    label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    label.add_theme_font_size_override("font_size", int(screen_size.y * shop_button_font_ratio))
+    hbox.add_child(label)
     
     var entry = {"button": button, "global_reference": global_entry, "upgrade": upgrade, "bought": global_entry["bought"]}
     button.entry_reference = entry
@@ -295,9 +319,7 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
     if global_entry["bought"]:
         button.text = "-- SOLD OUT --"; button.disabled = true
     else:
-        button.pressed.connect(func():
-            if cat == "passive" or cat == "viewer": handle_passive_purchase(entry)
-        )
+        button.pressed.connect(func(): if cat == "passive" or cat == "viewer": handle_passive_purchase(entry))
 
 func refresh_stats():
     build_stat_pages()
@@ -351,7 +373,27 @@ func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int,
 func finalize_item_purchase(entry):
     entry["bought"] = true
     entry["global_reference"]["bought"] = true
-    entry["button"].text = "-- SOLD OUT --"; entry["button"].disabled = true
+    
+    var btn = entry["button"]
+    btn.disabled = true
+    
+    # Access the HBoxContainer (first child of the button)
+    var hbox = btn.get_child(0)
+    if hbox and hbox is HBoxContainer:
+        # Clear the Icon (first child of HBox)
+        var tex_rect = hbox.get_child(0)
+        if tex_rect and tex_rect is TextureRect:
+            tex_rect.texture = null
+            
+        # Clear the Text (second child of HBox)
+        var label = hbox.get_child(1)
+        if label and label is Label:
+            label.text = "" 
+            
+    # Optional: If you want the "SOLD OUT" text to remain, 
+    # but remove the weapon info text, you could set btn.text = "-- SOLD OUT --"
+    # instead of clearing the label.
+    
     if GameManager.shop_items[0]["bought"] and \
        GameManager.shop_items[1]["bought"] and \
        GameManager.shop_items[2]["bought"]:
@@ -401,39 +443,70 @@ func reroll_shop():
 
 func setup_six_slots_ui():
     for child in slot_button_container.get_children(): child.queue_free()
+    
+    var weapons = GameManager.player_profile.get("weapons", [])
+    var screen_size = get_viewport_rect().size
+    
     for i in range(6):
         var slot_btn = DropSlotButton.new(i, self)
-        var screen_size = get_viewport_rect().size
         slot_btn.custom_minimum_size = Vector2(screen_size.x * slot_button_width_ratio, screen_size.y * slot_button_height_ratio)
-        slot_btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-        slot_btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-        update_slot_display_text(slot_btn, i)
-        slot_button_container.add_child(slot_btn)
+        
+        var hbox = HBoxContainer.new()
+        hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
+        hbox.add_theme_constant_override("separation", 15)
+        hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        slot_btn.add_child(hbox)
+        
+        # Icon setup
+        var tex_rect = TextureRect.new()
+        var icon_dim = screen_size.y * slot_button_height_ratio * 0.8
+        tex_rect.custom_minimum_size = Vector2(icon_dim, icon_dim)
+        tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+        hbox.add_child(tex_rect)
+        
+        # Label setup
+        var label = Label.new()
+        label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        label.add_theme_font_size_override("font_size", int(screen_size.y * slot_button_font_ratio))
+        hbox.add_child(label)
+        
+        var weapon_data = weapons[i] if i < weapons.size() else null
 
-func update_slot_display_text(btn: Button, index: int):
-    var base_font_size = int(get_viewport_rect().size.y * slot_button_font_ratio)
+        if typeof(weapon_data) == TYPE_DICTIONARY and weapon_data.has("icon"):
+            var atlas = AtlasTexture.new()
+        # Ensure the path exists or use a fallback
+            var path = weapon_data.get("icon", "res://icon.svg")
+            atlas.atlas = load(path)
+            var idx = weapon_data.get("index", 0)
+            atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
+            tex_rect.texture = atlas
+        else:
+            tex_rect.texture = null
+    
+        update_slot_display_text(label, i)
+        slot_button_container.add_child(slot_btn)
+        
+func update_slot_display_text(label_node: Label, index: int):
     var weapons_list = GameManager.player_profile.get("weapons", [])
+    
+    var w_name = "(Empty)"
+    var w_lvl = 1
     
     if index < weapons_list.size() and weapons_list[index] != null:
         var weapon_data = weapons_list[index]
-        
-        # Determine the name and level based on the type of weapon_data
-        var w_name = "Unknown"
-        var w_lvl = 1
-        
         if typeof(weapon_data) == TYPE_DICTIONARY:
             w_name = weapon_data.get("name", "Unknown")
             w_lvl = weapon_data.get("level", 1)
         elif typeof(weapon_data) == TYPE_STRING:
-            # If it's a string, it's just the name
             w_name = weapon_data
-            w_lvl = 1
-            
-        btn.text = "Slot " + str(index + 1) + "\n" + str(w_name) + "\nLvl: " + str(w_lvl)
+        label_node.text = "Slot " + str(index + 1) + "\n" + str(w_name) + " (Lvl " + str(w_lvl) + ")"
     else: 
-        btn.text = "Slot " + str(index + 1) + "\n(Empty)"
+        label_node.text = "Slot " + str(index + 1) + "\n(Empty)"
         
-    btn.add_theme_font_size_override("font_size", base_font_size)
+    label_node.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    # Ensure font size is consistently applied
+    label_node.add_theme_font_size_override("font_size", int(get_viewport_rect().size.y * slot_button_font_ratio))
     
 func update_gold():
     gold_label.text = "Gold: " + str(get_gold())
@@ -474,14 +547,26 @@ class DragShopButton extends Button:
 class DropSlotButton extends Button:
     var slot_index: int
     var shop_main: Node
-    func _init(idx, main_scene): slot_index = idx; shop_main = main_scene
+    
+    # Provide default values so .new() can be called without arguments
+    func _init(idx: int = -1, main_scene: Node = null):
+        slot_index = idx
+        shop_main = main_scene
+        
+    func setup(idx: int, main_scene: Node):
+        slot_index = idx
+        shop_main = main_scene
+
     func _can_drop_data(_pos, data) -> bool:
         if typeof(data) != TYPE_DICTIONARY: return false
         var upgrade = data["upgrade"]
         var cat = upgrade.get("category", "")
         if cat == "weapon": return true
         if cat == "weapon_mod":
-            var existing = GameManager.equipped_weapons[slot_index]
+            var weapons = GameManager.player_profile.get("weapons", [])
+            var existing = weapons[slot_index] if slot_index < weapons.size() else null
             return existing != null and existing.get("name") == upgrade.get("target_weapon")
         return false
-    func _drop_data(_pos, data): shop_main.handle_drag_drop_purchase(data["upgrade"], slot_index, data["entry"])
+        
+    func _drop_data(_pos, data): 
+        shop_main.handle_drag_drop_purchase(data["upgrade"], slot_index, data["entry"])
