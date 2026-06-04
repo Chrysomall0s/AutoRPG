@@ -77,7 +77,7 @@ var character_starting_loadouts: Dictionary = {
         },
         "passives": ["up3"],
         "weapons": ["Bow", "CurseStaff", "Sword","Sword","Sword","Sword" ],
-        "audience": ["Blue Fan", "Yellow Fan"]
+        "audience": ["Blue Fan", "Yellow Fan","Blue Fan"]
     },
     "char_slot3": {
         "sprite_data": {"texture": "res://Assets/atlas/fruit.tres", "frame": 2},

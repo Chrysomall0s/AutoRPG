@@ -60,19 +60,14 @@ var leave_button: Button
 @export var statsbook_font_ratio: float = 0.02
 
 func build_stat_pages():
+    # 1. Standard Stats Grouping
     var groups = {}
     var stats = GameManager.player_profile.get("stats", {})
-    
     for key in stats.keys():
         var def = GameManager.stat_registry.get(key, null)
-        if def == null:
-            continue
-        
+        if def == null: continue
         var group_name = def["group"]
-        
-        if not groups.has(group_name):
-            groups[group_name] = []
-        
+        if not groups.has(group_name): groups[group_name] = []
         groups[group_name].append(key)
     
     stat_pages.clear()
@@ -82,6 +77,36 @@ func build_stat_pages():
             "title": group_name,
             "stats": groups[group_name]
         })
+
+    # 2. Add Weapons Page
+    var passives = GameManager.player_profile.get("passives", [])
+    var passive_list = []
+    for p in passives:
+        # Assuming passives are dictionaries with 'name' and 'level'
+        var p_name = p.get("name", "Unknown")
+        var p_lvl = p.get("level", 1)
+        passive_list.append(p_name + " (Lv." + str(p_lvl) + ")")
+    
+    stat_pages.append({
+        "title": "Passive Items",
+        "items": passive_list
+    })
+
+   # 4. Add Audience Page (Sorted and Counted)
+    var audience = GameManager.player_profile.get("audience", [])
+    var audience_counts = {}
+    for member in audience:
+        var a_name = (member.get("name", "Unknown") if typeof(member) == TYPE_DICTIONARY else str(member))
+        audience_counts[a_name] = audience_counts.get(a_name, 0) + 1
+        
+    var sorted_audience = audience_counts.keys()
+    sorted_audience.sort()
+    
+    var audience_list = []
+    for name in sorted_audience:
+        audience_list.append(str(audience_counts[name]) + " " + name)
+        
+    stat_pages.append({"title": "Audience", "items": audience_list})
 
 func create_leave_button():
     var screen_size = get_viewport_rect().size
@@ -191,17 +216,25 @@ func update_stats_display():
     if not is_instance_valid(stats_label): return
     
     var page = stat_pages[current_page_index]
-    var stats = GameManager.player_profile.get("stats", {})
-    
     var text = page["title"] + "\n----------------\n"
     
-    for stat_key in page["stats"]:
-        var value = stats.get(stat_key, 0)
-        var def = GameManager.stat_registry.get(stat_key, {})
-        
-        var display_name = def.get("name", stat_key)
-        
-        text += display_name + ": " + str(value) + "\n"
+    # Case A: Standard Stat Page
+    if page.has("stats"):
+        var stats = GameManager.player_profile.get("stats", {})
+        for stat_key in page["stats"]:
+            var value = stats.get(stat_key, 0)
+            var def = GameManager.stat_registry.get(stat_key, {})
+            var display_name = def.get("name", stat_key)
+            text += display_name + ": " + str(value) + "\n"
+            
+    # Case B: Equipment/Audience List Page
+    elif page.has("items"):
+        var items = page["items"]
+        if items.size() == 0:
+            text += "(None)"
+        else:
+            for item in items:
+                text += "- " + str(item) + "\n"
     
     stats_label.text = text
 
