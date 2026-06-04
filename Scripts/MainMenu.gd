@@ -95,12 +95,21 @@ var character_starting_loadouts: Dictionary = {
     }
 }
 
+@export_group("Difficulty Button Layout")
+@export var diff_btn_width_ratio: float = 0.247
+@export var diff_btn_height_ratio: float = 0.06
+@export var diff_btn_y_pos_ratio: float = 0.03 # Position from top
+
+var difficulty_buttons: Array[Button] = []
+var difficulty_group: ButtonGroup = ButtonGroup.new() # Shared group for auto-toggling
+
 func _ready():
     DisplayServer.window_set_size(Vector2i(480, 852))
     randomize()
     spawn_audience()
     setup_hero_preview_position() 
     create_run_button()
+    create_difficulty_buttons()
 
 func _process(delta: float) -> void:
     player_sprite.update_weapon_movements(delta, player_sprite.position)
@@ -111,6 +120,42 @@ func setup_hero_preview_position():
         player_sprite.position = screen_size * hero_display_position_ratio
         player_sprite.visible = true
         refresh_character_and_weapons()
+
+func create_difficulty_buttons():
+    var difficulties = ["Easy", "Normal", "Hard", "Insane"]
+    var screen_size = get_viewport_rect().size
+    
+    var hbox = HBoxContainer.new()
+    hbox.set_anchors_preset(Control.PRESET_TOP_WIDE)
+    # Using the ratio to set Y position dynamically
+    hbox.position.y = screen_size.y * diff_btn_y_pos_ratio
+    hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+    hbox.add_theme_constant_override("separation", 10)
+    add_child(hbox)
+
+    # Calculate button size based on ratios
+    var btn_size = Vector2(screen_size.x * diff_btn_width_ratio, screen_size.y * diff_btn_height_ratio)
+
+    for i in range(difficulties.size()):
+        var btn = Button.new()
+        btn.text = difficulties[i]
+        btn.custom_minimum_size = btn_size # Apply the calculated size
+        
+        btn.toggle_mode = true 
+        btn.button_group = difficulty_group 
+        
+        if i == 1: 
+            btn.button_pressed = true
+            
+        btn.pressed.connect(func(): _on_difficulty_selected(i + 1))
+        
+        hbox.add_child(btn)
+        difficulty_buttons.append(btn)
+
+func _on_difficulty_selected(value: int):
+    GameManager.selected_difficulty = value
+    print("Difficulty set to: ", value)
+    # Optional: Update button visuals here to show which is selected
 
 func spawn_audience():
     var screen_size = get_viewport_rect().size
@@ -132,8 +177,17 @@ func spawn_audience():
             
             var seat_index = character_seats.find(Vector2i(x, y))
             if seat_index != -1:
+                var char_key = characters[seat_index]
+                var char_data = character_starting_loadouts[char_key]
+                
+                # Pass the data so the audience sprite updates
+                audience.setup_type(char_data) 
+                
                 audience.set_filled(true)
-                audience.input_event.connect(func(_v, e, _s): if e is InputEventMouseButton and e.pressed: _on_audience_clicked(audience, seat_index))
+                audience.input_event.connect(func(_v, e, _s): 
+                    if e is InputEventMouseButton and e.pressed: 
+                        _on_audience_clicked(audience, seat_index)
+                )
             else:
                 audience.set_filled(false)
                 audience.input_pickable = false

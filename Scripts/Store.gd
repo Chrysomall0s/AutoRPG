@@ -1,4 +1,5 @@
 extends Control
+var outline_shader = preload("res://Assets/shaders/outline_shader.gdshader")
 
 # =================================================================
 # GAME CONFIGURATION SETTINGS
@@ -282,13 +283,13 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
     
     var hbox = HBoxContainer.new()
     hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-    hbox.add_theme_constant_override("separation", 15)
+    hbox.add_theme_constant_override("separation", 10)
+    hbox.add_theme_constant_override("margin_left", 10)
     hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
     button.add_child(hbox)
     
-    # Larger Icon (occupies 80% of button height)
     var tex_rect = TextureRect.new()
-    var icon_dim = screen_size.y * shop_item_height_ratio * 0.8
+    var icon_dim = screen_size.y * shop_item_height_ratio * 0.7
     tex_rect.custom_minimum_size = Vector2(icon_dim, icon_dim)
     tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -299,14 +300,22 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
         var idx = upgrade.get("index", 0)
         atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
         tex_rect.texture = atlas
+        # --- APPLY SHADER ---
+        var mat = ShaderMaterial.new()
+        mat.shader = outline_shader
+        mat.set_shader_parameter("level", float(upgrade.get("level", 1.0)))
+        tex_rect.material = mat
+        # --------------------
     hbox.add_child(tex_rect)
     
-    # Larger Text
     var label = Label.new()
     var action_hint = "\n[Drag to Slot]" if cat == "weapon" else "\n[Tap to Buy]"
     if cat == "weapon_mod": action_hint = "\n[Drag to Mod]"
     label.text = upgrade["name"] + " (" + str(upgrade["cost"]) + "G)" + action_hint
+    
     label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    label.autowrap_mode = TextServer.AUTOWRAP_OFF
+    label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
     label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     label.add_theme_font_size_override("font_size", int(screen_size.y * shop_button_font_ratio))
     hbox.add_child(label)
@@ -320,7 +329,7 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
         button.text = "-- SOLD OUT --"; button.disabled = true
     else:
         button.pressed.connect(func(): if cat == "passive" or cat == "viewer": handle_passive_purchase(entry))
-
+        
 func refresh_stats():
     build_stat_pages()
     if is_instance_valid(stats_label):
@@ -344,9 +353,9 @@ func handle_passive_purchase(entry_ref: Dictionary):
 func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int, entry_ref: Dictionary):
 
     var weapons = GameManager.player_profile.get("weapons", [])
-
-    if target_slot_index >= weapons.size():
-        return
+#
+    #if target_slot_index >= weapons.size():
+        #return
 
     if get_gold() < upgrade_data["cost"]:
         return
@@ -453,21 +462,22 @@ func setup_six_slots_ui():
         
         var hbox = HBoxContainer.new()
         hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
-        hbox.add_theme_constant_override("separation", 15)
+        hbox.add_theme_constant_override("separation", 10)
+        hbox.add_theme_constant_override("margin_left", 10)
         hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
         slot_btn.add_child(hbox)
         
-        # Icon setup
         var tex_rect = TextureRect.new()
-        var icon_dim = screen_size.y * slot_button_height_ratio * 0.8
+        var icon_dim = screen_size.y * slot_button_height_ratio * 0.7
         tex_rect.custom_minimum_size = Vector2(icon_dim, icon_dim)
         tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
         tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
         hbox.add_child(tex_rect)
         
-        # Label setup
         var label = Label.new()
         label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        label.autowrap_mode = TextServer.AUTOWRAP_OFF
+        label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
         label.add_theme_font_size_override("font_size", int(screen_size.y * slot_button_font_ratio))
         hbox.add_child(label)
         
@@ -475,12 +485,18 @@ func setup_six_slots_ui():
 
         if typeof(weapon_data) == TYPE_DICTIONARY and weapon_data.has("icon"):
             var atlas = AtlasTexture.new()
-        # Ensure the path exists or use a fallback
             var path = weapon_data.get("icon", "res://icon.svg")
             atlas.atlas = load(path)
             var idx = weapon_data.get("index", 0)
             atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
             tex_rect.texture = atlas
+            # --- APPLY SHADER ---
+            var mat = ShaderMaterial.new()
+            mat.shader = outline_shader
+            # Use the weapon's level
+            mat.set_shader_parameter("level", float(weapon_data.get("level", 1.0)))
+            tex_rect.material = mat
+            # --------------------
         else:
             tex_rect.texture = null
     
@@ -526,7 +542,7 @@ func _play():
 # ---------------------------------
 class DragShopButton extends Button:
     var upgrade_data: Dictionary
-    var shop_main: Node # This holds the reference to your main script
+    var shop_main: Node 
     var entry_reference: Dictionary
     
     func _init(data, main_scene): 
@@ -535,13 +551,25 @@ class DragShopButton extends Button:
         
     func _get_drag_data(_at_position):
         var cat = upgrade_data.get("category", "")
-        # Use shop_main.get_gold() instead of just get_gold()
         if cat == "passive" or cat == "viewer" or entry_reference["bought"] or shop_main.get_gold() < upgrade_data["cost"]: 
             return null
             
         var preview = TextureRect.new()
-        preview.texture = load(upgrade_data.get("icon", "res://icon.svg"))
-        preview.custom_minimum_size = Vector2(80, 80); set_drag_preview(preview)
+        preview.custom_minimum_size = Vector2(80, 80)
+        
+        # --- FIX STARTS HERE ---
+        if upgrade_data.has("icon"):
+            var atlas = AtlasTexture.new()
+            atlas.atlas = load(upgrade_data["icon"])
+            var idx = upgrade_data.get("index", 0)
+            # Ensure these region values match your setup logic
+            atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
+            preview.texture = atlas
+        else:
+            preview.texture = load("res://icon.svg")
+        # --- FIX ENDS HERE ---
+        
+        set_drag_preview(preview)
         return {"upgrade": upgrade_data, "entry": entry_reference}
         
 class DropSlotButton extends Button:
@@ -561,11 +589,19 @@ class DropSlotButton extends Button:
         if typeof(data) != TYPE_DICTIONARY: return false
         var upgrade = data["upgrade"]
         var cat = upgrade.get("category", "")
-        if cat == "weapon": return true
+    
+        var weapons = GameManager.player_profile.get("weapons", [])
+    # Ensure we don't crash if slot_index is outside current array size
+        var existing = weapons[slot_index] if slot_index < weapons.size() else null
+    
+        if cat == "weapon":
+        # Allow dropping a weapon anywhere as long as the slot index is within our UI bounds
+            return true 
+        
         if cat == "weapon_mod":
-            var weapons = GameManager.player_profile.get("weapons", [])
-            var existing = weapons[slot_index] if slot_index < weapons.size() else null
+        # Only allow mods if there is an existing weapon that matches
             return existing != null and existing.get("name") == upgrade.get("target_weapon")
+        
         return false
         
     func _drop_data(_pos, data): 
