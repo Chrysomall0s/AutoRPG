@@ -199,31 +199,43 @@ func _on_audience_clicked(clicked_member, seat_index):
     if seat_index < characters.size(): select_character(characters[seat_index])
 
 func select_character(slot_name: String):
-    # Reset the profile to empty
+    # Reset profile
     GameManager.player_profile = {
-        "stats": [],
+        "stats": {},
         "passives": [],
-        "weapons": [],
+        "weapons": [], # We will fill this below
         "audience": []
     }
     
     var loadout = character_starting_loadouts.get(slot_name)
     if not loadout: return
 
-    # 1. Populate Weapons
-# FIX: Populate Weapons as full Dictionaries
-    GameManager.player_profile["weapons"] = []
-    for weapon_name in loadout.get("weapons", []):
-        var full_weapon_data = _find_upgrade_by_name(weapon_name)
-        if not full_weapon_data.is_empty():
-            # Add a default level if missing
-            var weapon_copy = full_weapon_data.duplicate()
-            if not weapon_copy.has("level"): weapon_copy["level"] = 1
-            GameManager.player_profile["weapons"].append(weapon_copy)
-        else:
-            # Fallback if the name doesn't exist in UpgradeData
-            GameManager.player_profile["weapons"].append({"name": weapon_name, "level": 1})
+    # --- NEW WEAPON INITIALIZATION LOGIC ---
+    var weapon_names = loadout.get("weapons", [])
+    var final_weapons = []
+    
+    # 1. Add the weapons from your loadout (up to 6)
+    for i in range(6):
+        if i < weapon_names.size():
+            var weapon_name = weapon_names[i]
             
+            # If the loadout explicitly says null, keep it null
+            if weapon_name == null:
+                final_weapons.append(null)
+            else:
+                var full_data = _find_upgrade_by_name(weapon_name)
+                if not full_data.is_empty():
+                    var weapon_copy = full_data.duplicate()
+                    weapon_copy["level"] = weapon_copy.get("level", 1)
+                    final_weapons.append(weapon_copy)
+                else:
+                    # Fallback
+                    final_weapons.append({"name": weapon_name, "level": 1})
+        else:
+            # 2. Fill the remainder with null to guarantee 6 total slots
+            final_weapons.append(null)
+            
+    GameManager.player_profile["weapons"] = final_weapons
     # 2. Populate Passives (Find full data first)
     for name in loadout.get("passives", []):
         var data = _find_upgrade_by_name(name)

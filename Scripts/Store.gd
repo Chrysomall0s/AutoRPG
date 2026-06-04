@@ -653,27 +653,99 @@ class DragShopButton extends Button:
         return {"type": "rearrange", "from_index": idx}
 
     func _can_drop_data(_pos, drop_data) -> bool:
-        if is_shop_item: return false # Shop items don't accept drops
+        if drop_data.get("type") == "rearrange" and is_shop_item:
+        # Check if this shop slot is currently "Empty" (meaning it's already bought)
+        # entry_reference["bought"] is true if the item was bought/sold out
+            return true
         
-        # Determine what is being held
+        # 1. Get the weapons list safely
+        var weapons = GameManager.player_profile.get("weapons", [])
+        var target_idx = data.get("index")
+        
+        # Ensure the target index is actually within the bounds of the array
+        if target_idx == null or target_idx >= weapons.size():
+            return false
+
+        # 2. Get the existing weapon, allowing for it to be null (empty slot)
+        var existing = weapons[target_idx]
+
+        # 3. Determine what is being held
         if drop_data.get("type") == "purchase":
             var upgrade = drop_data["upgrade"]
-            var weapons = GameManager.player_profile.get("weapons", [])
-            var existing = weapons[data["index"]]
-            # Validate weapon/mod logic here...
-            return upgrade.get("category") == "weapon" or (upgrade.get("category") == "weapon_mod" and existing != null)
+            
+            # Now we can safely check categories without crashing on null
+            var is_weapon = upgrade.get("category") == "weapon"
+            var is_mod = upgrade.get("category") == "weapon_mod"
+            
+            # Only allow mods if there is an existing weapon (and it's not null)
+            if is_mod:
+                return existing != null
+            
+            return is_weapon
             
         if drop_data.get("type") == "rearrange":
-            return true # Allow swapping/leveling between slots
+            return true 
             
         return false
 
     func _drop_data(_pos, drop_data):
-        if drop_data.get("type") == "purchase":
+        if drop_data.get("type") == "rearrange" and is_shop_item:
+        # We need to know if we are selling (to empty) or swapping (to occupied)
+            if entry_reference["bought"]:
+                shop_main.sell_weapon(drop_data["from_index"], entry_reference)
+            elif entry_reference["upgrade"].get("category") == "weapon":
+                shop_main.swap_weapon_with_shop(drop_data["from_index"], entry_reference)
+        elif drop_data.get("type") == "purchase":
             shop_main.handle_drag_drop_purchase(drop_data["upgrade"], data["index"], drop_data["entry"])
         elif drop_data.get("type") == "rearrange":
             shop_main.handle_rearrange_weapons(drop_data["from_index"], data["index"])
-            
+
+
+# Replace your existing sell_weapon with this version
+func sell_weapon(slot_index: int, shop_entry: Dictionary):
+    var weapons = GameManager.player_profile.get("weapons", [])
+    if slot_index < 0 or slot_index >= weapons.size():
+        return
+        
+    var weapon_to_sell = weapons[slot_index]
+    if weapon_to_sell == null:
+        return
+        
+    # 1. Give money back
+    var refund = int(weapon_to_sell.get("cost", 0) * 0.5)
+    add_gold(refund)
+    
+    # 2. Move weapon back to shop slot
+    shop_entry["global_reference"]["upgrade"] = weapon_to_sell
+    shop_entry["global_reference"]["bought"] = false 
+    
+    # 3. Clear inventory
+    GameManager.player_profile["weapons"][slot_index] = null
+    
+    # 4. Refresh
+    draw_shop_from_persistent_memory()
+    update_gold()
+    setup_six_slots_ui() 
+    refresh_character_and_weapons()
+
+# ADD THIS FUNCTION to Store.gd to handle the swap
+func swap_weapon_with_shop(inventory_index: int, shop_entry: Dictionary):
+    var weapons = GameManager.player_profile.get("weapons", [])
+    var inventory_weapon = weapons[inventory_index]
+    var shop_weapon = shop_entry["global_reference"]["upgrade"]
+    
+    # 1. Put shop weapon into inventory
+    GameManager.player_profile["weapons"][inventory_index] = shop_weapon
+    
+    # 2. Put inventory weapon into shop slot
+    shop_entry["global_reference"]["upgrade"] = inventory_weapon
+    shop_entry["global_reference"]["bought"] = false
+    
+    # 3. Refresh
+    draw_shop_from_persistent_memory()
+    setup_six_slots_ui()
+    refresh_character_and_weapons()
+        
 func process_weapon_interaction(source_item: Dictionary, target_slot_index: int):
     var weapons = GameManager.player_profile.get("weapons", [])
     var target_weapon = weapons[target_slot_index] if target_slot_index < weapons.size() else null
