@@ -377,17 +377,42 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
     # 5. Connect signals
     button.disabled = global_entry["bought"]
     if not global_entry["bought"]:
-        button.pressed.connect(func(): if cat == "passive" or cat == "viewer": handle_passive_purchase(entry))
-
+        button.pressed.connect(func(): 
+            if cat == "passive": 
+                handle_passive_purchase(entry)
+            elif cat == "viewer":
+                handle_audience_purchase(entry)
+        )
+        
 func refresh_stats():
     build_stat_pages()
     if is_instance_valid(stats_label):
         update_stats_display()
 
+func handle_audience_purchase(entry_ref: Dictionary):
+    var upgrade_data = entry_ref["upgrade"]
+    if entry_ref["bought"]: return
+
+    # Ensure the audience list exists
+    if not "audience" in GameManager.player_profile:
+        GameManager.player_profile["audience"] = []
+
+    # Add directly to audience array
+    GameManager.player_profile["audience"].append(upgrade_data)
+
+    # Finalize UI
+    finalize_item_purchase(entry_ref)
+    update_gold()
+    refresh_stats()
+
 func handle_passive_purchase(entry_ref: Dictionary):
     var upgrade_data = entry_ref["upgrade"]
     if entry_ref["bought"]: return
 
+
+    if upgrade_data.get("category") == "viewer":
+        handle_audience_purchase(entry_ref)
+        return
     # Ensure the passives list exists
     if not "passives" in GameManager.player_profile:
         GameManager.player_profile["passives"] = []

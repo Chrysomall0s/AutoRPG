@@ -2,7 +2,7 @@ extends Node2D
 
 @export_group("Audience Grid Details")
 @export var audience_columns: int = 11
-@export var audience_rows: int = 6
+@export var audience_rows: int = 7
 @export var original_sprite_width: float = 44.0    
 @export var original_sprite_height: float = 44.0   
 
