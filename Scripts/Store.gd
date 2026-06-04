@@ -266,11 +266,17 @@ func generate_fresh_shop_pool():
         GameManager.shop_items.append({"upgrade": upgrade, "bought": false})
 
 func draw_shop_from_persistent_memory():
+    # 1. Clear existing buttons
     for entry in upgrade_buttons:
-        if is_instance_valid(entry["button"]): entry["button"].queue_free()
+        if is_instance_valid(entry["button"]): 
+            entry["button"].queue_free()
     upgrade_buttons.clear()
+    
+    # 2. Re-create buttons from the updated GameManager.shop_items
     for i in range(GameManager.shop_items.size()):
         create_upgrade_button(GameManager.shop_items[i], i)
+    
+    # 3. Force a UI update to colors/states
     update_upgrade_colors()
 
 func create_upgrade_button(global_entry: Dictionary, position_index: int):
@@ -278,9 +284,11 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
     var cat = upgrade.get("category")
     var screen_size = get_viewport_rect().size
     
-    var button = DragShopButton.new(upgrade, self)
+    # 1. Initialize the button
+    var button = DragShopButton.new(self, upgrade, true, {})
     button.custom_minimum_size = Vector2(screen_size.x * shop_item_width_ratio, screen_size.y * shop_item_height_ratio)
     
+    # 2. Build the UI
     var hbox = HBoxContainer.new()
     hbox.set_anchors_preset(Control.PRESET_FULL_RECT)
     hbox.add_theme_constant_override("separation", 10)
@@ -294,42 +302,50 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
     tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
     
-    if upgrade.has("icon"):
+    # FIX: ONLY set texture if not bought
+    if not global_entry["bought"] and upgrade.has("icon"):
         var atlas = AtlasTexture.new()
         atlas.atlas = load(upgrade["icon"])
         var idx = upgrade.get("index", 0)
         atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
         tex_rect.texture = atlas
-        # --- APPLY SHADER ---
+        
         var mat = ShaderMaterial.new()
         mat.shader = outline_shader
         mat.set_shader_parameter("level", float(upgrade.get("level", 1.0)))
         tex_rect.material = mat
-        # --------------------
+    else:
+        tex_rect.texture = null
+    
     hbox.add_child(tex_rect)
     
+    # 3. Create Label
     var label = Label.new()
-    var action_hint = "\n[Drag to Slot]" if cat == "weapon" else "\n[Tap to Buy]"
-    if cat == "weapon_mod": action_hint = "\n[Drag to Mod]"
-    label.text = upgrade["name"] + " (" + str(upgrade["cost"]) + "G)" + action_hint
+    if !global_entry["bought"]:
+        var action_hint = "\n[Drag to Slot]" if cat == "weapon" else "\n[Tap to Buy]"
+        if cat == "weapon_mod": action_hint = "\n[Drag to Mod]"
+        label.text = upgrade["name"] + " (" + str(upgrade["cost"]) + "G)" + action_hint
     
     label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-    label.autowrap_mode = TextServer.AUTOWRAP_OFF
-    label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-    label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     label.add_theme_font_size_override("font_size", int(screen_size.y * shop_button_font_ratio))
     hbox.add_child(label)
     
-    var entry = {"button": button, "global_reference": global_entry, "upgrade": upgrade, "bought": global_entry["bought"]}
+    # 4. Inject entry and store
+    var entry = {
+        "button": button, 
+        "global_reference": global_entry, 
+        "upgrade": upgrade, 
+        "bought": global_entry["bought"]
+    }
     button.entry_reference = entry
     upgrade_buttons.append(entry)
     main_button_container.add_child(button)
 
-    if global_entry["bought"]:
-        button.text = "-- SOLD OUT --"; button.disabled = true
-    else:
+    # 5. Connect signals
+    button.disabled = global_entry["bought"]
+    if not global_entry["bought"]:
         button.pressed.connect(func(): if cat == "passive" or cat == "viewer": handle_passive_purchase(entry))
-        
+
 func refresh_stats():
     build_stat_pages()
     if is_instance_valid(stats_label):
@@ -337,44 +353,70 @@ func refresh_stats():
 
 func handle_passive_purchase(entry_ref: Dictionary):
     var upgrade_data = entry_ref["upgrade"]
+    if entry_ref["bought"]: return
 
-    if entry_ref["bought"]:
-        return
+    # Ensure the passives list exists
+    if not "passives" in GameManager.player_profile:
+        GameManager.player_profile["passives"] = []
 
-    var success = ShopSystem.buy_passive_upgrade(upgrade_data)
-    if not success:
-        return
+    var player_passives = GameManager.player_profile["passives"]
+    var found = false
 
+    # Check if we already own this passive by name
+    for p in player_passives:
+        if p["name"] == upgrade_data["name"]:
+            # Increment only the level
+            p["level"] += 1
+            found = true
+            break
+    
+    # If not found, add it to our inventory as a new entry
+    if not found:
+        var new_passive = upgrade_data.duplicate()
+        new_passive["level"] = 1
+        player_passives.append(new_passive)
+
+    # Finalize UI
     finalize_item_purchase(entry_ref)
     update_gold()
-    refresh_character_and_weapons()
     refresh_stats()
+    
+    player_sprite.load_upgrade_sprites()
 
 func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int, entry_ref: Dictionary):
-
     var weapons = GameManager.player_profile.get("weapons", [])
-#
-    #if target_slot_index >= weapons.size():
-        #return
-
-    if get_gold() < upgrade_data["cost"]:
-        return
-
+    var existing_weapon = weapons[target_slot_index] if target_slot_index < weapons.size() else null
     var category = upgrade_data.get("category", "")
-
+    
     if category == "weapon":
+        if get_gold() < upgrade_data["cost"]: return
+        
+        # 1. Handle Swap logic
+        if existing_weapon != null:
+            # Place old weapon back into the shop's data reference
+            entry_ref["global_reference"]["upgrade"] = existing_weapon
+            entry_ref["global_reference"]["bought"] = false
+            
+            # Place new weapon into the slot
+            GameManager.player_profile["weapons"][target_slot_index] = upgrade_data
+        else:
+            # Normal Purchase
+            ShopSystem.equip_weapon(upgrade_data, target_slot_index)
+            finalize_item_purchase(entry_ref)
+        
         spend_gold(upgrade_data["cost"])
-        ShopSystem.equip_weapon(upgrade_data, target_slot_index)
-
+        
     elif category == "weapon_mod":
-        var existing = weapons[target_slot_index]
-        if existing and existing.get("name") == upgrade_data.get("target_weapon"):
+        if existing_weapon and existing_weapon.get("name") == upgrade_data.get("target_weapon"):
+            if get_gold() < upgrade_data["cost"]: return
             spend_gold(upgrade_data["cost"])
             ShopSystem.use_upgrade_on_weapon(upgrade_data, target_slot_index)
+            finalize_item_purchase(entry_ref)
         else:
             return
 
-    finalize_item_purchase(entry_ref)
+    # Refresh everything to ensure sync
+    draw_shop_from_persistent_memory()
     update_gold()
     setup_six_slots_ui()
     refresh_character_and_weapons()
@@ -457,7 +499,7 @@ func setup_six_slots_ui():
     var screen_size = get_viewport_rect().size
     
     for i in range(6):
-        var slot_btn = DropSlotButton.new(i, self)
+        var slot_btn = DragShopButton.new(self, {"index": i}, false)
         slot_btn.custom_minimum_size = Vector2(screen_size.x * slot_button_width_ratio, screen_size.y * slot_button_height_ratio)
         
         var hbox = HBoxContainer.new()
@@ -516,9 +558,9 @@ func update_slot_display_text(label_node: Label, index: int):
             w_lvl = weapon_data.get("level", 1)
         elif typeof(weapon_data) == TYPE_STRING:
             w_name = weapon_data
-        label_node.text = "Slot " + str(index + 1) + "\n" + str(w_name) + " (Lvl " + str(w_lvl) + ")"
+        label_node.text =   str(w_name)
     else: 
-        label_node.text = "Slot " + str(index + 1) + "\n(Empty)"
+        label_node.text =  "(Empty)"
         
     label_node.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     # Ensure font size is consistently applied
@@ -541,68 +583,99 @@ func _play():
 # CLASSES
 # ---------------------------------
 class DragShopButton extends Button:
-    var upgrade_data: Dictionary
-    var shop_main: Node 
-    var entry_reference: Dictionary
-    
-    func _init(data, main_scene): 
-        upgrade_data = data
-        shop_main = main_scene
-        
-    func _get_drag_data(_at_position):
-        var cat = upgrade_data.get("category", "")
-        if cat == "passive" or cat == "viewer" or entry_reference["bought"] or shop_main.get_gold() < upgrade_data["cost"]: 
-            return null
-            
-        var preview = TextureRect.new()
-        preview.custom_minimum_size = Vector2(80, 80)
-        
-        # --- FIX STARTS HERE ---
-        if upgrade_data.has("icon"):
-            var atlas = AtlasTexture.new()
-            atlas.atlas = load(upgrade_data["icon"])
-            var idx = upgrade_data.get("index", 0)
-            # Ensure these region values match your setup logic
-            atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
-            preview.texture = atlas
-        else:
-            preview.texture = load("res://icon.svg")
-        # --- FIX ENDS HERE ---
-        
-        set_drag_preview(preview)
-        return {"upgrade": upgrade_data, "entry": entry_reference}
-        
-class DropSlotButton extends Button:
-    var slot_index: int
     var shop_main: Node
+    var data: Dictionary # Holds either upgrade info OR weapon index/info
+    var is_shop_item: bool = false
+    var entry_reference: Dictionary # Only used if is_shop_item is true
     
-    # Provide default values so .new() can be called without arguments
-    func _init(idx: int = -1, main_scene: Node = null):
-        slot_index = idx
-        shop_main = main_scene
-        
-    func setup(idx: int, main_scene: Node):
-        slot_index = idx
-        shop_main = main_scene
+    var outline_shader = preload("res://Assets/shaders/outline_shader.gdshader")
 
-    func _can_drop_data(_pos, data) -> bool:
-        if typeof(data) != TYPE_DICTIONARY: return false
-        var upgrade = data["upgrade"]
-        var cat = upgrade.get("category", "")
-    
+    func _init(main_scene: Node, item_data: Dictionary, is_shop: bool, entry_ref: Dictionary = {}):
+        shop_main = main_scene
+        data = item_data
+        is_shop_item = is_shop
+        entry_reference = entry_ref
+
+    func _get_drag_data(_at_position):
+        # 1. Logic for Shop Items (Dragging OUT of shop)
+        if is_shop_item:
+            var cat = data.get("category", "")
+            if cat == "passive" or cat == "viewer" or entry_reference["bought"] or shop_main.get_gold() < data["cost"]:
+                return null
+            return {"type": "purchase", "upgrade": data, "entry": entry_reference}
+
+        # 2. Logic for Inventory Slots (Rearranging/Dragging OUT of slots)
         var weapons = GameManager.player_profile.get("weapons", [])
-    # Ensure we don't crash if slot_index is outside current array size
-        var existing = weapons[slot_index] if slot_index < weapons.size() else null
-    
-        if cat == "weapon":
-        # Allow dropping a weapon anywhere as long as the slot index is within our UI bounds
-            return true 
+        var idx = data.get("index")
+        if idx == null or idx >= weapons.size() or weapons[idx] == null:
+            return null
+        return {"type": "rearrange", "from_index": idx}
+
+    func _can_drop_data(_pos, drop_data) -> bool:
+        if is_shop_item: return false # Shop items don't accept drops
         
-        if cat == "weapon_mod":
-        # Only allow mods if there is an existing weapon that matches
-            return existing != null and existing.get("name") == upgrade.get("target_weapon")
-        
+        # Determine what is being held
+        if drop_data.get("type") == "purchase":
+            var upgrade = drop_data["upgrade"]
+            var weapons = GameManager.player_profile.get("weapons", [])
+            var existing = weapons[data["index"]]
+            # Validate weapon/mod logic here...
+            return upgrade.get("category") == "weapon" or (upgrade.get("category") == "weapon_mod" and existing != null)
+            
+        if drop_data.get("type") == "rearrange":
+            return true # Allow swapping/leveling between slots
+            
         return false
+
+    func _drop_data(_pos, drop_data):
+        if drop_data.get("type") == "purchase":
+            shop_main.handle_drag_drop_purchase(drop_data["upgrade"], data["index"], drop_data["entry"])
+        elif drop_data.get("type") == "rearrange":
+            shop_main.handle_rearrange_weapons(drop_data["from_index"], data["index"])
+            
+func process_weapon_interaction(source_item: Dictionary, target_slot_index: int):
+    var weapons = GameManager.player_profile.get("weapons", [])
+    var target_weapon = weapons[target_slot_index] if target_slot_index < weapons.size() else null
+    
+    # CASE: Same Type -> LEVEL UP
+    if target_weapon != null and target_weapon.get("name") == source_item.get("name"):
+        target_weapon["level"] = target_weapon.get("level", 1) + 1
+        print("Leveled up: " + target_weapon["name"])
+        return true # Interaction successful
         
-    func _drop_data(_pos, data): 
-        shop_main.handle_drag_drop_purchase(data["upgrade"], slot_index, data["entry"])
+    # CASE: Replace/Swap
+    else:
+        # If we have a target, we move it to where the source came from (if applicable)
+        # This implementation simplifies to: Swap current target with source
+        weapons[target_slot_index] = source_item
+        # Note: If dragging from shop, you handle source removal elsewhere
+        return false
+
+# Place this in your main Store.gd script, NOT inside the classes
+func handle_rearrange_weapons(from_index: int, to_index: int):
+    var weapons = GameManager.player_profile.get("weapons", [])
+    
+    # 1. Validate indices
+    if from_index < 0 or from_index >= weapons.size() or \
+       to_index < 0 or to_index >= weapons.size():
+        return
+        
+    var source_weapon = weapons[from_index]
+    var target_weapon = weapons[to_index]
+
+    # 2. Logic: Level up if same, Swap if different
+    if source_weapon != null and target_weapon != null and source_weapon.get("name") == target_weapon.get("name"):
+        # Same weapon: Level up the target, nullify the source
+        target_weapon["level"] = target_weapon.get("level", 1) + 1
+        weapons[from_index] = null
+        print("Leveled up: " + target_weapon["name"])
+        
+    else:
+        # Different (or one is empty): Perform a standard swap
+        var temp = weapons[from_index]
+        weapons[from_index] = weapons[to_index]
+        weapons[to_index] = temp
+    
+    # 3. Update the UI
+    setup_six_slots_ui()
+    refresh_character_and_weapons()
