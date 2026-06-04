@@ -4,10 +4,10 @@ uniform float level = 1.0;
 uniform float outline_width : hint_range(0.0, 10.0) = 8.0;
 
 vec4 get_color_for_level(float lvl) {
-    if (lvl <= 2.0) return mix(vec4(1.0, 1.0, 1.0, 1.0), vec4(1.0, 1.0, 0.0, 1.0), (lvl - 1.0) / 19.0);
-    if (lvl <= 4.0) return mix(vec4(1.0, 1.0, 0.0, 1.0), vec4(0.0, 1.0, 0.0, 1.0), (lvl - 21.0) / 19.0);
-    if (lvl <= 6.0) return mix(vec4(0.0, 1.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0), (lvl - 41.0) / 19.0);
-    if (lvl <= 8.0) return mix(vec4(0.0, 0.0, 1.0, 1.0), vec4(0.5, 0.0, 0.5, 1.0), (lvl - 61.0) / 19.0);
+    if (lvl <= 1.0) return mix(vec4(1.0, 1.0, 1.0, 1.0), vec4(1.0, 1.0, 0.0, 1.0), (lvl - 1.0) / 19.0);
+    if (lvl <= 2.0) return mix(vec4(1.0, 1.0, 0.0, 1.0), vec4(0.0, 1.0, 0.0, 1.0), (lvl - 21.0) / 19.0);
+    if (lvl <= 3.0) return mix(vec4(0.0, 1.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0), (lvl - 41.0) / 19.0);
+    if (lvl <= 4.0) return mix(vec4(0.0, 0.0, 1.0, 1.0), vec4(0.5, 0.0, 0.5, 1.0), (lvl - 61.0) / 19.0);
     return mix(vec4(0.5, 0.0, 0.5, 1.0), vec4(1.0, 0.75, 0.8, 1.0), (lvl - 81.0) / 19.0);
 }
 

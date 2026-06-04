@@ -194,16 +194,20 @@ func setup_statsbook_ui():
     var screen_size = get_viewport_rect().size
     
     stats_container = VBoxContainer.new()
-    # Position based on ratio
     stats_container.position = Vector2(screen_size.x * statsbook_x_ratio, screen_size.y * statsbook_y_ratio)
     
+    # Optional: Set a fixed width so the container doesn't collapse
+    stats_container.custom_minimum_size = Vector2(screen_size.x * 0.2, screen_size.y * 0.4)
+    
+    # 1. Stats Label (or the new container of rows)
     stats_label = Label.new()
-    # Dynamic font size
+    stats_label.name = "StatsLabel"
     stats_label.add_theme_font_size_override("font_size", int(screen_size.y * statsbook_font_ratio))
-    stats_label.custom_minimum_size = Vector2(screen_size.x * 0.15, screen_size.y * 0.3)
     stats_container.add_child(stats_label)
     
+    # 2. Flip Button (Always added last to be at the bottom)
     var flip_button = Button.new()
+    flip_button.name = "FlipButton" # Named for easy identification
     flip_button.text = "Flip Page"
     flip_button.add_theme_font_size_override("font_size", int(screen_size.y * statsbook_font_ratio))
     flip_button.pressed.connect(flip_stats_page)
@@ -211,32 +215,66 @@ func setup_statsbook_ui():
     
     add_child(stats_container)
     update_stats_display()
-
 func update_stats_display():
-    if not is_instance_valid(stats_label): return
+    if not is_instance_valid(stats_container): return
     
+    # 1. Clear existing rows (keep the header/flip button if they are in there)
+    # Assuming stats_label was the only child, or you want to clear specific generated nodes
+    for child in stats_container.get_children():
+        if child.name != "FlipButton" and child.name != "Header": # Add logic to protect header/buttons
+            child.queue_free()
+
     var page = stat_pages[current_page_index]
-    var text = page["title"] + "\n----------------\n"
     
-    # Case A: Standard Stat Page
+    # Add Title/Header
+    var title = Label.new()
+    title.name = "Header"
+    title.text = page["title"]
+    stats_container.add_child(title)
+
+    # 2. Render content
     if page.has("stats"):
         var stats = GameManager.player_profile.get("stats", {})
         for stat_key in page["stats"]:
             var value = stats.get(stat_key, 0)
             var def = GameManager.stat_registry.get(stat_key, {})
             var display_name = def.get("name", stat_key)
-            text += display_name + ": " + str(value) + "\n"
             
-    # Case B: Equipment/Audience List Page
+            # Use the helper to create the row
+            var icon_path = def.get("iconatlas", "")
+            var icon_idx = def.get("iconindex", 0)
+            create_stat_row(display_name + ": " + str(value), icon_path, icon_idx)
+            
     elif page.has("items"):
-        var items = page["items"]
-        if items.size() == 0:
-            text += "(None)"
-        else:
-            for item in items:
-                text += "- " + str(item) + "\n"
+        for item in page["items"]:
+            create_stat_row(str(item), "", 0) # Items might not have icons
+
+func create_stat_row(text: String, icon_path: String, icon_idx: int):
+    var row = HBoxContainer.new()
+    var screen_size = get_viewport_rect().size
+    var font_size = int(screen_size.y * statsbook_font_ratio)
     
-    stats_label.text = text
+    # Icon
+    if icon_path != "":
+        var tex_rect = TextureRect.new()
+        tex_rect.custom_minimum_size = Vector2(font_size, font_size)
+        tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+        tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+        
+        var atlas = AtlasTexture.new()
+        atlas.atlas = load(icon_path)
+        # Adjust these values based on your atlas grid size (e.g., 250)
+        atlas.region = Rect2(Vector2((icon_idx % 4) * 250, (icon_idx / 4) * 250), Vector2(250, 250))
+        tex_rect.texture = atlas
+        row.add_child(tex_rect)
+        
+    # Text
+    var label = Label.new()
+    label.text = text
+    label.add_theme_font_size_override("font_size", font_size)
+    row.add_child(label)
+    
+    stats_container.add_child(row)
 
 func flip_stats_page():
     current_page_index = (current_page_index + 1) % stat_pages.size()

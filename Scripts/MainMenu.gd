@@ -59,7 +59,8 @@ var character_starting_loadouts: Dictionary = {
         "hp": 100,
         "maxmp": 100,
         "mp": 100,
-        "gold": 100
+        "gold": 100,
+        "dmg": 4,
         },
         "passives": [],
         "weapons": ["Sword"],
@@ -73,7 +74,8 @@ var character_starting_loadouts: Dictionary = {
         "hp": 100,
         "maxmp": 100,
         "mp": 100,
-        "gold": 100
+        "gold": 100,
+        "dmg": 4,
         },
         "passives": ["up3"],
         "weapons": ["Bow", "CurseStaff", "Sword","Sword","Sword","Sword" ],
@@ -87,7 +89,8 @@ var character_starting_loadouts: Dictionary = {
         "hp": 100,
         "maxmp": 100,
         "mp": 100,
-        "gold": 100
+        "gold": 100,
+        "dmg": 4,
         },
         "passives": ["up2","up1","up2","up1","up2","up1","up2","up1","up2","up1","up2","up1","up2","up1","up2","up1"],
         "weapons": ["Staff"],

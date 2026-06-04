@@ -4,32 +4,34 @@ extends Node
 var stat_registry = {
 	"hp": {
 		"name": "Health",
-		"group": "Health Stats"
+		"group": "Health Stats",
+		"iconatlas": "res://Assets/atlas/icon.tres",
+		"iconindex": 1
 	},
 	"maxhp": {
 		"name": "Max Health",
-		"group": "Health Stats"
+		"group": "Health Stats",
+		"iconatlas": "res://Assets/atlas/icon.tres",
+		"iconindex": 1
 	},
 	"mp": {
 		"name": "Mana",
-		"group": "Resources"
+		"group": "Resources",
+		"iconatlas": "res://Assets/atlas/icon.tres",
+		"iconindex": 2
 	},
 	"maxmp": {
 		"name": "Max Mana",
-		"group": "Resources"
+		"group": "Resources",
+		"iconatlas": "res://Assets/atlas/icon.tres",
+		"iconindex": 2
 	},
-	"damage": {
+	"dmg": {
 		"name": "Damage",
-		"group": "Combat Stats"
+		"group": "Combat Stats",
+		"iconatlas": "res://Assets/atlas/icon.tres",
+		"iconindex": 14
 	},
-	"crit": {
-		"name": "Critical Hit",
-		"group": "Combat Stats"
-	},
-	"attack_speed": {
-		"name": "Attack Speed",
-		"group": "Combat Stats"
-	}
 }
 
 # --- Profiles ---
@@ -39,6 +41,7 @@ var player_profile = {
 		"hp": 100,
 		"maxmp": 100,
 		"mp": 100,
+		"dmg": 4,
 		"gold": 100,
 		"crit": 5,
 		"attack_speed": 2
