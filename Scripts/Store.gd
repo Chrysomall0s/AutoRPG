@@ -394,7 +394,7 @@ func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int,
         # FIX: Check if the weapon is the same as the one already equipped
         if existing_weapon != null and existing_weapon.get("name") == upgrade_data.get("name"):
             # LEVEL UP: Increase level, don't swap
-            existing_weapon["level"] = existing_weapon.get("level", 1) + 1
+            existing_weapon["level"] = existing_weapon.get("level") + upgrade_data.get("level")
             # Still need to "buy" it (remove from shop)
             finalize_item_purchase(entry_ref)
             
@@ -409,7 +409,7 @@ func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int,
                 finalize_item_purchase(entry_ref)
                 
             # Place new weapon into the slot
-            GameManager.player_profile["weapons"][target_slot_index] = upgrade_data
+            GameManager.player_profile["weapons"][target_slot_index] = upgrade_data.duplicate(true)
         
         spend_gold(upgrade_data["cost"])
         
@@ -647,7 +647,7 @@ func process_weapon_interaction(source_item: Dictionary, target_slot_index: int)
     
     # CASE: Same Type -> LEVEL UP
     if target_weapon != null and target_weapon.get("name") == source_item.get("name"):
-        target_weapon["level"] = target_weapon.get("level", 1) + 1
+        target_weapon["level"] = target_weapon.get("level") + source_item.get("level")
         print("Leveled up: " + target_weapon["name"])
         return true # Interaction successful
         
@@ -674,7 +674,7 @@ func handle_rearrange_weapons(from_index: int, to_index: int):
     # 2. Logic: Level up if same, Swap if different
     if source_weapon != null and target_weapon != null and source_weapon.get("name") == target_weapon.get("name"):
         # Same weapon: Level up the target, nullify the source
-        target_weapon["level"] = target_weapon.get("level", 1) + 1
+        target_weapon["level"] = target_weapon.get("level") + source_weapon.get("level")
         weapons[from_index] = null
         print("Leveled up: " + target_weapon["name"])
         
