@@ -391,22 +391,30 @@ func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int,
     if category == "weapon":
         if get_gold() < upgrade_data["cost"]: return
         
-        # 1. Handle Swap logic
-        if existing_weapon != null:
-            # Place old weapon back into the shop's data reference
-            entry_ref["global_reference"]["upgrade"] = existing_weapon
-            entry_ref["global_reference"]["bought"] = false
+        # FIX: Check if the weapon is the same as the one already equipped
+        if existing_weapon != null and existing_weapon.get("name") == upgrade_data.get("name"):
+            # LEVEL UP: Increase level, don't swap
+            existing_weapon["level"] = existing_weapon.get("level", 1) + 1
+            # Still need to "buy" it (remove from shop)
+            finalize_item_purchase(entry_ref)
             
+        # CASE: Different weapon or empty slot - Perform Swap or Equip
+        else:
+            if existing_weapon != null:
+                # Place old weapon back into the shop's data reference
+                entry_ref["global_reference"]["upgrade"] = existing_weapon
+                entry_ref["global_reference"]["bought"] = false
+            else:
+                # Normal empty slot purchase
+                finalize_item_purchase(entry_ref)
+                
             # Place new weapon into the slot
             GameManager.player_profile["weapons"][target_slot_index] = upgrade_data
-        else:
-            # Normal Purchase
-            ShopSystem.equip_weapon(upgrade_data, target_slot_index)
-            finalize_item_purchase(entry_ref)
         
         spend_gold(upgrade_data["cost"])
         
     elif category == "weapon_mod":
+        # Keep your existing logic for mods
         if existing_weapon and existing_weapon.get("name") == upgrade_data.get("target_weapon"):
             if get_gold() < upgrade_data["cost"]: return
             spend_gold(upgrade_data["cost"])
@@ -415,7 +423,7 @@ func handle_drag_drop_purchase(upgrade_data: Dictionary, target_slot_index: int,
         else:
             return
 
-    # Refresh everything to ensure sync
+    # Refresh everything
     draw_shop_from_persistent_memory()
     update_gold()
     setup_six_slots_ui()

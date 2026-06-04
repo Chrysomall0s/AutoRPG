@@ -10,6 +10,26 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_voxcw")
+gold_label_font_ratio = null
+shop_button_font_ratio = null
+slot_button_font_ratio = null
+shop_item_width_ratio = null
+shop_item_height_ratio = null
+slot_button_width_ratio = null
+slot_button_height_ratio = null
+gold_label_x_ratio = null
+gold_label_y_ratio = null
+master_shop_y_ratio = null
+rainbow_radius_x = null
+rainbow_offset = null
+rainbow_radius_y = null
+rainbow_y_offset = null
+float_amplitude = null
+float_wave_speed = null
+weapon_follow_smoothness = null
+statsbook_x_ratio = null
+statsbook_y_ratio = null
+statsbook_font_ratio = null
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1774489409]
 position = Vector2(725.25, 1310)
