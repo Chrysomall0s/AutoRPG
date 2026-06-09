@@ -2,10 +2,34 @@ extends Area2D
 
 @onready var seat = $Seat
 @onready var person = $Person # Assuming this is a Sprite2D
-
+@onready var medal = $Medal
+@onready var lock = $Lock # Make sure this path matches your scene tree
+var is_border := false
 var viewer_data = null
 var is_filled := false
 
+func set_medal(data: Dictionary) -> void:
+	medal.visible = false
+
+	if data.is_empty():
+		return
+
+	if data.get(2, false):
+		medal.visible = true
+		medal.frame = 2 # gold
+	elif data.get(1, false):
+		medal.visible = true
+		medal.frame = 1 # silver
+	elif data.get(0, false):
+		medal.visible = true
+		medal.frame = 0 # bronze
+
+func set_is_border(status: bool):
+	is_border = status
+	# Update the lock visibility immediately in case it was already set
+	if lock != null:
+		lock.visible = (!is_filled and !is_border)
+	
 func setup_type(data: Dictionary):
 	viewer_data = data
 	is_filled = true
@@ -25,6 +49,8 @@ func setup_type(data: Dictionary):
 func set_filled(value: bool):
 	is_filled = value
 	person.visible = value
+	if lock != null:
+		lock.visible = (!value and !is_border)
 	seat.modulate = Color(1, 1, 1) if value else Color(0.5, 0.5, 0.5)
 
 func _process(delta):

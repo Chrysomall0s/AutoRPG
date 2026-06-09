@@ -129,52 +129,54 @@ func refresh_character_and_weapons(profile: Dictionary):
 		
 	# Since this function is now inside the Hero script, 
 	# you can call these methods directly
-	load_upgrade_sprites()
+	load_upgrade_sprites(profile)
 	spawn_weapons(profile["weapons"])
 
-func load_upgrade_sprites() -> void:
+func load_upgrade_sprites(profile: Dictionary) -> void:
 	# Clear existing icons
 	for child in layers.get_children():
 		child.queue_free()
 
-	var passives = GameManager.player_profile.get("passives", [])
-	
-	# Configuration for the "flower bank" layout
-	var columns = 5            # Number of icons per row
-	var icon_spacing = 40.0    # Distance between icons
-	var start_pos = Vector2(-80, 150) # Starting position relative to player
-	var icon_scale = Vector2(0.2, 0.2) # Adjust size to be smaller/appropriate for bank
-
+	var passives = profile.get("passives", [])
 	var count = 0
-	for upgrade in passives:
-		if upgrade.has("icon"):
+	
+	# --- ADDED: Load UpgradeData to resolve names ---
+	var upgrade_data_source = preload("res://Scripts/UpgradeData.gd").new()
+	# -------------------------------------------------
+
+	for item in passives:
+		# Resolve string to full dictionary if necessary
+		var upgrade = item
+		if upgrade is String:
+			for data in upgrade_data_source.upgrades:
+				if data["name"] == upgrade:
+					upgrade = data
+					break
+		
+		# Now 'upgrade' is a dictionary (if found)
+		if upgrade is Dictionary and upgrade.has("icon"):
 			var sprite = Sprite2D.new()
 			
 			# --- APPLY SHADER ---
 			var mat = ShaderMaterial.new()
 			mat.shader = outline_shader
-			# Set the level uniform from the upgrade data
 			mat.set_shader_parameter("level", float(upgrade.get("level", 1.0)))
 			sprite.material = mat
 			# --------------------
 			
 			var icon_path = upgrade["icon"]
-			
 			if ResourceLoader.exists(icon_path):
 				var atlas = load(icon_path).duplicate()
 				var index = upgrade.get("index", 0)
 				var tile_size = Vector2(250, 250)
 				
-				# Slice the 4x4 atlas correctly
 				atlas.region = Rect2(Vector2((index % 4) * tile_size.x, (index / 4) * tile_size.y), tile_size)
-				
 				sprite.texture = atlas
-				sprite.scale = icon_scale
+				sprite.scale = Vector2(0.2, 0.2)
 				
-				# Calculate grid position: x increments by column, y increments by row
-				var row = count / columns
-				var col = count % columns
-				sprite.position = start_pos + Vector2(col * icon_spacing, row * icon_spacing)
+				var row = count / 5
+				var col = count % 5
+				sprite.position = Vector2(-80, 150) + Vector2(col * 40.0, row * 40.0)
 				
 				if upgrade.has("layer"):
 					sprite.z_index = clamp(upgrade["layer"], -4096, 4096)
