@@ -1,43 +1,7 @@
 # GameManager.gd
 extends Node
 
-var stat_registry = {
-    "hp": {
-        "name": "Health",
-        "group": "Health Stats",
-        "iconatlas": "res://Assets/atlas/icon.tres",
-        "iconindex": 1,
-        "defaultValue": 12
-    },
-    "maxhp": {
-        "name": "Max Health",
-        "group": "Health Stats",
-        "iconatlas": "res://Assets/atlas/icon.tres",
-        "iconindex": 1,
-        "defaultValue": 12
-    },
-    "mp": {
-        "name": "Mana",
-        "group": "Resources",
-        "iconatlas": "res://Assets/atlas/icon.tres",
-        "iconindex": 2,
-        "defaultValue": 12
-    },
-    "maxmp": {
-        "name": "Max Mana",
-        "group": "Resources",
-        "iconatlas": "res://Assets/atlas/icon.tres",
-        "iconindex": 2,
-        "defaultValue": 12
-    },
-    "dmg": {
-        "name": "Damage",
-        "group": "Combat Stats",
-        "iconatlas": "res://Assets/atlas/icon.tres",
-        "iconindex": 14,
-        "defaultValue": 12
-    },
-}
+
 
 # --- Profiles ---
 var player_profile = {

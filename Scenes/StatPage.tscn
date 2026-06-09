@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://cxna0lg66ts1q"]
+
+[ext_resource type="Script" uid="uid://b5l68lrh8avf3" path="res://stat_page.gd" id="1_e3ova"]
+
+[node name="StatPage" type="Control" unique_id=452004817]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_e3ova")
