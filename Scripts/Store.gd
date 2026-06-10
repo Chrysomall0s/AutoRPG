@@ -291,7 +291,7 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
             var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
 
             tex_rect.add_child(_create_corner_element(w_lvl, true, 9))  # Left-Down
-            tex_rect.add_child(_create_corner_element(scale_value, false, 9)) # Right-Down
+            tex_rect.add_child(_create_corner_element(scale_value, false, 13)) # Right-Down
         # ------------------------------------
     else:
         tex_rect.texture = null
@@ -562,7 +562,7 @@ func setup_six_slots_ui():
             var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
 
             tex_rect.add_child(_create_corner_element(w_lvl, true, 9))  # Left-Down
-            tex_rect.add_child(_create_corner_element(scale_value, false, 9)) # Right-Down
+            tex_rect.add_child(_create_corner_element(scale_value, false, 13)) # Right-Down
             # --------------------
         else:
             tex_rect.texture = null
