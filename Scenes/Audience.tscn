@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://b4ukcqb3xd5aa" path="res://Scripts/Audience.gd" id="1_6fy64"]
 [ext_resource type="Texture2D" uid="uid://8urf20hdkyag" path="res://Assets/mush.png" id="2_6fy64"]
 [ext_resource type="Texture2D" uid="uid://c5x0s5ep8ksop" path="res://Assets/atlas/icon.tres" id="3_6fy64"]
-[ext_resource type="Texture2D" uid="uid://dqqw4j32lfkb5" path="res://Assets/icon.png" id="4_uui05"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mxbuo"]
 atlas = ExtResource("2_6fy64")
@@ -17,7 +16,6 @@ region = Rect2(250, 250, 250, 250)
 size = Vector2(46.875008, 78.124985)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_128j7"]
-atlas = ExtResource("4_uui05")
 region = Rect2(0, 750, 250, 250)
 
 [node name="Audience" type="Area2D" unique_id=418806984]

@@ -52,7 +52,7 @@ var floating_time := 0.0
 
 var character_starting_loadouts: Dictionary = {
     "char_slot1": {
-        "sprite_data": {"texture": "res://Assets/atlas/fruit.tres", "frame": 1},
+        "icon": "res://Assets/atlas/fruit.tres", "index": 1,
         "stats":
         {},
         "passives": [],
@@ -60,7 +60,7 @@ var character_starting_loadouts: Dictionary = {
         "audience": ["Yellow Fan"]
     },
     "char_slot2": {
-        "sprite_data": {"texture": "res://Assets/atlas/fruit.tres", "frame": 0},
+        "icon": "res://Assets/atlas/fruit.tres", "index": 0,
         "stats":
         {},
         "passives": ["up3"],
@@ -68,7 +68,7 @@ var character_starting_loadouts: Dictionary = {
         "audience": ["Blue Fan", "Yellow Fan","Blue Fan"]
     },
     "char_slot3": {
-        "sprite_data": {"texture": "res://Assets/atlas/fruit.tres", "frame": 2},
+        "icon": "res://Assets/atlas/fruit.tres", "index": 2,
         "stats":
         {},
         "passives": ["up2","up1"],
@@ -100,7 +100,7 @@ func _ready():
         "passives": [],
         "weapons": [null, null, null, null, null, null],
         "audience": [],
-        "sprite_data": null
+        "icon": null
     }
     GameManager.selectedCharacter = -1
     DisplayServer.window_set_size(Vector2i(480, 852))
@@ -242,7 +242,8 @@ func select_character(slot_name: String):
         if data:
             GameManager.player_profile["audience"].append(data.duplicate())
     
-    GameManager.player_profile["sprite_data"] = loadout.get("sprite_data")
+    GameManager.player_profile["icon"] = loadout.get("icon")
+    GameManager.player_profile["index"] = loadout.get("index", 0) # Defaults to 0 if missing
     GameManager.player_profile["stats"] = DEFAULT_STATS.duplicate()
     GameManager.player_profile["stats"].merge(loadout.get("stats", {}), true)
     refresh_character_and_weapons()

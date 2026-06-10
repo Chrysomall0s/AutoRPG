@@ -4,7 +4,7 @@ extends Node
 var monsters = {
 	"Easy": [
 		{
-		"sprite_data": {"texture": "res://Assets/atlas/mush.tres", "frame": 0},
+		"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"stats": {
 				"maxhp": 50,
 				"hp": 50,
@@ -16,7 +16,7 @@ var monsters = {
 			"audience": ["Yellow Fan"]
 		},
 		{
-			"sprite_data": {"texture": "res://Assets/atlas/mush.tres", "frame": 0},
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"stats": {
 				"maxhp": 60,
 				"hp": 60,
@@ -28,7 +28,7 @@ var monsters = {
 			"audience": ["Blue Fan"]
 		},
 		{
-			"sprite_data": {"texture": "res://Assets/atlas/mush.tres", "frame": 0},
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"stats": {
 				"maxhp": 60,
 				"hp": 120,
@@ -40,7 +40,7 @@ var monsters = {
 			"audience": ["Blue Fan"]
 		},
 		{
-			"sprite_data": {"texture": "res://Assets/atlas/mush.tres", "frame": 0},
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"stats": {
 				"maxhp": 60,
 				"hp": 200,
@@ -54,7 +54,7 @@ var monsters = {
 	],
 	"Normal": [
 		{
-			"sprite_data": {"texture": "res://Assets/atlas/mush.tres", "frame": 0},
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"stats": {
 				"maxhp": 50,
 				"hp": 50,
@@ -68,7 +68,8 @@ var monsters = {
 	],
 	"Hard": [
 		{
-			"sprite_data": {"texture": "res://Assets/atlas/mush.tres", "frame": 0},
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1
+			,
 			"stats": {
 				"maxhp": 50,
 				"hp": 50,
@@ -82,7 +83,7 @@ var monsters = {
 	],
 	"Insane": [
 		{
-			"sprite_data": {"texture": "res://Assets/atlas/mush.tres", "frame": 0},
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"stats": {
 				"maxhp": 50,
 				"hp": 50,
