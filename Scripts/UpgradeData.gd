@@ -13,8 +13,8 @@ var upgrades = [
 	# --- BASE WEAPONS (Equipped into any empty slot or replaces old weapon) ---
 	{"name": "Sword","friendly":false, "category": "weapon", "type": "damage","scale": "hp","weight": 20, "cost": 2, "icon":           "res://Assets/atlas/leaf.tres","index": 0, "amount": 10, "speed": 4, "level": 1},
 	{"name": "Bow","friendly":false,    "category": "weapon", "type": "damage","scale": "hp","weight": 20, "cost": 2, "icon":           "res://Assets/atlas/leaf.tres","index": 1,   "amount": 8,  "speed": 6, "level": 1},
-	{"name": "Staff","friendly":true,  "category": "weapon","type": "heal","scale": "hp", "weight": 20, "cost": 2, "icon":             "res://Assets/atlas/leaf.tres","index": 2, "amount": 14, "speed": 3, "level": 1},
-	{"name": "Staff","friendly":false, "category": "weapon","type": "damage","scale": "hp", "weight": 20, "cost": 2, "icon": "res://Assets/atlas/leaf.tres","index": 3, "amount" : 1, "speed": 3, "level": 1},
+	{"name": "Staff","friendly":true,  "category": "weapon","type": "heal","scale": "hp", "weight": 2000, "cost": 2, "icon":             "res://Assets/atlas/leaf.tres","index": 2, "amount": 14, "speed": 30, "level": 1},
+	{"name": "Stavv","friendly":false, "category": "weapon","type": "heal","scale": "hp", "weight": 2000, "cost": 2, "icon": "res://Assets/atlas/leaf.tres","index": 3, "amount" : 1, "speed": 6, "level": 1},
 	{"name": "Curse","friendly":false, "category": "weapon","type": "damage","scale": "hp", "weight": 0, "cost": 2, "icon":            "res://Assets/atlas/leaf.tres","index": 4, "amount": 4, "speed": 3, "level": 1},
 	
 	# --- AUDIENCE UPGRADES ---

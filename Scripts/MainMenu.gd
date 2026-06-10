@@ -220,6 +220,7 @@ func select_character(slot_name: String):
                 var full_data = _find_upgrade_by_name(weapon_name)
                 if not full_data.is_empty():
                     var weapon_copy = full_data.duplicate()
+                    weapon_copy["unique_id"] = str(i) + "_" + weapon_name + "_" + str(Time.get_ticks_usec())
                     weapon_copy["level"] = weapon_copy.get("level", 1)
                     final_weapons.append(weapon_copy)
                 else:

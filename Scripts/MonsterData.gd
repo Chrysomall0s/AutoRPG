@@ -102,9 +102,53 @@ func get_monster(difficulty_key: String, round: int) -> Dictionary:
 	if !monsters.has(difficulty_key):
 		return {}
 
-	var difficulty_monsters = monsters[difficulty_key]
-
-	if round < 0 or round >= difficulty_monsters.size():
+	var difficulty_list = monsters[difficulty_key]
+	if round < 0 or round >= difficulty_list.size():
 		return {}
 
-	return difficulty_monsters[round].duplicate(true)
+	var raw_data = difficulty_list[round]
+	
+	# Create a profile structure identical to the player's
+	var monster_profile = {
+		"stats": raw_data.get("stats", {}).duplicate(),
+		"passives": [],
+		"weapons": [],
+		"audience": [],
+		"icon": raw_data.get("icon"),
+		"index": raw_data.get("index", 0)
+	}
+
+	# 1. Initialize Weapons (Guaranteed 6 slots)
+	var weapon_names = raw_data.get("weapons", [])
+	for i in range(6):
+		if i < weapon_names.size():
+			var w_name = weapon_names[i]
+			var full_data = _find_upgrade_by_name(w_name)
+			# --- APPLY UNIQUE ID LOGIC HERE ---
+			var weapon_entry = full_data.duplicate(true) if !full_data.is_empty() else {"name": w_name, "level": 1}
+			# --- APPLY UNIQUE ID LOGIC HERE ---
+			# Add a prefix to distinguish enemy weapons from player weapons
+			weapon_entry["unique_id"] = "enemy_" + str(i) + "_" + w_name + "_" + str(Time.get_ticks_usec())
+			monster_profile["weapons"].append(weapon_entry)
+		else:
+			monster_profile["weapons"].append(null)
+
+	# 2. Populate Passives
+	for name in raw_data.get("passives", []):
+		var data = _find_upgrade_by_name(name)
+		if data: monster_profile["passives"].append(data.duplicate())
+
+	# 3. Populate Audience
+	for name in raw_data.get("audience", []):
+		var data = _find_upgrade_by_name(name)
+		if data: monster_profile["audience"].append(data.duplicate())
+
+	return monster_profile
+
+# Ensure this helper exists in this script or is accessible
+func _find_upgrade_by_name(target_name: String) -> Dictionary:
+	# Assuming you have access to UpgradeData here
+	var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
+	for upgrade in UpgradeData.upgrades:
+		if upgrade.get("name") == target_name: return upgrade
+	return {}

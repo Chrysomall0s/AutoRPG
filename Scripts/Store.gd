@@ -100,7 +100,7 @@ func _ready():
     randomize()
     setup_gold_ui()
     setup_statsbook_ui()
-
+    
     #update_stats_display()
     master_shop_container = VBoxContainer.new()
     master_shop_container.set_anchors_preset(Control.PRESET_CENTER_TOP)
@@ -138,6 +138,7 @@ func _ready():
     
     await get_tree().process_frame
     adjust_layout_containers()
+    reroll_shop()
 
 func _process(delta: float) -> void:
     # 3. Delegate the movement calculations to the Hero node
