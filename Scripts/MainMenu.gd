@@ -64,7 +64,7 @@ var character_starting_loadouts: Dictionary = {
         "stats":
         {},
         "passives": ["up3"],
-        "weapons": ["Bow", "CurseStaff", "Sword","Sword","Sword","Sword" ],
+        "weapons": ["Bow", "Sword", "Sword","Sword","Sword","Sword" ],
         "audience": ["Blue Fan", "Yellow Fan","Blue Fan"]
     },
     "char_slot3": {

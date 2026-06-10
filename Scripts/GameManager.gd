@@ -55,8 +55,8 @@ func initialize_seating(cols: int, rows: int):
         for x in range(1, cols - 1): # Skip edges
             seat_priority_order.append(Vector2i(x, y))
             
-    # Sort: Front rows (high Y) first, then middle seats (low X distance)
+    # Sort: Top rows (low Y) first, then middle seats (low X distance)
     seat_priority_order.sort_custom(func(a, b):
-        if a.y != b.y: return a.y > b.y
+        if a.y != b.y: return a.y < b.y # Changed > to < for top-down
         return abs(a.x - center_x) < abs(b.x - center_x)
     )

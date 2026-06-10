@@ -107,4 +107,4 @@ func get_monster(difficulty_key: String, round: int) -> Dictionary:
 	if round < 0 or round >= difficulty_monsters.size():
 		return {}
 
-	return difficulty_monsters[round]
+	return difficulty_monsters[round].duplicate(true)

@@ -66,7 +66,7 @@ func spawn_weapons(weapon_data_array: Array):
         weapon.material = mat
         var lvl = weapon_info.get("level", 1.0)
         mat.set_shader_parameter("level", float(lvl))
-        var icon_path = weapon_info.get("icon", "res://icon.svg")
+        var icon_path = weapon_info.get("icon")
         var atlas = load(icon_path).duplicate()
         
         var index = weapon_info.get("index", 0)

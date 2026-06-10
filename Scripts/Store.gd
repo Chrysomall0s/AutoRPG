@@ -34,6 +34,9 @@ var outline_shader = preload("res://Assets/shaders/outline_shader.gdshader")
 @onready var gold_label: Label = Label.new()
 @onready var player_sprite = $Hero
 
+@export var badge_size_ratio: float = 0.045
+@export var badge_y_offset_ratio: float = 0.05 # Higher = moves badges higher
+
 var master_shop_container: VBoxContainer
 var main_button_container: HBoxContainer
 var utility_button_container: HBoxContainer
@@ -49,66 +52,9 @@ var reroll_button: Button
 var weapon_sprites: Array[Sprite2D] = []
 var floating_time := 0.0
 
-#var stats_container: VBoxContainer
-#var stats_label: Label
-#var current_page_index: int = 0
-#var stat_pages = []
 var leave_button: Button
-#@export_group("Statsbook Layout")
-#@export var statsbook_x_ratio: float = 0.65
-#@export var statsbook_y_ratio: float = 0.15
-#@export var statsbook_font_ratio: float = 0.02
 
 var stats_page_instance: Node
-#
-#func build_stat_pages():
-    ## 1. Standard Stats Grouping
-    #var groups = {}
-    #var stats = GameManager.player_profile.get("stats", {})
-    #for key in stats.keys():
-        #var def = GameManager.stat_registry.get(key, null)
-        #if def == null: continue
-        #var group_name = def["group"]
-        #if not groups.has(group_name): groups[group_name] = []
-        #groups[group_name].append(key)
-    #
-    #stat_pages.clear()
-    #
-    #for group_name in groups.keys():
-        #stat_pages.append({
-            #"title": group_name,
-            #"stats": groups[group_name]
-        #})
-#
-    ## 2. Add Weapons Page
-    #var passives = GameManager.player_profile.get("passives", [])
-    #var passive_list = []
-    #for p in passives:
-        ## Assuming passives are dictionaries with 'name' and 'level'
-        #var p_name = p.get("name", "Unknown")
-        #var p_lvl = p.get("level", 1)
-        #passive_list.append(p_name + " (Lv." + str(p_lvl) + ")")
-    #
-    #stat_pages.append({
-        #"title": "Passive Items",
-        #"items": passive_list
-    #})
-#
-   ## 4. Add Audience Page (Sorted and Counted)
-    #var audience = GameManager.player_profile.get("audience", [])
-    #var audience_counts = {}
-    #for member in audience:
-        #var a_name = (member.get("name", "Unknown") if typeof(member) == TYPE_DICTIONARY else str(member))
-        #audience_counts[a_name] = audience_counts.get(a_name, 0) + 1
-        #
-    #var sorted_audience = audience_counts.keys()
-    #sorted_audience.sort()
-    #
-    #var audience_list = []
-    #for name in sorted_audience:
-        #audience_list.append(str(audience_counts[name]) + " " + name)
-        #
-    #stat_pages.append({"title": "Audience", "items": audience_list})
 
 func create_leave_button():
     var screen_size = get_viewport_rect().size
@@ -193,96 +139,6 @@ func _ready():
     await get_tree().process_frame
     adjust_layout_containers()
 
-#func setup_statsbook_ui():
-    #var screen_size = get_viewport_rect().size
-    #
-    #stats_container = VBoxContainer.new()
-    #stats_container.position = Vector2(screen_size.x * statsbook_x_ratio, screen_size.y * statsbook_y_ratio)
-    #
-    ## Optional: Set a fixed width so the container doesn't collapse
-    #stats_container.custom_minimum_size = Vector2(screen_size.x * 0.2, screen_size.y * 0.4)
-    #
-    ## 1. Stats Label (or the new container of rows)
-    #stats_label = Label.new()
-    #stats_label.name = "StatsLabel"
-    #stats_label.add_theme_font_size_override("font_size", int(screen_size.y * statsbook_font_ratio))
-    #stats_container.add_child(stats_label)
-    #
-    ## 2. Flip Button (Always added last to be at the bottom)
-    #var flip_button = Button.new()
-    #flip_button.name = "FlipButton" # Named for easy identification
-    #flip_button.text = "Flip Page"
-    #flip_button.add_theme_font_size_override("font_size", int(screen_size.y * statsbook_font_ratio))
-    #flip_button.pressed.connect(flip_stats_page)
-    #stats_container.add_child(flip_button)
-    #
-    #add_child(stats_container)
-    #update_stats_display()
-#func update_stats_display():
-    #if not is_instance_valid(stats_container): return
-    #
-    ## 1. Clear existing rows (keep the header/flip button if they are in there)
-    ## Assuming stats_label was the only child, or you want to clear specific generated nodes
-    #for child in stats_container.get_children():
-        #if child.name != "FlipButton" and child.name != "Header": # Add logic to protect header/buttons
-            #child.queue_free()
-#
-    #var page = stat_pages[current_page_index]
-    #
-    ## Add Title/Header
-    #var title = Label.new()
-    #title.name = "Header"
-    #title.text = page["title"]
-    #stats_container.add_child(title)
-#
-    ## 2. Render content
-    #if page.has("stats"):
-        #var stats = GameManager.player_profile.get("stats", {})
-        #for stat_key in page["stats"]:
-            #var value = stats.get(stat_key, 0)
-            #var def = GameManager.stat_registry.get(stat_key, {})
-            #var display_name = def.get("name", stat_key)
-            #
-            ## Use the helper to create the row
-            #var icon_path = def.get("iconatlas", "")
-            #var icon_idx = def.get("iconindex", 0)
-            #create_stat_row(display_name + ": " + str(value), icon_path, icon_idx)
-            #
-    #elif page.has("items"):
-        #for item in page["items"]:
-            #create_stat_row(str(item), "", 0) # Items might not have icons
-#
-#func create_stat_row(text: String, icon_path: String, icon_idx: int):
-    #var row = HBoxContainer.new()
-    #var screen_size = get_viewport_rect().size
-    #var font_size = int(screen_size.y * statsbook_font_ratio)
-    #
-    ## Icon
-    #if icon_path != "":
-        #var tex_rect = TextureRect.new()
-        #tex_rect.custom_minimum_size = Vector2(font_size, font_size)
-        #tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-        #tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-        #
-        #var atlas = AtlasTexture.new()
-        #atlas.atlas = load(icon_path)
-        ## Adjust these values based on your atlas grid size (e.g., 250)
-        #atlas.region = Rect2(Vector2((icon_idx % 4) * 250, (icon_idx / 4) * 250), Vector2(250, 250))
-        #tex_rect.texture = atlas
-        #row.add_child(tex_rect)
-        #
-    ## Text
-    #var label = Label.new()
-    #label.text = text
-    #label.add_theme_font_size_override("font_size", font_size)
-    #row.add_child(label)
-    #
-    #stats_container.add_child(row)
-#
-#func flip_stats_page():
-    #current_page_index = (current_page_index + 1) % stat_pages.size()
-    #update_stats_display()
-
 func _process(delta: float) -> void:
     # 3. Delegate the movement calculations to the Hero node
     if is_instance_valid(player_sprite) and player_sprite.has_method("update_weapon_movements"):
@@ -295,9 +151,6 @@ func adjust_layout_containers():
         (screen_size.x - master_shop_container.size.x) / 2.0,
         screen_size.y * master_shop_y_ratio
     )
-    #if is_instance_valid(stats_container):
-        #stats_container.position = Vector2(screen_size.x * statsbook_x_ratio, screen_size.y * statsbook_y_ratio)
-
 # ---------------------------------
 # WEAPON ORBIT & REFRESH LOGIC
 # ---------------------------------
@@ -353,6 +206,48 @@ func draw_shop_from_persistent_memory():
     # 3. Force a UI update to colors/states
     update_upgrade_colors()
 
+func _create_corner_element(text: String, is_left: bool, atlas_index: int = 0) -> Control:
+    var screen_size = get_viewport_rect().size
+    var badge_size = screen_size.y * badge_size_ratio
+    var y_offset = screen_size.y * badge_y_offset_ratio
+    
+    var container = Control.new()
+    container.custom_minimum_size = Vector2(badge_size, badge_size)
+    container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    
+    # Position relative to the parent (the weapon TextureRect)
+    if is_left:
+        container.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+        # Using -y_offset moves the badge UP
+        container.position = Vector2(-badge_size * 0.2, -y_offset)
+    else:
+        container.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+        # Using -y_offset moves the badge UP
+        container.position = Vector2(-badge_size * 0.8, -y_offset)
+    
+    # Create the background sprite
+    var sprite = TextureRect.new()
+    sprite.set_anchors_preset(Control.PRESET_FULL_RECT)
+    sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    
+    var atlas = AtlasTexture.new()
+    atlas.atlas = load("res://Assets/atlas/icon.tres") 
+    atlas.region = Rect2(Vector2((atlas_index % 4) * 250, (atlas_index / 4) * 250), Vector2(250, 250))
+    sprite.texture = atlas
+    container.add_child(sprite)
+    
+    # Create the label
+    var lbl = Label.new()
+    lbl.text = text
+    lbl.set_anchors_preset(Control.PRESET_FULL_RECT)
+    lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    lbl.add_theme_font_size_override("font_size", int(badge_size * 0.5))
+    container.add_child(lbl)
+    
+    return container
+
 func create_upgrade_button(global_entry: Dictionary, position_index: int):
     var upgrade = global_entry["upgrade"]
     var cat = upgrade.get("category")
@@ -388,6 +283,16 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
         mat.shader = outline_shader
         mat.set_shader_parameter("level", float(upgrade.get("level", 1.0)))
         tex_rect.material = mat
+        # --- ADD CORNER BADGES TO SHOP ITEM ---
+        # Only show level badges for weapons/mods that have a level
+        if cat == "weapon" or cat == "weapon_mod":
+            var w_lvl = str(upgrade.get("level", 1))
+            var scale_key = upgrade.get("scale", "hp") # Default to hp if missing
+            var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
+
+            tex_rect.add_child(_create_corner_element(w_lvl, true, 9))  # Left-Down
+            tex_rect.add_child(_create_corner_element(scale_value, false, 9)) # Right-Down
+        # ------------------------------------
     else:
         tex_rect.texture = null
     
@@ -424,11 +329,6 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
             elif cat == "viewer":
                 handle_audience_purchase(entry)
         )
-        
-#func refresh_stats():
-    #build_stat_pages()
-    #if is_instance_valid(stats_label):
-        #update_stats_display()
 
 func handle_audience_purchase(entry_ref: Dictionary):
     var upgrade_data = entry_ref["upgrade"]
@@ -656,6 +556,13 @@ func setup_six_slots_ui():
             # Use the weapon's level
             mat.set_shader_parameter("level", float(weapon_data.get("level", 1.0)))
             tex_rect.material = mat
+            # --- ADD CORNER LABELS ---
+            var w_lvl = str(weapon_data.get("level", 1))
+            var scale_key = weapon_data.get("scale", "hp") # Default to hp if missing
+            var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
+
+            tex_rect.add_child(_create_corner_element(w_lvl, true, 9))  # Left-Down
+            tex_rect.add_child(_create_corner_element(scale_value, false, 9)) # Right-Down
             # --------------------
         else:
             tex_rect.texture = null
