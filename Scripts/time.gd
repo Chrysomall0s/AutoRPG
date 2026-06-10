@@ -98,8 +98,8 @@ func _get_callback_for_row(row: int, index: int) -> Callable:
 # Callback functions
 func pausespeed(): Engine.time_scale = 0.0
 func slowspeed(): Engine.time_scale = 0.5
-func normalspeed(): Engine.time_scale = 1.0
-func fastspeed(): Engine.time_scale = 2.0
+func normalspeed(): Engine.time_scale = 2.0
+func fastspeed(): Engine.time_scale = 8.0
 func easydifficulty(): GameManager.selected_difficulty = 1
 func normaldifficulty(): GameManager.selected_difficulty = 2
 func harddifficulty(): GameManager.selected_difficulty = 3

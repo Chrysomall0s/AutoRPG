@@ -11,6 +11,7 @@ anchors_preset = 0
 offset_right = 75.0
 offset_bottom = 71.0
 script = ExtResource("1_wvl2i")
+seconds_per_tick = null
 
 [node name="Arena" type="Sprite2D" parent="." unique_id=1403740229]
 position = Vector2(721.25, 1203.5)

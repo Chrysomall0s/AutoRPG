@@ -53,10 +53,10 @@ func set_filled(value: bool):
         lock.visible = (!value and !is_border)
     seat.modulate = Color(1, 1, 1) if value else Color(0.5, 0.5, 0.5)
 
-func _process(delta):
+#func _process(delta):
     # Throw logic based on upgrade stats
-    if is_filled and viewer_data and randf() < viewer_data.get("throw_chance", 0):
-        perform_throw()
+    #if is_filled and viewer_data and randf() < viewer_data.get("throw_chance", 0):
+        #perform_throw()
 
 func perform_throw():
     var target = get_tree().current_scene.get_node_or_null("Foe")
