@@ -2,7 +2,7 @@ extends Control
 
 const TimeController = preload("res://Scripts/time.gd")
 var time_ctrl = TimeController.new()
-
+const FloatingTextScene = preload("res://Scenes/floating_text.tscn")
 # =================================================================
 # SETTINGS & REFERENCES
 # =================================================================
@@ -83,6 +83,10 @@ func _process_combat_ticks(opponent_stats: Dictionary, target_stats: Dictionary,
 			var friendly = weapon.get_meta("friendly")
 
 			Stats.execute_weapon(type, amount, target_stats, opponent_stats)
+			var floating_text = FloatingTextScene.instantiate()
+			add_child(floating_text)
+			floating_text.global_position = target_node.global_position + Vector2(randf_range(-20, 20), -80)
+			floating_text.setup(abs(amount), friendly, 0) # 0 is your atlas icon index
 			if friendly:
 				attacker_node.attack_target(
 				weapon,

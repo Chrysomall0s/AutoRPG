@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://cni3flphs4amo"]
+
+[ext_resource type="Script" uid="uid://t33751l5nkv" path="res://Scripts/floating_text.gd" id="1_ds5wh"]
+[ext_resource type="Texture2D" uid="uid://dqqw4j32lfkb5" path="res://Assets/icon.png" id="2_8goxa"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4ufsu"]
+atlas = ExtResource("2_8goxa")
+region = Rect2(0, 750, 250, 250)
+
+[node name="FloatingText" type="Marker2D" unique_id=1686757241]
+script = ExtResource("1_ds5wh")
+
+[node name="Label" type="Label" parent="." unique_id=367907067]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1259233877]
+texture = SubResource("AtlasTexture_4ufsu")
