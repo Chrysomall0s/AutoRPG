@@ -301,9 +301,8 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
     # 3. Create Label
     var label = Label.new()
     if !global_entry["bought"]:
-        var action_hint = "\n[Drag to Slot]" if cat == "weapon" else "\n[Tap to Buy]"
-        if cat == "weapon_mod": action_hint = "\n[Drag to Mod]"
-        label.text = upgrade["name"] + " (" + str(upgrade["cost"]) + "G)" + action_hint
+        var action_hint = str(upgrade["cost"]) + "G"
+        label.text = upgrade["name"] + "\n" + action_hint
     
     label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     label.add_theme_font_size_override("font_size", int(screen_size.y * shop_button_font_ratio))

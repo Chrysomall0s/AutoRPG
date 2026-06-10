@@ -44,16 +44,8 @@ var stat_registry = {
 	},
 }
 
-func _ready():
-	stats_container = VBoxContainer.new()
-	add_child(stats_container)
-	refresh_stats()
 
-func refresh_stats():
-	# 1. Rebuild the internal data
-	build_stat_pages()
-	# 2. Re-render the UI
-	update_stats_display()
+
 
 func build_stat_pages():
 	var groups = {}
@@ -108,14 +100,37 @@ func build_stat_pages():
 	stat_pages.append({"title": "Audience", "items": audience_list})
 # Helper to find data in your UpgradeData array
 
+func _ready():
+	stats_container = VBoxContainer.new()
+	add_child(stats_container) # Add to tree first
+	
+	# Use the correct method name: set_anchors_preset
+	stats_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+	
+	# Add padding/separation
+	stats_container.add_theme_constant_override("separation", 10)
+	
+	# Listen for window resizing to update the layout
+	get_viewport().size_changed.connect(refresh_stats)
+	
+	refresh_stats()
+
+func refresh_stats():
+	build_stat_pages()
+	update_stats_display()
+
 func update_stats_display():
 	for child in stats_container.get_children():
 		child.queue_free()
 
 	var page = stat_pages[current_page_index]
 	
+	# Use dynamic font sizing
+	var dynamic_font_size = int(get_viewport_rect().size.y * statsbook_font_ratio)
+	
 	var title = Label.new()
 	title.text = page["title"]
+	title.add_theme_font_size_override("font_size", int(dynamic_font_size * 1.5))
 	stats_container.add_child(title)
 
 	if page.has("stats"):
@@ -124,29 +139,37 @@ func update_stats_display():
 			var value = stats.get(stat_key, 0)
 			var def = stat_registry.get(stat_key, {})
 			create_stat_row(def.get("name", stat_key) + ": " + str(value), def.get("iconatlas", ""), def.get("iconindex", 0))
-	
 	elif page.has("items"):
 		for item in page["items"]:
-			# CHANGE HERE: Pass the item's specific icon and index
 			create_stat_row(item["text"], item.get("icon", ""), item.get("index", 0))
 			
 	var flip_button = Button.new()
 	flip_button.text = "Flip Page"
+	flip_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	flip_button.pressed.connect(flip_stats_page)
 	stats_container.add_child(flip_button)
 
 func create_stat_row(text: String, icon_path: String, icon_idx: int):
 	var row = HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_BEGIN
+	
 	var font_size = int(get_viewport_rect().size.y * statsbook_font_ratio)
 	
 	if icon_path != "":
 		var tex_rect = TextureRect.new()
+		# Scale icon relative to the calculated font size
 		tex_rect.custom_minimum_size = Vector2(font_size, font_size)
 		tex_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		tex_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		
+		var full_tex = load(icon_path)
 		var atlas = AtlasTexture.new()
-		atlas.atlas = load(icon_path)
-		atlas.region = Rect2(Vector2((icon_idx % 4) * 250, (icon_idx / 4) * 250), Vector2(250, 250))
+		atlas.atlas = full_tex
+		# Calculate region dynamically based on texture dimensions
+		var tile_w = full_tex.get_width() / 4.0
+		var tile_h = full_tex.get_height() / 4.0
+		atlas.region = Rect2(Vector2((icon_idx % 4) * tile_w, (icon_idx / 4) * tile_h), Vector2(tile_w, tile_h))
+		
 		tex_rect.texture = atlas
 		row.add_child(tex_rect)
 		
@@ -154,6 +177,7 @@ func create_stat_row(text: String, icon_path: String, icon_idx: int):
 	label.text = text
 	label.add_theme_font_size_override("font_size", font_size)
 	row.add_child(label)
+	
 	stats_container.add_child(row)
 
 func flip_stats_page():
