@@ -31,7 +31,7 @@ func get_difficulty_key() -> String:
     if selected_difficulty < 0 or selected_difficulty >= difficulties.size():
         return "Easy" # fallback safety
     return difficulties[selected_difficulty]
-
+var after_battle_data
 var currentRound: int = 0
 var battle_over: bool = false
 var escaped: bool = false

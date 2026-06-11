@@ -124,30 +124,49 @@ func update_stats_display():
 		child.queue_free()
 
 	var page = stat_pages[current_page_index]
-	
-	# Use dynamic font sizing
+
 	var dynamic_font_size = int(get_viewport_rect().size.y * statsbook_font_ratio)
-	
+
+	# =========================
+	# BIG FLIP BUTTON (TOP)
+	# =========================
+	var flip_button = Button.new()
+	flip_button.text = "FLIP PAGE"
+	flip_button.pressed.connect(flip_stats_page)
+
+	# Make it BIG
+	flip_button.custom_minimum_size = Vector2(0, dynamic_font_size * 3)
+	flip_button.add_theme_font_size_override("font_size", dynamic_font_size * 2)
+
+	flip_button.size_flags_horizontal = Control.SIZE_FILL
+	stats_container.add_child(flip_button)
+
+	# Optional spacing
+	var spacer = Control.new()
+	spacer.custom_minimum_size = Vector2(0, 10)
+	stats_container.add_child(spacer)
+
+	# =========================
+	# TITLE
+	# =========================
 	var title = Label.new()
 	title.text = page["title"]
 	title.add_theme_font_size_override("font_size", int(dynamic_font_size * 1.5))
 	stats_container.add_child(title)
 
+	# =========================
+	# CONTENT
+	# =========================
 	if page.has("stats"):
 		var stats = GameManager.player_profile.get("stats", {})
 		for stat_key in page["stats"]:
 			var value = stats.get(stat_key, 0)
 			var def = stat_registry.get(stat_key, {})
 			create_stat_row(def.get("name", stat_key) + ": " + str(value), def.get("iconatlas", ""), def.get("iconindex", 0))
+
 	elif page.has("items"):
 		for item in page["items"]:
 			create_stat_row(item["text"], item.get("icon", ""), item.get("index", 0))
-			
-	var flip_button = Button.new()
-	flip_button.text = "Flip Page"
-	flip_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	flip_button.pressed.connect(flip_stats_page)
-	stats_container.add_child(flip_button)
 
 func create_stat_row(text: String, icon_path: String, icon_idx: int):
 	var row = HBoxContainer.new()

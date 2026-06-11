@@ -60,7 +60,7 @@ func create_leave_button():
     var screen_size = get_viewport_rect().size
     
     leave_button = Button.new()
-    leave_button.text = "Leave"
+    leave_button.text = "Battle!"
     leave_button.pressed.connect(_play)
 
     leave_button.custom_minimum_size = Vector2(
@@ -288,9 +288,9 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
         # Only show level badges for weapons/mods that have a level
         if cat == "weapon" or cat == "weapon_mod":
             var w_lvl = str(upgrade.get("level", 1))
-            var scale_key = upgrade.get("scale", "hp") # Default to hp if missing
-            var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
-
+            #var scale_key = upgrade.get("scale", "hp") # Default to hp if missing
+            #var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
+            var scale_value = str(upgrade.get("speed", 1))
             tex_rect.add_child(_create_corner_element(w_lvl, true, 9))  # Left-Down
             tex_rect.add_child(_create_corner_element(scale_value, false, 13)) # Right-Down
         # ------------------------------------
@@ -558,9 +558,9 @@ func setup_six_slots_ui():
             tex_rect.material = mat
             # --- ADD CORNER LABELS ---
             var w_lvl = str(weapon_data.get("level", 1))
-            var scale_key = weapon_data.get("scale", "hp") # Default to hp if missing
-            var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
-
+            #var scale_key = weapon_data.get("scale", "hp") # Default to hp if missing
+            #var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
+            var scale_value = str(weapon_data.get("speed", 1))
             tex_rect.add_child(_create_corner_element(w_lvl, true, 9))  # Left-Down
             tex_rect.add_child(_create_corner_element(scale_value, false, 13)) # Right-Down
             # --------------------

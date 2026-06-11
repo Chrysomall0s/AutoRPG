@@ -4,14 +4,14 @@ extends Node
 var monsters = {
 	"Easy": [
 		{
-		"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+		"icon": "res://Assets/atlas/fruit.tres", "index": 4,
 			"stats": {
 				"maxhp": 50,
 				"hp": 50,
 				"dmg": 4,
 				"speed": 5,
 			},
-			"passives": ["Cha1"],
+			"passives": [],
 			"weapons": ["Sword"],
 			"audience": ["Yellow Fan"]
 		},
@@ -23,7 +23,7 @@ var monsters = {
 				"dmg": 5,
 				"speed": 4,
 			},
-			"passives": ["Cha2"],
+			"passives": [],
 			"weapons": ["Axe"],
 			"audience": ["Blue Fan"]
 		},
@@ -35,7 +35,7 @@ var monsters = {
 				"dmg": 5,
 				"speed": 4,
 			},
-			"passives": ["Cha2"],
+			"passives": [],
 			"weapons": ["Axe"],
 			"audience": ["Blue Fan"]
 		},
@@ -47,7 +47,7 @@ var monsters = {
 				"dmg": 5,
 				"speed": 4,
 			},
-			"passives": ["Cha2"],
+			"passives": [],
 			"weapons": ["Axe"],
 			"audience": ["Blue Fan"]
 		},
@@ -61,7 +61,7 @@ var monsters = {
 				"dmg": 4,
 				"speed": 5,
 			},
-			"passives": ["Cha1"],
+			"passives": [],
 			"weapons": ["Sword"],
 			"audience": ["Yellow Fan"]
 		},
@@ -76,7 +76,7 @@ var monsters = {
 				"dmg": 4,
 				"speed": 5,
 			},
-			"passives": ["Cha1"],
+			"passives": [],
 			"weapons": ["Sword"],
 			"audience": ["Yellow Fan"]
 		},
@@ -90,21 +90,30 @@ var monsters = {
 				"dmg": 4,
 				"speed": 5,
 			},
-			"passives": ["Cha1"],
+			"passives": [],
 			"weapons": ["Sword"],
 			"audience": ["Yellow Fan"]
 		},
 	],
 }
 
+func has_next_round(difficulty_key: int, round: int) -> bool:
+	
+	var difficulty_list = monsters[GameManager.get_difficulty_key()]
+	return round + 1 < difficulty_list.size()
 
 func get_monster(difficulty_key: String, round: int) -> Dictionary:
 	if !monsters.has(difficulty_key):
-		return {}
+		assert(false, "Unknown difficulty key: %s" % difficulty_key)
 
 	var difficulty_list = monsters[difficulty_key]
+
 	if round < 0 or round >= difficulty_list.size():
-		return {}
+		assert(
+			false,
+			"Round %d out of range for difficulty '%s' (size=%d)" %
+			[round, difficulty_key, difficulty_list.size()]
+		)
 
 	var raw_data = difficulty_list[round]
 	
@@ -147,8 +156,11 @@ func get_monster(difficulty_key: String, round: int) -> Dictionary:
 
 # Ensure this helper exists in this script or is accessible
 func _find_upgrade_by_name(target_name: String) -> Dictionary:
-	# Assuming you have access to UpgradeData here
 	var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
+
 	for upgrade in UpgradeData.upgrades:
-		if upgrade.get("name") == target_name: return upgrade
+		if upgrade.get("name") == target_name:
+			return upgrade
+
+	assert(false, "Upgrade not found: %s" % target_name)
 	return {}
