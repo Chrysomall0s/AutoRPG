@@ -284,7 +284,7 @@ func execute_weapon_event(weapon, weapon_data: Dictionary):
 
     weapon.set_meta("next_activation", tickcount + ticks_until_next)
     # Apply stats
-    Stats.execute_weapon(weapon.get_meta("weapon_type"), weapon.get_meta("amount"), target_stats, attacker_stats)
+    Stats.execute_weapon(weapon.get_meta("weapon_type"), weapon_data.get("level"), target_stats, attacker_stats)
     
     # Visuals
     var floating_text = FloatingTextScene.instantiate()
@@ -293,7 +293,7 @@ func execute_weapon_event(weapon, weapon_data: Dictionary):
     floating_text.global_position = target_node.global_position + Vector2(randf_range(-20, 20), -80)
     if (weapon.get_meta("friendly")):
             floating_text.global_position = attacker_node.global_position + Vector2(randf_range(-20, 20), -80)
-    floating_text.setup(abs(weapon.get_meta("amount")), weapon.get_meta("friendly"), 0)
+    floating_text.setup(abs(weapon_data.get("level")), weapon.get_meta("friendly"), 0)
     
     var attack_pos = attacker_node.global_position + Vector2(0, -50) if weapon.get_meta("friendly") else target_node.global_position
     attacker_node.attack_target(weapon, attack_pos, 0.2)
