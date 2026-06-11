@@ -181,8 +181,8 @@ func _process(delta):
 			a += 1
 		if total_duration > 0:
 			progress = clamp(progress, 0.0, 1.0)
-		progress *= 0.3   
-		progress += 0.666
+		progress *= 0.25   
+		progress += 0.7
 		if weapon.material is ShaderMaterial:
 			weapon.material.set_shader_parameter("charge_progress", progress)
 
@@ -198,13 +198,14 @@ func _process(delta):
 			var a = 0
 			a += 1
 		time_since_last_tick = 0.0
+		next_event_index += 1
+		if(next_event_index == battle_timeline.size()):
+			next_event_index = 0
 		var event = battle_timeline[next_event_index]
 		if event["type"] == "weapon":
 			execute_weapon_event(find_weapon_node_from_data(event.weapon), event.weapon)
 			
-		next_event_index += 1
-		if(next_event_index == battle_timeline.size()):
-			next_event_index = 0
+	
 	   
 var next_event_index: int = 0
 var last_execution_time: float = 0.0
@@ -278,9 +279,8 @@ func execute_weapon_event(weapon, weapon_data: Dictionary):
 	if(ticks_until_next > 6):
 		print_debug("hey")
 	weapon.set_meta("last_activation", tickcount)
-	if (ticks_until_next == 1):
-		ticks_until_next -=1
-	weapon.set_meta("next_activation", tickcount + ticks_until_next +1)
+
+	weapon.set_meta("next_activation", tickcount + ticks_until_next)
 	# Apply stats
 	Stats.execute_weapon(weapon.get_meta("weapon_type"), weapon.get_meta("amount"), target_stats, attacker_stats)
 	
