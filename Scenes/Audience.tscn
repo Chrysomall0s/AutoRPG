@@ -1,8 +1,27 @@
 [gd_scene format=3 uid="uid://bkq81ulyqfbgf"]
 
 [ext_resource type="Script" uid="uid://b4ukcqb3xd5aa" path="res://Scripts/Audience.gd" id="1_6fy64"]
+[ext_resource type="Shader" uid="uid://evdhf67xm8d1" path="res://Assets/shaders/audience.gdshader" id="1_uui05"]
 [ext_resource type="Texture2D" uid="uid://8urf20hdkyag" path="res://Assets/mush.png" id="2_6fy64"]
 [ext_resource type="Texture2D" uid="uid://c5x0s5ep8ksop" path="res://Assets/atlas/icon.tres" id="3_6fy64"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mxbuo"]
+shader = ExtResource("1_uui05")
+shader_parameter/level = 1.0
+shader_parameter/outline_width = 8.0
+shader_parameter/is_friendly = true
+shader_parameter/use_charge_shader = false
+shader_parameter/charge_progress = 0.5
+shader_parameter/charge_color = Color(0, 1, 0, 0.5)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_128j7"]
+shader = ExtResource("1_uui05")
+shader_parameter/level = 1.0
+shader_parameter/outline_width = 8.0
+shader_parameter/is_friendly = true
+shader_parameter/use_charge_shader = false
+shader_parameter/charge_progress = 0.5
+shader_parameter/charge_color = Color(0, 1, 0, 0.5)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mxbuo"]
 atlas = ExtResource("2_6fy64")
@@ -19,12 +38,14 @@ size = Vector2(46.875008, 78.124985)
 region = Rect2(0, 750, 250, 250)
 
 [node name="Audience" type="Area2D" unique_id=418806984]
+material = SubResource("ShaderMaterial_mxbuo")
 scale = Vector2(1.6, 1.6)
 script = ExtResource("1_6fy64")
 
 [node name="Person" type="Sprite2D" parent="." unique_id=1194428705]
-position = Vector2(-6.25, -6.875)
-scale = Vector2(0.32375, 0.295)
+material = SubResource("ShaderMaterial_128j7")
+position = Vector2(2.1875, -0.31249928)
+scale = Vector2(0.22749999, 0.27249998)
 texture = SubResource("AtlasTexture_mxbuo")
 
 [node name="Seat" type="Sprite2D" parent="." unique_id=1467693951]
@@ -39,12 +60,14 @@ shape = SubResource("RectangleShape2D_6fy64")
 
 [node name="Medal" type="Sprite2D" parent="." unique_id=2075707453]
 visible = false
+material = SubResource("ShaderMaterial_128j7")
 position = Vector2(1.25, 42.5)
 scale = Vector2(0.19750002, 0.18625002)
 texture = SubResource("AtlasTexture_128j7")
 
 [node name="Lock" type="Sprite2D" parent="." unique_id=118401781]
 visible = false
+material = SubResource("ShaderMaterial_128j7")
 position = Vector2(1.25, 42.5)
 scale = Vector2(0.19750002, 0.18625002)
 texture = SubResource("AtlasTexture_128j7")

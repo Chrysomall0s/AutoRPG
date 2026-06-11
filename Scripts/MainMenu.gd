@@ -57,7 +57,7 @@ var character_starting_loadouts: Dictionary = {
         {},
         "passives": [],
         "weapons": ["Sword"],
-        "audience": ["Yellow Fan"]
+        "audience": ["Zealot"]
     },
     "char_slot2": {
         "icon": "res://Assets/atlas/fruit.tres", "index": 0,
@@ -65,7 +65,7 @@ var character_starting_loadouts: Dictionary = {
         {},
         "passives": ["up3"],
         "weapons": ["Bow", "Sword", "Sword","Sword","Sword","Sword" ],
-        "audience": ["Blue Fan", "Yellow Fan","Blue Fan"]
+        "audience": ["Patron", "Hooligan","Hooligan"]
     },
     "char_slot3": {
         "icon": "res://Assets/atlas/fruit.tres", "index": 2,
@@ -73,7 +73,7 @@ var character_starting_loadouts: Dictionary = {
         {},
         "passives": ["up2","up1"],
         "weapons": ["Staff"],
-        "audience": ["Violet Fan"]
+        "audience": ["Patron"]
     }
 }
 
@@ -149,7 +149,7 @@ func spawn_audience():
                 var char_data = character_starting_loadouts[char_key]
                 
                 # Pass the data so the audience sprite updates
-                audience.setup_type(char_data)
+                audience.setup_type(char_data, true)
                 
                 audience.set_filled(true)
                 if !GameManager.audience_mastery.has(seat_index):

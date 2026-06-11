@@ -18,8 +18,8 @@ var upgrades = [
 	{"name": "Curse","friendly":false, "category": "weapon","type": "damage","scale": "hp", "weight": 0, "cost": 2, "icon":            "res://Assets/atlas/leaf.tres","index": 4, "amount": 4, "speed": 3, "level": 1},
 	
 	# --- AUDIENCE UPGRADES ---
-	{"name": "Yellow Fan", "category": "viewer", "type": "heal",   "value": 5,"weight": 30, "throw_chance": 0.005, "cost": 3, "icon":  "res://Assets/atlas/mush.tres","index": 0, "level": 1},
-	{"name": "Blue Fan",   "category": "viewer", "type": "damage", "value": 10,"weight": 20, "throw_chance": 0.003, "cost": 3, "icon":  "res://Assets/atlas/mush.tres","index": 1, "level": 1},
-	{"name": "Violet Fan", "category": "viewer", "type": "damage", "value": 50,"weight": 11, "throw_chance": 0.001, "cost": 5, "icon":  "res://Assets/atlas/mush.tres","index": 2, "level": 1},
-	{"name": "Empty Fan", "category": "viewer", "type": "damage", "value": 0,"weight": 24, "throw_chance": 0.000, "cost": 5, "icon":  "res://Assets/atlas/mush.tres","index": 3, "level": 1},
+	{"name": "Patron", "category": "viewer", "type": "heal",   "value": 5,"weight": 30, "throw_chance": 0.005, "cost": 3, "icon":  "res://Assets/atlas/mush.tres","index": 3, "level": 1},
+	{"name": "Hooligan",   "category": "viewer", "type": "damage", "value": 10,"weight": 20, "throw_chance": 0.003, "cost": 3, "icon":  "res://Assets/atlas/mush.tres","index": 7, "level": 1},
+	{"name": "Zealot", "category": "viewer", "type": "damage", "value": 50,"weight": 11, "throw_chance": 0.001, "cost": 5, "icon":  "res://Assets/atlas/mush.tres","index": 11, "level": 1},
+	{"name": "Heckler", "category": "viewer", "type": "damage", "value": 0,"weight": 24, "throw_chance": 0.000, "cost": 5, "icon":  "res://Assets/atlas/mush.tres","index": 15, "level": 1},
 ]

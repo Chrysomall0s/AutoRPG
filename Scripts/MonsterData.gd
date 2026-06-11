@@ -13,7 +13,7 @@ var monsters = {
 			},
 			"passives": [],
 			"weapons": ["Sword"],
-			"audience": ["Yellow Fan"]
+			"audience": ["Heckler"]
 		},
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
@@ -25,7 +25,7 @@ var monsters = {
 			},
 			"passives": [],
 			"weapons": ["Axe"],
-			"audience": ["Blue Fan"]
+			"audience": ["Heckler"]
 		},
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
@@ -37,7 +37,7 @@ var monsters = {
 			},
 			"passives": [],
 			"weapons": ["Axe"],
-			"audience": ["Blue Fan"]
+			"audience": ["Heckler"]
 		},
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
@@ -49,7 +49,7 @@ var monsters = {
 			},
 			"passives": [],
 			"weapons": ["Axe"],
-			"audience": ["Blue Fan"]
+			"audience": ["Heckler"]
 		},
 	],
 	"Normal": [
@@ -63,7 +63,7 @@ var monsters = {
 			},
 			"passives": [],
 			"weapons": ["Sword"],
-			"audience": ["Yellow Fan"]
+			"audience": ["Heckler"]
 		},
 	],
 	"Hard": [
@@ -78,7 +78,7 @@ var monsters = {
 			},
 			"passives": [],
 			"weapons": ["Sword"],
-			"audience": ["Yellow Fan"]
+			"audience": ["Heckler"]
 		},
 	],
 	"Insane": [
@@ -92,7 +92,7 @@ var monsters = {
 			},
 			"passives": [],
 			"weapons": ["Sword"],
-			"audience": ["Yellow Fan"]
+			"audience": ["Heckler"]
 		},
 	],
 }
