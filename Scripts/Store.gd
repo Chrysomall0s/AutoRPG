@@ -207,7 +207,7 @@ func draw_shop_from_persistent_memory():
     # 3. Force a UI update to colors/states
     update_upgrade_colors()
 
-func _create_corner_element(text: String, is_left: bool, atlas_index: int = 0) -> Control:
+func _create_corner_element(text: String, alignment_index: int = 0, atlas_index: int = 0) -> Control:    
     var screen_size = get_viewport_rect().size
     var badge_size = screen_size.y * badge_size_ratio
     var y_offset = screen_size.y * badge_y_offset_ratio
@@ -217,14 +217,22 @@ func _create_corner_element(text: String, is_left: bool, atlas_index: int = 0) -
     container.mouse_filter = Control.MOUSE_FILTER_IGNORE
     
     # Position relative to the parent (the weapon TextureRect)
-    if is_left:
-        container.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-        # Using -y_offset moves the badge UP
-        container.position = Vector2(-badge_size * 0.2, -y_offset)
-    else:
-        container.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-        # Using -y_offset moves the badge UP
-        container.position = Vector2(-badge_size * 0.8, -y_offset)
+    match alignment_index:
+        0: # Left
+            container.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+            container.position = Vector2(-badge_size * 0.2, -y_offset)
+        1: # Right
+            container.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+            container.position = Vector2(-badge_size * 0.0, -y_offset)
+        2: # Right Right
+            container.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+            container.position = Vector2(badge_size * 0.6, -y_offset)
+        3: # Right Right Right
+            container.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+            container.position = Vector2(badge_size * 1.2, -y_offset)
+        _: # Default/Fallback
+            container.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+            container.position = Vector2(-badge_size * 0.2, -y_offset)
     
     # Create the background sprite
     var sprite = TextureRect.new()
@@ -245,6 +253,15 @@ func _create_corner_element(text: String, is_left: bool, atlas_index: int = 0) -
     lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
     lbl.add_theme_font_size_override("font_size", int(badge_size * 0.5))
+    
+    # --- ADD THESE LINES ---
+    # Set text color to white
+    lbl.add_theme_color_override("font_color", Color.BLACK)
+    # Set outline color to black
+    lbl.add_theme_color_override("font_outline_color", Color.BLACK)
+    # Set outline thickness (adjust as needed, e.g., 4 to 8 works well for UI)
+    lbl.add_theme_constant_override("outline_size", 8)
+    # -----------------------
     container.add_child(lbl)
     
     return container
@@ -286,13 +303,15 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
         tex_rect.material = mat
         # --- ADD CORNER BADGES TO SHOP ITEM ---
         # Only show level badges for weapons/mods that have a level
+        var price_value = str(upgrade.get("cost", 1))
+        tex_rect.add_child(_create_corner_element(price_value, 3, 0))
         if cat == "weapon" or cat == "weapon_mod":
             var w_lvl = str(upgrade.get("level", 1))
             #var scale_key = upgrade.get("scale", "hp") # Default to hp if missing
             #var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
             var scale_value = str(upgrade.get("speed", 1))
-            tex_rect.add_child(_create_corner_element(w_lvl, true, 9))  # Left-Down
-            tex_rect.add_child(_create_corner_element(scale_value, false, 13)) # Right-Down
+            tex_rect.add_child(_create_corner_element(w_lvl, 1, 9))  # Left-Down
+            tex_rect.add_child(_create_corner_element(scale_value, 2, 13)) # Right-Down
         # ------------------------------------
     else:
         tex_rect.texture = null
@@ -302,8 +321,7 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
     # 3. Create Label
     var label = Label.new()
     if !global_entry["bought"]:
-        var action_hint = str(upgrade["cost"]) + "G"
-        label.text = upgrade["name"] + "\n" + action_hint
+        label.text = upgrade["name"] 
     
     label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
     label.add_theme_font_size_override("font_size", int(screen_size.y * shop_button_font_ratio))
@@ -454,15 +472,17 @@ func finalize_item_purchase(entry):
         if tex_rect and tex_rect is TextureRect:
             tex_rect.texture = null
             
+            # --- ADD THIS: REMOVE CORNER BADGES ---
+            for child in tex_rect.get_children():
+                child.queue_free()
+            # --------------------------------------
+            
         # Clear the Text (second child of HBox)
         var label = hbox.get_child(1)
         if label and label is Label:
             label.text = "" 
             
-    # Optional: If you want the "SOLD OUT" text to remain, 
-    # but remove the weapon info text, you could set btn.text = "-- SOLD OUT --"
-    # instead of clearing the label.
-    
+    # Check if all shop items are bought for reroll cost logic
     if GameManager.shop_items[0]["bought"] and \
        GameManager.shop_items[1]["bought"] and \
        GameManager.shop_items[2]["bought"]:
@@ -561,8 +581,11 @@ func setup_six_slots_ui():
             #var scale_key = weapon_data.get("scale", "hp") # Default to hp if missing
             #var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
             var scale_value = str(weapon_data.get("speed", 1))
-            tex_rect.add_child(_create_corner_element(w_lvl, true, 9))  # Left-Down
-            tex_rect.add_child(_create_corner_element(scale_value, false, 13)) # Right-Down
+            var price_value = str(weapon_data.get("cost", 1))
+            tex_rect.add_child(_create_corner_element(price_value, 3, 0))
+            tex_rect.add_child(_create_corner_element(w_lvl, 1, 9))  # Left-Down
+            tex_rect.add_child(_create_corner_element(scale_value, 2, 13)) # Right-Down
+
             # --------------------
         else:
             tex_rect.texture = null
