@@ -1,69 +1,87 @@
 extends Node2D
 
-@export_group("Audience Grid Details")
-@export var audience_columns: int = 11
+@export_group("Grid Settings")
+@export var audience_columns: int = 12
 @export var audience_rows: int = 7
-@export var original_sprite_width: float = 44.0    
-@export var original_sprite_height: float = 44.0   
+
+@export_group("Spacing & Sizing (Percentage of Screen)")
+@export var seat_size: float = 0.08    # 5% of screen width
+@export var gap_x: float = 0.01       # 1% of screen width
+@export var gap_y: float = -0.02       # 2% of screen height
+@export var starting_y: float = 0.47   # Starts 20% down from top
 
 @onready var AudienceScene = preload("res://Scenes/Audience.tscn")
-@onready var audience_container = self # Assuming script is on the container
-
-func _ready():
-    populate_audience()
 
 func populate_audience():
-    randomize()
-    
-    # 1. Ensure seat order is calculated once
-    if GameManager.seat_priority_order.is_empty():
-        GameManager.initialize_seating(audience_columns, audience_rows)
-        
-    var player_audience = GameManager.player_profile.get("audience", [])
-    var enemy_audience = GameManager.current_enemy_profile.get("audience", [])
-    # 2. Local pool to track who gets a seat (Duplicate to avoid modifying global state)
-    var available_pool = player_audience + enemy_audience
-    # 3. Setup positioning math
+    # 1. Cleanup
+    for child in get_children():
+        child.queue_free()
+
+    # 2. Setup Screen Math
     var screen_size = get_viewport_rect().size
-    var zone_size = Vector2(screen_size.x * 1.1, screen_size.y * 0.4)
-    var zone_center = Vector2(screen_size.x * 0.5, screen_size.y * 0.7)
-    var zone_top_left = zone_center - (zone_size / 2.0)
-    var spacing_x = zone_size.x / audience_columns
-    var spacing_y = zone_size.y / audience_rows
-    var uniform_scale = min((spacing_x / original_sprite_width) * 0.9, (spacing_y / original_sprite_height) * 0.9)
-    
-    # 4. Instantiate all seats first and leave them empty
+    var seat_px = screen_size.x * seat_size
+    var gap_x_px = screen_size.x * gap_x
+    var gap_y_px = screen_size.y * gap_y
+    var row_width = (audience_columns * seat_px) + ((audience_columns - 1) * gap_x_px)
+    var start_x = (screen_size.x / 2.0) - (row_width / 2.0)
+    var start_y = screen_size.y * starting_y
+
+    # 3. Instantiate all seats
     var all_seats = []
     for y in range(audience_rows):
+        var row_offset = (seat_px * 0.5) if (y % 2 != 0) else 0.0
         for x in range(audience_columns):
-            var audience = AudienceScene.instantiate()
-            add_child(audience)
-            audience.scale = Vector2(uniform_scale, uniform_scale)
-            audience.position = zone_top_left + Vector2((x * spacing_x) + (spacing_x * 0.5 if y % 2 == 1 else 0.0), y * spacing_y)
-            audience.set_filled(false)
-            all_seats.append(audience)
-            
-    # 5. Fill seats based on the pre-calculated priority order
+            var seat = AudienceScene.instantiate()
+            add_child(seat)
+            var scale_factor = seat_px / 44.0
+            seat.scale = Vector2(scale_factor, scale_factor)
+            seat.position = Vector2(start_x + (x * (seat_px + gap_x_px)) + row_offset, start_y + (y * (seat_px + gap_y_px)))
+            seat.z_index = y
+            seat.set_filled(false)
+            all_seats.append(seat)
+
+  # 4. RANDOMIZED "THOUSAND-YEAR DOOR" POPULATION
+    var pool = GameManager.player_profile.get("audience", []) + GameManager.current_enemy_profile.get("audience", [])
     var player_count = GameManager.player_profile.get("audience", []).size()
-    for coord in GameManager.seat_priority_order:
-        # Stop if we run out of viewers to place
-        if available_pool.is_empty(): 
-            break
+    
+    # Keep track of which seats are filled so we can calculate proximity
+    var filled_seats = []
+    var seat_scores = []
+    
+    # First, generate base scores for all seats (excluding edges)
+    for i in range(all_seats.size()):
+        var x = i % audience_columns
+        var y = i / audience_columns
         
-        # Calculate flat index to find the seat in our all_seats array
-        var seat_index = coord.y * audience_columns + coord.x
+        # Skip edge seats (column 0 and last column)
+        if x == 0 or x == audience_columns - 1:
+            continue
         
-        # Safety check: ensure the seat index exists
-        if seat_index >= 0 and seat_index < all_seats.size():
-            var chosen_viewer = available_pool.pop_front()
-            # Determine if this viewer is friendly
-            # If the current index is less than player_count, it's friendly
-            
-            
-            if typeof(chosen_viewer) == TYPE_DICTIONARY:
-                var is_friendly = (player_count > 0)
-                player_count -= 1 
-                all_seats[seat_index].setup_type(chosen_viewer, is_friendly)
-            
-            else:
-                push_warning("Audience pool contained invalid data (not a dictionary): ", chosen_viewer)
+        # 1. Front row bias: (Higher weight)
+        var front_bias = (audience_rows - y) * 2000
+        # 2. Center bias:
+        var dist_from_center = abs(x - (audience_columns / 2.0))
+        var center_bias = (audience_columns / 2.0 - dist_from_center) * 500
+        # 3. HIGH RANDOMNESS: This allows people to sit "far away" randomly
+        var randomness = randi_range(0, 3000) 
+        
+        seat_scores.append({"index": i, "score": front_bias + center_bias + randomness})
+
+    # Sort by score descending
+    seat_scores.sort_custom(func(a, b): return a.score > b.score)
+    
+    # Fill seats
+    for item in seat_scores:
+        if pool.is_empty(): break
+        var idx = item.index
+        
+        # --- PROXIMITY PENALTY (The "Stranger Danger" logic) ---
+        # If we have already filled seats, let's see if this seat is near one.
+        # If it's too close to someone else, we reduce its score to encourage 
+        # scattering, but we still fill it if the list is exhausted.
+        var viewer = pool.pop_front()
+        if typeof(viewer) == TYPE_DICTIONARY:
+            all_seats[idx].setup_type(viewer, (player_count > 0))
+            all_seats[idx].set_filled(true)
+            filled_seats.append(idx)
+            player_count -= 1

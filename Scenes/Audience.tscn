@@ -49,8 +49,8 @@ scale = Vector2(0.22749999, 0.27249998)
 texture = SubResource("AtlasTexture_mxbuo")
 
 [node name="Seat" type="Sprite2D" parent="." unique_id=1467693951]
-position = Vector2(-5, 61.875)
-scale = Vector2(0.42750004, 0.56750005)
+position = Vector2(-1.8750014, 36.249996)
+scale = Vector2(0.32499996, 0.325)
 texture = SubResource("AtlasTexture_uui05")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1005145938]

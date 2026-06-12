@@ -43,20 +43,3 @@ var shop_items: Array = []  # Stores item dictionary states and "bought" statuse
 var persistent_reroll_cost: int = 10
 
 var selected_difficulty = 1
-# --------------------------
-# MAP PERSISTENCE STATS 
-# --------------------------           
-# GameManager.gd
-var seat_priority_order: Array[Vector2i] = []
-
-func initialize_seating(cols: int, rows: int):
-    var center_x = cols / 2.0
-    for y in range(rows):
-        for x in range(1, cols - 1): # Skip edges
-            seat_priority_order.append(Vector2i(x, y))
-            
-    # Sort: Top rows (low Y) first, then middle seats (low X distance)
-    seat_priority_order.sort_custom(func(a, b):
-        if a.y != b.y: return a.y < b.y # Changed > to < for top-down
-        return abs(a.x - center_x) < abs(b.x - center_x)
-    )

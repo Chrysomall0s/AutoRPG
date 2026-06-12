@@ -6,22 +6,12 @@ extends Control
 @export_group("Text Typography Scaling")
 @export var run_button_font_ratio: float = 0.024
 
+var current_character_index: int = 0
+
 @export_group("Run Button Layout")
 @export var run_btn_width_ratio: float = 0.80
 @export var run_btn_height_ratio: float = 0.09
 @export var run_btn_bottom_margin_ratio: float = 0.04
-
-@export_group("Audience Stadium Positioning")
-@export var audience_center_x_ratio: float = 0.5
-@export var audience_center_y_ratio: float = 0.7
-@export var audience_width_ratio: float = 1.1
-@export var audience_height_ratio: float = 0.4
-
-@export_subgroup("Audience Grid Details")
-@export var audience_columns: int = 11
-@export var audience_rows: int = 6
-@export var original_sprite_width: float = 44.0
-@export var original_sprite_height: float = 44.0
 
 @export_group("Hero Preview Position")
 @export var hero_display_position_ratio: Vector2 = Vector2(0.5, 0.32)
@@ -36,7 +26,6 @@ extends Control
 @export var weapon_follow_smoothness: float = 8.0
 # =================================================================
 
-@onready var AudienceScene = preload("res://Scenes/Audience.tscn")
 @onready var audience_container = $AudienceContainer
 @onready var player_sprite: Sprite2D = $Hero
 
@@ -93,8 +82,37 @@ func refresh_stats():
     if is_instance_valid(stats_page_instance):
         stats_page_instance.refresh_stats()
 
-func _ready():
+func create_nav_buttons():
+    # Create two buttons (Left/Right) next to the player_sprite
+    var btn_left = Button.new()
+    btn_left.text = "<"
+    btn_left.pressed.connect(func(): change_character(-1))
+    add_child(btn_left)
+
+    var btn_right = Button.new()
+    btn_right.text = ">"
+    btn_right.pressed.connect(func(): change_character(1))
+    add_child(btn_right)
     
+    # Position them near player_sprite (adjust positions as needed)
+    btn_left.position = player_sprite.position + Vector2(-100, 0)
+    btn_right.position = player_sprite.position + Vector2(100, 0)
+
+func change_character(direction: int):
+    current_character_index = wrapi(current_character_index + direction, 0, characters.size())
+    update_character_display()
+
+func update_character_display():
+    GameManager.selectedCharacter = current_character_index
+    select_character(characters[current_character_index])
+    refresh_stats()
+    if audience_container.has_method("populate_audience"):
+        audience_container.populate_audience()
+    # If you want, you can trigger a visual update in AudienceManager here
+    # to highlight the seat corresponding to 'current_character_index'
+
+func _ready():
+
     GameManager.player_profile = {
         "stats": DEFAULT_STATS.duplicate(),
         "passives": [],
@@ -107,12 +125,12 @@ func _ready():
     add_child(time_ctrl)
     time_ctrl.create_difficulty_buttons(self)
     randomize()
-    spawn_audience()
     setup_hero_preview_position()
     create_run_button()
      # Explicitly set to "unselected"
-    run_button.disabled = true
     setup_statsbook_ui()
+    create_nav_buttons() # Add this
+    update_character_display()
     
 func _process(delta: float) -> void:
     player_sprite.update_weapon_movements(delta, player_sprite.position)
@@ -123,65 +141,6 @@ func setup_hero_preview_position():
         player_sprite.position = screen_size * hero_display_position_ratio
         player_sprite.visible = true
         refresh_character_and_weapons()
-
-func spawn_audience():
-    var screen_size = get_viewport_rect().size
-    var zone_size = Vector2(screen_size.x * audience_width_ratio, screen_size.y * audience_height_ratio)
-    var zone_center = Vector2(screen_size.x * audience_center_x_ratio, screen_size.y * audience_center_y_ratio)
-    var zone_top_left = zone_center - (zone_size / 2.0)
-    var spacing_x = zone_size.x / audience_columns
-    var spacing_y = zone_size.y / audience_rows
-    var uniform_scale = min((spacing_x / original_sprite_width) * 0.9, (spacing_y / original_sprite_height) * 0.9)
-
-    var character_seats = [Vector2i(3, 2), Vector2i(5, 2), Vector2i(7, 2)]
-
-    for y in range(audience_rows):
-        for x in range(audience_columns):
-            var audience = AudienceScene.instantiate()
-            audience_container.add_child(audience)
-            audience.scale = Vector2(uniform_scale, uniform_scale)
-            audience.position = zone_top_left + Vector2((x * spacing_x) + (spacing_x * 0.5 if y % 2 == 1 else 0.0), y * spacing_y)
-            var is_border_seat = (x == 0 or x == audience_columns - 1)
-            audience.set_is_border(is_border_seat)
-            var seat_index = character_seats.find(Vector2i(x, y))
-            if seat_index != -1:
-                var char_key = characters[seat_index]
-                var char_data = character_starting_loadouts[char_key]
-                
-                # Pass the data so the audience sprite updates
-                audience.setup_type(char_data, true)
-                
-                audience.set_filled(true)
-                if !GameManager.audience_mastery.has(seat_index):
-                    GameManager.audience_mastery[seat_index] = {}
-                audience.set_medal(GameManager.audience_mastery[seat_index])
-                audience.input_event.connect(func(_v, e, _s):
-                    if e is InputEventMouseButton and e.pressed:
-                        _on_audience_clicked(audience, seat_index)
-                )
-            else:
-                audience.set_filled(false)
-                # Change this so players can click locked seats to see info
-                audience.input_pickable = true 
-                # Connect a signal to handle "locked" clicks
-                audience.input_event.connect(func(_v, e, _s):
-                    if e is InputEventMouseButton and e.pressed:
-                        print("This seat is locked! Unlock progress: ...")
-                )
-
-func _on_audience_clicked(clicked_member, seat_index):
-    if is_instance_valid(selected_audience_member):
-        selected_audience_member.set_filled(true)
-
-    selected_audience_member = clicked_member
-    selected_audience_member.set_filled(false)
-
-    if seat_index < characters.size():
-        GameManager.selectedCharacter = seat_index
-        select_character(characters[seat_index])
-        refresh_stats()
-        # Enable the button now that a selection exists
-        run_button.disabled = false
         
 const DEFAULT_STATS := {
     "maxhp": 100,
@@ -194,6 +153,12 @@ const DEFAULT_STATS := {
      
 func select_character(slot_name: String):
     # Reset profile
+    GameManager.current_enemy_profile = {
+        "stats": {},
+        "passives": [],
+        "weapons": [], # We will fill this below
+        "audience": []
+    }
     GameManager.player_profile = {
         "stats": {},
         "passives": [],

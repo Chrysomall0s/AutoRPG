@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bna3rkm4ldjfl" path="res://Scripts/MainMenu.gd" id="1_tt5f1"]
 [ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_8saeu"]
 [ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="3_8saeu"]
+[ext_resource type="Script" uid="uid://btebqoe7vm7fj" path="res://Scripts/AudienceManager.gd" id="3_ghw46"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_8saeu"]
 
@@ -18,8 +19,6 @@ position = Vector2(724.25, 1196.5)
 scale = Vector2(3.3983452, 2.655902)
 texture = ExtResource("2_8saeu")
 
-[node name="AudienceContainer" type="Node2D" parent="." unique_id=244993427]
-
 [node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1382867474]
 layout_mode = 0
 offset_right = 40.0
@@ -30,3 +29,6 @@ alignment = 1
 position = Vector2(722, 889.99994)
 scale = Vector2(1, 1)
 texture = SubResource("AtlasTexture_8saeu")
+
+[node name="AudienceContainer" type="Node2D" parent="." unique_id=1917706470]
+script = ExtResource("3_ghw46")

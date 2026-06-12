@@ -30,7 +30,3 @@ autostart = true
 
 [node name="AudienceContainer" type="Node2D" parent="." unique_id=1109504530]
 script = ExtResource("5_p46lj")
-audience_columns = null
-audience_rows = null
-original_sprite_width = null
-original_sprite_height = null
