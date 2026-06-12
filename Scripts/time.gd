@@ -59,6 +59,14 @@ func _generate_row(parent: Control, row_index: int, atlas_start_index: int, labe
 func _create_btn(parent: Control, text: String, row: int, index: int, pos: Vector2, atlas_index: int, group: ButtonGroup) -> Button:
 	var screen_size = parent.get_viewport_rect().size
 	var btn = Button.new()
+	
+	var empty_style = StyleBoxEmpty.new()
+	btn.add_theme_stylebox_override("normal", empty_style)
+	btn.add_theme_stylebox_override("hover", empty_style)
+	btn.add_theme_stylebox_override("pressed", empty_style)
+	btn.add_theme_stylebox_override("focus", empty_style) # Removes the outline box when selected
+	btn.add_theme_stylebox_override("disabled", empty_style)
+	
 	btn.toggle_mode = true
 	btn.button_group = group
 	btn.custom_minimum_size = Vector2(screen_size.x * button_w_ratio, screen_size.y * button_h_ratio)
