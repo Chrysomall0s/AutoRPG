@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://b4ukcqb3xd5aa" path="res://Scripts/Audience.gd" id="1_6fy64"]
 [ext_resource type="Shader" uid="uid://evdhf67xm8d1" path="res://Assets/shaders/audience.gdshader" id="1_uui05"]
-[ext_resource type="Texture2D" uid="uid://8urf20hdkyag" path="res://Assets/mush.png" id="2_6fy64"]
 [ext_resource type="Texture2D" uid="uid://c5x0s5ep8ksop" path="res://Assets/atlas/icon.tres" id="3_6fy64"]
+[ext_resource type="Texture2D" uid="uid://b7lxfogmp102g" path="res://Assets/fruit.png" id="3_uui05"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mxbuo"]
 shader = ExtResource("1_uui05")
@@ -24,7 +24,7 @@ shader_parameter/charge_progress = 0.5
 shader_parameter/charge_color = Color(0, 1, 0, 0.5)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_mxbuo"]
-atlas = ExtResource("2_6fy64")
+atlas = ExtResource("3_uui05")
 region = Rect2(0, 250, 250, 250)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_uui05"]
@@ -44,8 +44,8 @@ script = ExtResource("1_6fy64")
 
 [node name="Person" type="Sprite2D" parent="." unique_id=1194428705]
 material = SubResource("ShaderMaterial_128j7")
-position = Vector2(2.1875, -0.31249928)
-scale = Vector2(0.22749999, 0.27249998)
+position = Vector2(1.1718776, 5.0781207)
+scale = Vector2(0.31062502, 0.339375)
 texture = SubResource("AtlasTexture_mxbuo")
 
 [node name="Seat" type="Sprite2D" parent="." unique_id=1467693951]
