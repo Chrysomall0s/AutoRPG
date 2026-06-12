@@ -55,59 +55,15 @@ func spawn_weapons(weapon_data_array: Array):
 		var data = weapon_data_array[i]
 		if not data: continue
 		
-		var weapon_info = data
-		if weapon_info is String:
-			weapon_info = _find_upgrade_by_name(weapon_info)
+		var weapon_info = _find_upgrade_by_name(data) if data is String else data
 		if weapon_info.is_empty(): continue
 
-		var weapon = Sprite2D.new()
-		var mat = ShaderMaterial.new()
-		mat.shader = outline_shader
-		weapon.material = mat
-		var lvl = weapon_info.get("level", 1.0)
-		mat.set_shader_parameter("level", float(lvl))
-		mat.set_shader_parameter("use_charge_shader", false) # Default to off
+		# Reuse the helper function
+		var weapon = GameManager._create_weapon_sprite(weapon_info)
 		
-		var icon_path = weapon_info.get("icon")
-		var atlas = load(icon_path).duplicate()
-		
-		var index = weapon_info.get("index", 0)
-		var tile_size = Vector2(250, 250)
-		atlas.region = Rect2(Vector2((index % 4) * tile_size.x, (index / 4) * tile_size.y), tile_size)
-		
-		weapon.texture = atlas
-		add_child(weapon)
-		
-		# --- NEW: ADD TYPE OVERLAY ---
-		var weapon_type = weapon_info.get("type")
-		if weapon_type == "DMG":
-			var overlay = Sprite2D.new()
-			var overlay_atlas = load("res://Assets/atlas/icon.tres").duplicate()
-			
-			# Configure the overlay icon
-			var overlay_index = 9 # Your specific index for damage
-			overlay_atlas.region = Rect2(Vector2((overlay_index % 4) * tile_size.x, (overlay_index / 4) * tile_size.y), tile_size)
-			
-			overlay.texture = overlay_atlas
-			# Adjust position/scale as needed to sit on top of the weapon
-			overlay.position = Vector2(0, -20) 
-			overlay.scale = Vector2(0.5, 0.5) 
-			
-			# Add to the weapon so it inherits movement/tweens
-			weapon.add_child(overlay) 
-		# ------------------------------
-		
-		# --- WEAPON METADATA ---
-		var speed_val = weapon_info.get("speed", 3.0)
-		var cooldown_duration = 1.0 / ((10.0 + speed_val) / 10.0)
-		
+		# Set slot-specific meta and store
 		weapon.set_meta("slot_index", i)
-		weapon.set_meta("weapon_type", weapon_info.get("type"))
-		weapon.set_meta("amount", weapon_info.get("amount"))
-		weapon.set_meta("friendly", weapon_info.get("friendly"))
-		weapon.set_meta("cooldown_max", cooldown_duration)
-		weapon.set_meta("cooldown_timer", randf_range(0.0, cooldown_duration))
-		
+		add_child(weapon)
 		weapon_sprites.append(weapon)
 
 # Inside Hero.gd
@@ -155,6 +111,8 @@ func refresh_character_and_weapons(profile: Dictionary):
 	# you can call these methods directly
 	load_upgrade_sprites(profile)
 	spawn_weapons(profile["weapons"])
+
+
 
 func load_upgrade_sprites(profile: Dictionary) -> void:
 	# Clear existing icons

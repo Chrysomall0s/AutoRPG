@@ -222,7 +222,7 @@ func _create_corner_element(text: String, alignment_index: int = 0, atlas_index:
         1: # Right
             container.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
             container.position = Vector2(-badge_size * 0.0, -y_offset)
-        2: # Right Right
+
             container.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
             container.position = Vector2(badge_size * 0.6, -y_offset)
         3: # Right Right Right
@@ -302,7 +302,11 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
         # --- ADD CORNER BADGES TO SHOP ITEM ---
         # Only show level badges for weapons/mods that have a level
         var price_value = str(upgrade.get("cost", 1))
+        GameManager.add_weapon_type_overlay(tex_rect, upgrade.get("type", ""),0)
+
+        
         tex_rect.add_child(_create_corner_element(price_value, 3, 0))
+        
         #if cat == "weapon" or cat == "weapon_mod":
             #var w_lvl = str(upgrade.get("level", 1))
             ##var scale_key = upgrade.get("scale", "hp") # Default to hp if missing
@@ -568,6 +572,8 @@ func setup_six_slots_ui():
             var idx = weapon_data.get("index", 0)
             atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
             tex_rect.texture = atlas
+            GameManager.add_weapon_type_overlay(tex_rect, weapon_data.get("type", ""),0.04)
+
             # --- APPLY SHADER ---
             var mat = ShaderMaterial.new()
             mat.shader = outline_shader
