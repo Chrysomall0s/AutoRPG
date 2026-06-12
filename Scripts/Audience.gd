@@ -100,4 +100,4 @@ func apply_effect():
 	if viewer_data.name == "Empty Fan" or viewer_data.value == 0:
 		return
 
-	Stats.execute_weapon(viewer_data.type, viewer_data.value, GameManager.player_profile, GameManager.current_enemy_profile)
+	#Stats_Handler.execute_weapon(viewer_data.type, viewer_data.value, GameManager.player_profile, GameManager.current_enemy_profile)

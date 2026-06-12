@@ -1,7 +1,6 @@
 extends Control
 
 const TimeController = preload("res://Scripts/time.gd")
-const FloatingTextScene = preload("res://Scenes/floating_text.tscn")
 
 @onready var player_sprite = $Hero
 @onready var enemy_sprite = $Foe
@@ -291,19 +290,7 @@ func execute_weapon_event(weapon, weapon_data: Dictionary):
 
     weapon.set_meta("next_activation", tickcount + ticks_until_next)
     # Apply stats
-    Stats.execute_weapon(weapon.get_meta("weapon_type"), weapon_data.get("level"), target_stats, attacker_stats)
-    
-    # Visuals
-    var floating_text = FloatingTextScene.instantiate()
-    add_child(floating_text)
-    
-    floating_text.global_position = target_node.global_position + Vector2(randf_range(-20, 20), -80)
-    if (weapon.get_meta("friendly")):
-            floating_text.global_position = attacker_node.global_position + Vector2(randf_range(-20, 20), -80)
-    floating_text.setup(abs(weapon_data.get("level")), weapon.get_meta("friendly"), 0)
-    
-    var attack_pos = attacker_node.global_position + Vector2(0, -50) if weapon.get_meta("friendly") else target_node.global_position
-    attacker_node.attack_target(weapon, attack_pos, 0.2)
+    Stats_Handler.execute_weapon(self, target_node, attacker_node, weapon, weapon_data, target_stats, attacker_stats)
     
     # UI Refresh
     player_sprite.draw_health(GameManager.player_profile)

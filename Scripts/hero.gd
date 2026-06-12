@@ -80,7 +80,7 @@ func spawn_weapons(weapon_data_array: Array):
 		
 		# --- NEW: ADD TYPE OVERLAY ---
 		var weapon_type = weapon_info.get("type")
-		if weapon_type == "damage":
+		if weapon_type == "DMG":
 			var overlay = Sprite2D.new()
 			var overlay_atlas = load("res://Assets/atlas/icon.tres").duplicate()
 			
