@@ -13,6 +13,18 @@ anchors_preset = 0
 offset_right = 672.0
 offset_bottom = 1107.0
 script = ExtResource("1_tt5f1")
+run_button_font_ratio = null
+run_btn_width_ratio = null
+run_btn_height_ratio = null
+run_btn_bottom_margin_ratio = null
+hero_display_position_ratio = null
+rainbow_radius_x = null
+rainbow_offset = null
+rainbow_radius_y = null
+rainbow_y_offset = null
+float_amplitude = null
+float_wave_speed = null
+weapon_follow_smoothness = null
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1838137876]
 position = Vector2(724.25, 1196.5)
