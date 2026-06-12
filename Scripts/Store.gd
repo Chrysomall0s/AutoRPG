@@ -302,7 +302,7 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
         # --- ADD CORNER BADGES TO SHOP ITEM ---
         # Only show level badges for weapons/mods that have a level
         var price_value = str(upgrade.get("cost", 1))
-        GameManager.add_weapon_type_overlay(tex_rect, upgrade.get("type", ""),0)
+        GameManager.add_weapon_type_overlay(tex_rect, upgrade.get("type", ""),0.15)
 
         
         tex_rect.add_child(_create_corner_element(price_value, 3, 0))
@@ -572,7 +572,7 @@ func setup_six_slots_ui():
             var idx = weapon_data.get("index", 0)
             atlas.region = Rect2(Vector2((idx % 4) * 250, (idx / 4) * 250), Vector2(250, 250))
             tex_rect.texture = atlas
-            GameManager.add_weapon_type_overlay(tex_rect, weapon_data.get("type", ""),0.04)
+            GameManager.add_weapon_type_overlay(tex_rect, weapon_data.get("type", ""), 0.22)
 
             # --- APPLY SHADER ---
             var mat = ShaderMaterial.new()
@@ -655,49 +655,58 @@ class DragShopButton extends Button:
         entry_reference = entry_ref
 
     func _get_drag_data(_at_position):
+        var data_to_send = null
+        
         # 1. Logic for Shop Items (Dragging OUT of shop)
         if is_shop_item:
             var cat = data.get("category", "")
             if cat == "passive" or cat == "viewer" or entry_reference["bought"] or shop_main.get_gold() < data["cost"]:
                 return null
-            return {"type": "purchase", "upgrade": data, "entry": entry_reference}
+            data_to_send = {"type": "purchase", "upgrade": data, "entry": entry_reference}
 
         # 2. Logic for Inventory Slots (Rearranging/Dragging OUT of slots)
-        var weapons = GameManager.player_profile.get("weapons", [])
-        var idx = data.get("index")
-        if idx == null or idx >= weapons.size() or weapons[idx] == null:
-            return null
-        return {"type": "rearrange", "from_index": idx}
+        else:
+            var weapons = GameManager.player_profile.get("weapons", [])
+            var idx = data.get("index")
+            if idx == null or idx >= weapons.size() or weapons[idx] == null:
+                return null
+            data_to_send = {"type": "rearrange", "from_index": idx}
+
+        # --- PREVIEW CREATION ---
+        # Create a visual preview of the button contents to follow the mouse
+        var preview = TextureRect.new()
+        # Grabs the TextureRect inside the HBoxContainer (the first child of the button)
+        var source_tex = self.get_child(0).get_child(0) 
+        
+        if source_tex is TextureRect and source_tex.texture:
+            preview.texture = source_tex.texture
+            preview.custom_minimum_size = source_tex.size
+            preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+            preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+            preview.modulate = Color(1, 1, 1, 0.7) # Slight transparency for visual feedback
+            set_drag_preview(preview)
+            
+        return data_to_send
 
     func _can_drop_data(_pos, drop_data) -> bool:
         if drop_data.get("type") == "rearrange" and is_shop_item:
-        # Check if this shop slot is currently "Empty" (meaning it's already bought)
-        # entry_reference["bought"] is true if the item was bought/sold out
             return true
         
-        # 1. Get the weapons list safely
         var weapons = GameManager.player_profile.get("weapons", [])
         var target_idx = data.get("index")
         
-        # Ensure the target index is actually within the bounds of the array
         if target_idx == null or target_idx >= weapons.size():
             return false
 
-        # 2. Get the existing weapon, allowing for it to be null (empty slot)
         var existing = weapons[target_idx]
 
-        # 3. Determine what is being held
         if drop_data.get("type") == "purchase":
             var upgrade = drop_data["upgrade"]
-            
-            # Now we can safely check categories without crashing on null
             var is_weapon = upgrade.get("category") == "weapon"
             var is_mod = upgrade.get("category") == "weapon_mod"
             
-            # Only allow mods if there is an existing weapon (and it's not null)
             if is_mod:
                 return existing != null
-            
             return is_weapon
             
         if drop_data.get("type") == "rearrange":
@@ -707,7 +716,6 @@ class DragShopButton extends Button:
 
     func _drop_data(_pos, drop_data):
         if drop_data.get("type") == "rearrange" and is_shop_item:
-        # We need to know if we are selling (to empty) or swapping (to occupied)
             if entry_reference["bought"]:
                 shop_main.sell_weapon(drop_data["from_index"], entry_reference)
             elif entry_reference["upgrade"].get("category") == "weapon":

@@ -20,22 +20,32 @@ var current_enemy_profile = {
 
 var audience_mastery := {}
 var selectedCharacter: int = 0
-
-# Inside GameManager.gd
+var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
 # Inside GameManager.gd
 # Inside GameManager.gd
 # Use "Node" instead of "Control" to accept both Sprite2D and TextureRect
 func add_weapon_type_overlay(parent_node: Node, weapon_type: String, value):
-    if weapon_type != "DMG": return
+    # 1. Find the item data in UpgradeData
+    var item_data = null
+    for upgrade in UpgradeData.upgrades:
+        if upgrade["name"] == weapon_type:
+            item_data = upgrade
+            break
+    
+    # If no data found, or no icon defined, exit
+    if not item_data or not item_data.has("icon"):
+        return
 
-    var overlay_index = 9
-    var atlas_path = "res://Assets/atlas/icon.tres"
+    # 2. Extract info from the found item
+    var atlas_path = item_data["icon"]
+    var overlay_index = item_data.get("index", 0)
+
     var region = Rect2(Vector2((overlay_index % 4) * 250, (overlay_index / 4) * 250), Vector2(250, 250))
     
     # Get the base reference size (e.g., your design resolution)
     var screen_size = get_viewport().get_visible_rect().size
     var reference_width = 480.0
-    var scale_factor = screen_size.x / reference_width *0.5
+    var scale_factor = screen_size.x / reference_width *0.4
 
     # --- HANDLE SPRITE2D (Hero.gd) ---
     if parent_node is Sprite2D:
