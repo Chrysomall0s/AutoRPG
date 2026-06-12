@@ -80,11 +80,6 @@ func setup_statsbook_ui():
     stats_page_instance.position = Vector2(get_viewport_rect().size.x * 0.65, get_viewport_rect().size.y * 0.15)
     add_child(stats_page_instance)
 
-# Update your purchase functions to call the new instance's method
-func refresh_stats():
-    if is_instance_valid(stats_page_instance):
-        stats_page_instance.refresh_stats()
-
 var atlas_tex: Texture2D = preload("res://Assets/atlas/settings.tres")
 
 func create_nav_buttons():
@@ -141,7 +136,6 @@ func change_character(direction: int):
 func update_character_display():
     GameManager.selectedCharacter = current_character_index
     select_character(characters[current_character_index])
-    refresh_stats()
     if audience_container.has_method("populate_audience"):
         audience_container.populate_audience()
     # If you want, you can trigger a visual update in AudienceManager here
