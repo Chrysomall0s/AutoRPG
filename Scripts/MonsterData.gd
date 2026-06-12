@@ -5,49 +5,37 @@ var monsters = {
     "Easy": [
         {
         "icon": "res://Assets/atlas/fruit.tres", "index": 4,
-            "stats": {
-                "maxhp": 50,
-                "hp": 50,
-                "dmg": 4,
-                "speed": 5,
-            },
-            "passives": ["up3",{"name": "up3", "level": 30}],
+            "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
             "weapons": ["Staff"],
             "audience": ["Heckler"]
         },
         {
             "icon": "res://Assets/atlas/fruit.tres", "index": 1,
-            "stats": {
-                "maxhp": 60,
-                "hp": 60,
-                "dmg": 5,
-                "speed": 4,
-            },
-            "passives": [],
+            "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
             "weapons": ["Club"],
             "audience": ["Heckler"]
         },
         {
             "icon": "res://Assets/atlas/fruit.tres", "index": 1,
-            "stats": {
-                "maxhp": 60,
-                "hp": 120,
-                "dmg": 5,
-                "speed": 4,
-            },
-            "passives": [],
+            "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
             "weapons": ["Staff"],
             "audience": ["Heckler"]
         },
         {
             "icon": "res://Assets/atlas/fruit.tres", "index": 1,
-            "stats": {
-                "maxhp": 60,
-                "hp": 200,
-                "dmg": 5,
-                "speed": 4,
-            },
-            "passives": [],
+            "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
             "weapons": ["Staff"],
             "audience": ["Heckler"]
         },
@@ -55,13 +43,10 @@ var monsters = {
     "Normal": [
         {
             "icon": "res://Assets/atlas/fruit.tres", "index": 1,
-            "stats": {
-                "maxhp": 50,
-                "hp": 50,
-                "dmg": 4,
-                "speed": 5,
-            },
-            "passives": [],
+            "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
             "weapons": ["Staff"],
             "audience": ["Heckler"]
         },
@@ -69,14 +54,10 @@ var monsters = {
     "Hard": [
         {
             "icon": "res://Assets/atlas/fruit.tres", "index": 1
-            ,
-            "stats": {
-                "maxhp": 50,
-                "hp": 50,
-                "dmg": 4,
-                "speed": 5,
-            },
-            "passives": [],
+            ,"passives":[
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
             "weapons": ["Staff"],
             "audience": ["Heckler"]
         },
@@ -84,13 +65,10 @@ var monsters = {
     "Insane": [
         {
             "icon": "res://Assets/atlas/fruit.tres", "index": 1,
-            "stats": {
-                "maxhp": 50,
-                "hp": 50,
-                "dmg": 4,
-                "speed": 5,
-            },
-            "passives": [],
+            "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
             "weapons": ["Staff"],
             "audience": ["Heckler"]
         },

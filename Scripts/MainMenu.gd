@@ -42,25 +42,28 @@ var floating_time := 0.0
 var character_starting_loadouts: Dictionary = {
     "char_slot1": {
         "icon": "res://Assets/atlas/fruit.tres", "index": 1,
-        "stats":
-        {},
-        "passives": [],
+        "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
         "weapons": ["Club",{"name": "Staff", "level": 5, "speed": 10.0}],
         "audience": ["Zealot"]
     },
     "char_slot2": {
         "icon": "res://Assets/atlas/fruit.tres", "index": 0,
-        "stats":
-        {},
-        "passives": [{"name": "up3", "level": 30}],
+        "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
         "weapons": ["Club" ],
         "audience": ["Patron", "Hooligan","Hooligan"]
     },
     "char_slot3": {
         "icon": "res://Assets/atlas/fruit.tres", "index": 2,
-        "stats":
-        {},
-        "passives": ["up2","up1"],
+        "passives": [
+            {"name": "HP", "level": 12},
+            {"name": "MAXHP", "level": 12},
+            ],
         "weapons": ["Staff"],
         "audience": ["Patron"]
     }
@@ -147,7 +150,6 @@ func update_character_display():
 func _ready():
 
     GameManager.player_profile = {
-        "stats": DEFAULT_STATS.duplicate(),
         "passives": [],
         "weapons": [null, null, null, null, null, null],
         "audience": [],
@@ -174,26 +176,15 @@ func setup_hero_preview_position():
         player_sprite.position = screen_size * hero_display_position_ratio
         player_sprite.visible = true
         refresh_character_and_weapons()
-        
-const DEFAULT_STATS := {
-    "maxhp": 100,
-    "hp": 100,
-    "maxmp": 100,
-    "mp": 100,
-    "gold": 100,
-    "dmg": 5,
-}
      
 func select_character(slot_name: String):
     # Reset profile
     GameManager.current_enemy_profile = {
-        "stats": {},
         "passives": [],
         "weapons": [], # We will fill this below
         "audience": []
     }
     GameManager.player_profile = {
-        "stats": {},
         "passives": [],
         "weapons": [], # We will fill this below
         "audience": []
@@ -245,8 +236,6 @@ func select_character(slot_name: String):
     
     GameManager.player_profile["icon"] = loadout.get("icon")
     GameManager.player_profile["index"] = loadout.get("index", 0) # Defaults to 0 if missing
-    GameManager.player_profile["stats"] = DEFAULT_STATS.duplicate()
-    GameManager.player_profile["stats"].merge(loadout.get("stats", {}), true)
     refresh_character_and_weapons()
     
 func refresh_character_and_weapons():

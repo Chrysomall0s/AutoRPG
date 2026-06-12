@@ -306,8 +306,8 @@ func execute_weapon_event(weapon, weapon_data: Dictionary):
     attacker_node.attack_target(weapon, attack_pos, 0.2)
     
     # UI Refresh
-    player_sprite.draw_health(GameManager.player_profile["stats"])
-    enemy_sprite.draw_health(GameManager.current_enemy_profile["stats"])
+    player_sprite.draw_health(GameManager.player_profile)
+    enemy_sprite.draw_health(GameManager.current_enemy_profile)
     
     await get_tree().create_timer(0.8).timeout
     weapon.set_meta("last_fired_tick", current_tick)
@@ -316,12 +316,13 @@ func execute_weapon_event(weapon, weapon_data: Dictionary):
 
 func check_game_state():
     if battle_over: return
-    if GameManager.player_profile["stats"]["hp"] <= 0 or GameManager.current_enemy_profile["stats"]["hp"] <= 0:
+    if GameManager.getpassive("HP")<= 0:
+        battle_over = false
+        go_to_after_battle("lose")
+    if GameManager.getpassive2("HP")<= 0:
         battle_over = true
-        if GameManager.current_enemy_profile["stats"]["hp"] <= 0:
-            go_to_after_battle("win")
-        else:
-            go_to_after_battle("lose")
+        go_to_after_battle("win")
+            
 # =================================================================
 # GAME STATE & TOURNAMENT LOGIC
 # =================================================================

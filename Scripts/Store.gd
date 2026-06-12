@@ -85,16 +85,14 @@ func create_leave_button():
     )
     
 func get_gold() -> int:
-    return GameManager.player_profile["stats"]["gold"]
+   return GameManager.getpassive("Gold")
 
 func spend_gold(amount: int) -> bool:
-    if GameManager.player_profile["stats"]["gold"] < amount:
-        return false
-    GameManager.player_profile["stats"]["gold"] -= amount
+    GameManager.addtopassive("Gold",-amount)
     return true
 
 func add_gold(amount: int) -> void:
-    GameManager.player_profile["stats"]["gold"] += amount
+    GameManager.addtopassive("Gold",amount)
 
 func _ready():
     randomize()
@@ -258,7 +256,7 @@ func _create_corner_element(text: String, alignment_index: int = 0, atlas_index:
     # Set text color to white
     lbl.add_theme_color_override("font_color", Color.BLACK)
     # Set outline color to black
-    lbl.add_theme_color_override("font_outline_color", Color.BLACK)
+    lbl.add_theme_color_override("font_outline_color", Color.ANTIQUE_WHITE)
     # Set outline thickness (adjust as needed, e.g., 4 to 8 works well for UI)
     lbl.add_theme_constant_override("outline_size", 8)
     # -----------------------
@@ -305,13 +303,13 @@ func create_upgrade_button(global_entry: Dictionary, position_index: int):
         # Only show level badges for weapons/mods that have a level
         var price_value = str(upgrade.get("cost", 1))
         tex_rect.add_child(_create_corner_element(price_value, 3, 0))
-        if cat == "weapon" or cat == "weapon_mod":
-            var w_lvl = str(upgrade.get("level", 1))
-            #var scale_key = upgrade.get("scale", "hp") # Default to hp if missing
-            #var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
-            var scale_value = str(upgrade.get("speed", 1))
-            tex_rect.add_child(_create_corner_element(w_lvl, 1, 9))  # Left-Down
-            tex_rect.add_child(_create_corner_element(scale_value, 2, 13)) # Right-Down
+        #if cat == "weapon" or cat == "weapon_mod":
+            #var w_lvl = str(upgrade.get("level", 1))
+            ##var scale_key = upgrade.get("scale", "hp") # Default to hp if missing
+            ##var scale_value = str(GameManager.player_profile["stats"].get(scale_key, 0))
+            #var scale_value = str(upgrade.get("speed", 1))
+            #tex_rect.add_child(_create_corner_element(w_lvl, 1, 9))  # Left-Down
+            #tex_rect.add_child(_create_corner_element(scale_value, 2, 13)) # Right-Down
         # ------------------------------------
     else:
         tex_rect.texture = null
@@ -583,8 +581,8 @@ func setup_six_slots_ui():
             var scale_value = str(weapon_data.get("speed", 1))
             var price_value = str(weapon_data.get("cost", 1))
             tex_rect.add_child(_create_corner_element(price_value, 3, 0))
-            tex_rect.add_child(_create_corner_element(w_lvl, 1, 9))  # Left-Down
-            tex_rect.add_child(_create_corner_element(scale_value, 2, 13)) # Right-Down
+            #tex_rect.add_child(_create_corner_element(w_lvl, 1, 9))  # Left-Down
+            #tex_rect.add_child(_create_corner_element(scale_value, 2, 13)) # Right-Down
 
             # --------------------
         else:

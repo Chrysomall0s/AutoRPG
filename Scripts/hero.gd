@@ -25,7 +25,7 @@ func _find_upgrade_by_name(target_name: String) -> Dictionary:
 
 #func _ready() -> void:
 
-func draw_health(stats: Dictionary):
+func draw_health(target: Dictionary):
 
 	if not health_bar:
 		health_bar = ProgressBar.new()
@@ -43,8 +43,8 @@ func draw_health(stats: Dictionary):
 
 		add_child(health_bar)
 
-	health_bar.max_value = stats["maxhp"]
-	health_bar.value = stats["hp"]
+	health_bar.max_value = GameManager.getpassive3("MAXHP",target)
+	health_bar.value = GameManager.getpassive3("HP",target)
 
 func spawn_weapons(weapon_data_array: Array):
 	weapon_sprites.clear()
@@ -77,6 +77,25 @@ func spawn_weapons(weapon_data_array: Array):
 		
 		weapon.texture = atlas
 		add_child(weapon)
+		
+		# --- NEW: ADD TYPE OVERLAY ---
+		var weapon_type = weapon_info.get("type")
+		if weapon_type == "damage":
+			var overlay = Sprite2D.new()
+			var overlay_atlas = load("res://Assets/atlas/icon.tres").duplicate()
+			
+			# Configure the overlay icon
+			var overlay_index = 9 # Your specific index for damage
+			overlay_atlas.region = Rect2(Vector2((overlay_index % 4) * tile_size.x, (overlay_index / 4) * tile_size.y), tile_size)
+			
+			overlay.texture = overlay_atlas
+			# Adjust position/scale as needed to sit on top of the weapon
+			overlay.position = Vector2(0, -20) 
+			overlay.scale = Vector2(0.5, 0.5) 
+			
+			# Add to the weapon so it inherits movement/tweens
+			weapon.add_child(overlay) 
+		# ------------------------------
 		
 		# --- WEAPON METADATA ---
 		var speed_val = weapon_info.get("speed", 3.0)

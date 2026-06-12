@@ -11,9 +11,8 @@ static func execute_weapon(type, amount, target_stats: Dictionary, opponent_stat
 			print("Unknown weapon type: ", type)
 
 static func _damage(target_stats: Dictionary, opponent_stats: Dictionary, amount: float) -> void:
-	target_stats["stats"]["hp"] -= amount
-	target_stats["stats"]["hp"] = max(target_stats["stats"]["hp"], 0)
+	GameManager.addtopassive3("HP",-amount,target_stats)
+	
 
 static func _heal(target_stats: Dictionary, opponent_stats: Dictionary, amount: float) -> void:
-	opponent_stats["stats"]["hp"] += amount
-	opponent_stats["stats"]["hp"] = min(opponent_stats["stats"]["hp"], opponent_stats["stats"]["maxhp"])
+	GameManager.addtopassive3("HP",amount,target_stats)
