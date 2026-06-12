@@ -56,15 +56,15 @@ var character_starting_loadouts: Dictionary = {
         "stats":
         {},
         "passives": [],
-        "weapons": ["Sword"],
+        "weapons": ["Club",{"name": "Staff", "level": 5, "speed": 10.0}],
         "audience": ["Zealot"]
     },
     "char_slot2": {
         "icon": "res://Assets/atlas/fruit.tres", "index": 0,
         "stats":
         {},
-        "passives": ["up3"],
-        "weapons": ["Bow", "Sword", "Sword","Sword","Sword","Sword" ],
+        "passives": [{"name": "up3", "level": 30}],
+        "weapons": ["Club" ],
         "audience": ["Patron", "Hooligan","Hooligan"]
     },
     "char_slot3": {
@@ -211,35 +211,37 @@ func select_character(slot_name: String):
     # 1. Add the weapons from your loadout (up to 6)
     for i in range(6):
         if i < weapon_names.size():
-            var weapon_name = weapon_names[i]
+            var weapon_input = weapon_names[i] # This can be a String or a Dictionary
             
-            # If the loadout explicitly says null, keep it null
-            if weapon_name == null:
+            if weapon_input == null:
                 final_weapons.append(null)
             else:
-                var full_data = _find_upgrade_by_name(weapon_name)
-                if not full_data.is_empty():
-                    var weapon_copy = full_data.duplicate()
-                    weapon_copy["unique_id"] = str(i) + "_" + weapon_name + "_" + str(Time.get_ticks_usec())
+                var weapon_data = get_processed_data(weapon_input)
+                if not weapon_data.is_empty():
+                    var weapon_copy = weapon_data.duplicate()
+                    
+                    # FIX: Use weapon_data["name"] instead of the raw input which might be a dictionary
+                    var w_name_str = weapon_data.get("name", "unknown")
+                    weapon_copy["unique_id"] = str(i) + "_" + w_name_str + "_" + str(Time.get_ticks_usec())
+                    
                     weapon_copy["level"] = weapon_copy.get("level", 1)
                     final_weapons.append(weapon_copy)
                 else:
                     # Fallback
-                    final_weapons.append({"name": weapon_name, "level": 1})
+                    final_weapons.append({"name": str(weapon_input), "level": 1})
         else:
-            # 2. Fill the remainder with null to guarantee 6 total slots
             final_weapons.append(null)
             
     GameManager.player_profile["weapons"] = final_weapons
     # 2. Populate Passives (Find full data first)
     for name in loadout.get("passives", []):
-        var data = _find_upgrade_by_name(name)
+        var data = get_processed_data(name)
         if data:
             GameManager.player_profile["passives"].append(data.duplicate())
 
     # 3. Populate Audience (Find full data first)
     for name in loadout.get("audience", []):
-        var data = _find_upgrade_by_name(name)
+        var data = get_processed_data(name)
         if data:
             GameManager.player_profile["audience"].append(data.duplicate())
     
@@ -252,6 +254,21 @@ func select_character(slot_name: String):
 func refresh_character_and_weapons():
     if is_instance_valid(player_sprite):
         player_sprite.refresh_character_and_weapons(GameManager.player_profile)
+
+func get_processed_data(input) -> Dictionary:
+    # If input is just a string, fetch default data
+    if input is String:
+        return _find_upgrade_by_name(input).duplicate(true)
+    
+    # If input is a dictionary (has overrides), fetch default and merge
+    if input is Dictionary and input.has("name"):
+        var base_data = _find_upgrade_by_name(input["name"]).duplicate(true)
+        # Merge dictionary: values in input overwrite values in base_data
+        for key in input:
+            base_data[key] = input[key]
+        return base_data
+        
+    return {}
 
 func _find_upgrade_by_name(target_name: String) -> Dictionary:
     for upgrade in UpgradeData.upgrades:

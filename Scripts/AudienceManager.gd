@@ -10,54 +10,54 @@ extends Node2D
 @onready var audience_container = self # Assuming script is on the container
 
 func _ready():
-	populate_audience()
+    populate_audience()
 
 func populate_audience():
-	randomize()
-	
-	# 1. Ensure seat order is calculated once
-	if GameManager.seat_priority_order.is_empty():
-		GameManager.initialize_seating(audience_columns, audience_rows)
-		
-	var player_audience = GameManager.player_profile.get("audience", [])
-	var enemy_audience = GameManager.current_enemy_profile.get("audience", [])
-	# 2. Local pool to track who gets a seat (Duplicate to avoid modifying global state)
-	var available_pool = player_audience + enemy_audience
-	# 3. Setup positioning math
-	var screen_size = get_viewport_rect().size
-	var zone_size = Vector2(screen_size.x * 1.1, screen_size.y * 0.4)
-	var zone_center = Vector2(screen_size.x * 0.5, screen_size.y * 0.7)
-	var zone_top_left = zone_center - (zone_size / 2.0)
-	var spacing_x = zone_size.x / audience_columns
-	var spacing_y = zone_size.y / audience_rows
-	var uniform_scale = min((spacing_x / original_sprite_width) * 0.9, (spacing_y / original_sprite_height) * 0.9)
-	
-	# 4. Instantiate all seats first and leave them empty
-	var all_seats = []
-	for y in range(audience_rows):
-		for x in range(audience_columns):
-			var audience = AudienceScene.instantiate()
-			add_child(audience)
-			audience.scale = Vector2(uniform_scale, uniform_scale)
-			audience.position = zone_top_left + Vector2((x * spacing_x) + (spacing_x * 0.5 if y % 2 == 1 else 0.0), y * spacing_y)
-			audience.set_filled(false)
-			all_seats.append(audience)
-			
-	# 5. Fill seats based on the pre-calculated priority order
-	var player_count = GameManager.player_profile.get("audience", []).size()
-	for coord in GameManager.seat_priority_order:
-		# Stop if we run out of viewers to place
-		if available_pool.is_empty(): 
-			break
-		
-		# Calculate flat index to find the seat in our all_seats array
-		var seat_index = coord.y * audience_columns + coord.x
-		
-		# Safety check: ensure the seat index exists
-		if seat_index >= 0 and seat_index < all_seats.size():
-			var chosen_viewer = available_pool.pop_front()
-			# Determine if this viewer is friendly
-			# If the current index is less than player_count, it's friendly
+    randomize()
+    
+    # 1. Ensure seat order is calculated once
+    if GameManager.seat_priority_order.is_empty():
+        GameManager.initialize_seating(audience_columns, audience_rows)
+        
+    var player_audience = GameManager.player_profile.get("audience", [])
+    var enemy_audience = GameManager.current_enemy_profile.get("audience", [])
+    # 2. Local pool to track who gets a seat (Duplicate to avoid modifying global state)
+    var available_pool = player_audience + enemy_audience
+    # 3. Setup positioning math
+    var screen_size = get_viewport_rect().size
+    var zone_size = Vector2(screen_size.x * 1.1, screen_size.y * 0.4)
+    var zone_center = Vector2(screen_size.x * 0.5, screen_size.y * 0.7)
+    var zone_top_left = zone_center - (zone_size / 2.0)
+    var spacing_x = zone_size.x / audience_columns
+    var spacing_y = zone_size.y / audience_rows
+    var uniform_scale = min((spacing_x / original_sprite_width) * 0.9, (spacing_y / original_sprite_height) * 0.9)
+    
+    # 4. Instantiate all seats first and leave them empty
+    var all_seats = []
+    for y in range(audience_rows):
+        for x in range(audience_columns):
+            var audience = AudienceScene.instantiate()
+            add_child(audience)
+            audience.scale = Vector2(uniform_scale, uniform_scale)
+            audience.position = zone_top_left + Vector2((x * spacing_x) + (spacing_x * 0.5 if y % 2 == 1 else 0.0), y * spacing_y)
+            audience.set_filled(false)
+            all_seats.append(audience)
+            
+    # 5. Fill seats based on the pre-calculated priority order
+    var player_count = GameManager.player_profile.get("audience", []).size()
+    for coord in GameManager.seat_priority_order:
+        # Stop if we run out of viewers to place
+        if available_pool.is_empty(): 
+            break
+        
+        # Calculate flat index to find the seat in our all_seats array
+        var seat_index = coord.y * audience_columns + coord.x
+        
+        # Safety check: ensure the seat index exists
+        if seat_index >= 0 and seat_index < all_seats.size():
+            var chosen_viewer = available_pool.pop_front()
+            # Determine if this viewer is friendly
+            # If the current index is less than player_count, it's friendly
             
             
             if typeof(chosen_viewer) == TYPE_DICTIONARY:
