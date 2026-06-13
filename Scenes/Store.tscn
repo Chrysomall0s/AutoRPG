@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_fy3ub"]
 [ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="3_fy3ub"]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_fy3ub"]
+
 [node name="Store" type="Control" unique_id=480470293]
 layout_mode = 3
 anchors_preset = 0
@@ -22,5 +24,6 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="Hero" parent="." unique_id=448655595 instance=ExtResource("3_fy3ub")]
-position = Vector2(675.75, 930.12494)
-scale = Vector2(1, 1)
+position = Vector2(1286, 1174)
+scale = Vector2(2, 2)
+texture = SubResource("AtlasTexture_fy3ub")
