@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d3a2rmy55yye0"]
 
 [ext_resource type="Script" uid="uid://b2jfxrl34sxfk" path="res://Scripts/Store.gd" id="1_voxcw"]
-[ext_resource type="Texture2D" uid="uid://by05jlnt357b8" path="res://Assets/Backstage.png" id="2_2s633"]
+[ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_fy3ub"]
 [ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="3_fy3ub"]
 
 [node name="Store" type="Control" unique_id=480470293]
@@ -11,10 +11,10 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("1_voxcw")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1774489409]
-position = Vector2(725.25, 1310)
-scale = Vector2(3.4172573, 2.9198215)
-texture = ExtResource("2_2s633")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=118634467]
+position = Vector2(2142.5996, 1161.5)
+scale = Vector2(10.120379, 9.448978)
+texture = ExtResource("2_fy3ub")
 
 [node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1727398375]
 layout_mode = 0

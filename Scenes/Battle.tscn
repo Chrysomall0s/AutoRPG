@@ -12,18 +12,18 @@ offset_right = 75.0
 offset_bottom = 71.0
 script = ExtResource("1_wvl2i")
 
-[node name="Arena" type="Sprite2D" parent="." unique_id=1403740229]
-position = Vector2(721.25, 1203.5)
-scale = Vector2(3.398345, 2.6648111)
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1040946958]
+position = Vector2(2142.5996, 1161.5)
+scale = Vector2(10.120379, 9.448978)
 texture = ExtResource("2_1samx")
 
 [node name="Hero" parent="." unique_id=1923588313 instance=ExtResource("4_1samx")]
-position = Vector2(380, 867.99994)
-scale = Vector2(1, 1)
+position = Vector2(1196, 1147)
+scale = Vector2(2, 2)
 
 [node name="Foe" parent="." unique_id=448655595 instance=ExtResource("4_1samx")]
-position = Vector2(400, 0)
-scale = Vector2(-1, 1)
+position = Vector2(3070, 1147)
+scale = Vector2(2, 2)
 
 [node name="Timer" type="Timer" parent="." unique_id=1833122652]
 autostart = true

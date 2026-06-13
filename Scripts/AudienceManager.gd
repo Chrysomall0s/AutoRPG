@@ -1,14 +1,14 @@
 extends Node2D
 
 @export_group("Grid Settings")
-@export var audience_columns: int = 12
-@export var audience_rows: int = 7
+@export var audience_columns: int = 20
+@export var audience_rows: int = 6
 
 @export_group("Spacing & Sizing (Percentage of Screen)")
-@export var seat_size: float = 0.08    # 5% of screen width
+@export var seat_size: float = 0.042    # 5% of screen width
 @export var gap_x: float = 0.01       # 1% of screen width
-@export var gap_y: float = -0.02       # 2% of screen height
-@export var starting_y: float = 0.47   # Starts 20% down from top
+@export var gap_y: float = -0.04       # 2% of screen height
+@export var starting_y: float = 0.72  # Starts 20% down from top
 
 @onready var AudienceScene = preload("res://Scenes/Audience.tscn")
 

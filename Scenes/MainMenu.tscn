@@ -15,8 +15,8 @@ offset_bottom = 1107.0
 script = ExtResource("1_tt5f1")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1838137876]
-position = Vector2(724.25, 1196.5)
-scale = Vector2(3.3983452, 2.655902)
+position = Vector2(2142.5996, 1161.5)
+scale = Vector2(10.120379, 9.448978)
 texture = ExtResource("2_8saeu")
 
 [node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1382867474]
@@ -26,8 +26,8 @@ offset_bottom = 40.0
 alignment = 1
 
 [node name="Hero" parent="." unique_id=448655595 instance=ExtResource("3_8saeu")]
-position = Vector2(722, 889.99994)
-scale = Vector2(1, 1)
+position = Vector2(1286, 1174)
+scale = Vector2(2, 2)
 texture = SubResource("AtlasTexture_8saeu")
 
 [node name="AudienceContainer" type="Node2D" parent="." unique_id=1917706470]

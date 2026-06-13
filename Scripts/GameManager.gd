@@ -44,7 +44,7 @@ func add_weapon_type_overlay(parent_node: Node, weapon_type: String, value):
     
     # Get the base reference size (e.g., your design resolution)
     var screen_size = get_viewport().get_visible_rect().size
-    var reference_width = 480.0
+    var reference_width = 1400.0
     var scale_factor = screen_size.x / reference_width *0.4
 
     # --- HANDLE SPRITE2D (Hero.gd) ---

@@ -32,7 +32,7 @@ atlas = ExtResource("3_6fy64")
 region = Rect2(250, 250, 250, 250)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6fy64"]
-size = Vector2(46.875008, 78.124985)
+size = Vector2(46.875008, 74.37498)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_128j7"]
 region = Rect2(0, 750, 250, 250)
@@ -49,13 +49,13 @@ scale = Vector2(0.31062502, 0.339375)
 texture = SubResource("AtlasTexture_mxbuo")
 
 [node name="Seat" type="Sprite2D" parent="." unique_id=1467693951]
-position = Vector2(-1.8750014, 36.249996)
-scale = Vector2(0.32499996, 0.325)
+position = Vector2(-1.5624988, 44.999996)
+scale = Vector2(0.33250004, 0.25499994)
 texture = SubResource("AtlasTexture_uui05")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1005145938]
-position = Vector2(2.8124995, 30.937475)
-scale = Vector2(0.99999964, 0.99999964)
+position = Vector2(2.8124995, 32.812477)
+scale = Vector2(0.9999995, 0.9999995)
 shape = SubResource("RectangleShape2D_6fy64")
 
 [node name="Medal" type="Sprite2D" parent="." unique_id=2075707453]

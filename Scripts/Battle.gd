@@ -77,8 +77,8 @@ func create_surrender_button():
 
 func setup_battlefield():
 	var screen_size = get_viewport_rect().size
-	player_sprite.position = Vector2(screen_size.x * 0.25, screen_size.y * 0.3)
-	enemy_sprite.position = Vector2(screen_size.x * 0.75, screen_size.y * 0.3)
+	player_sprite.position = Vector2(screen_size.x * 0.25, screen_size.y * 0.5)
+	enemy_sprite.position = Vector2(screen_size.x * 0.75, screen_size.y * 0.5)
 	player_sprite.refresh_character_and_weapons(GameManager.player_profile)
 	enemy_sprite.refresh_character_and_weapons(GameManager.current_enemy_profile)
 # Change the variable to an integer to track 'Turns' or 'Ticks'
