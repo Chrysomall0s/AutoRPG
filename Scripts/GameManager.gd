@@ -14,23 +14,29 @@ func go_to_after_battle(result: String):
     var audience_container = current_scene.find_child("AudienceContainer", true, false)
     if audience_container:
         for seat in audience_container.get_children():
-            if seat.is_filled and seat.amfriendly and seat.has_method("goldd"):
-                seat.goldd()
+            if is_instance_valid(seat):
+                if seat.is_filled and seat.amfriendly and seat.has_method("goldd"):
+                    if is_instance_valid(seat):
+                        seat.goldd()
     if audience_container:
         for seat in audience_container.get_children():
-            if seat.is_filled and seat.has_method("perform_throw"):
-                await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
-                seat.perform_throw()
+            if is_instance_valid(seat):
+                if seat.is_filled and seat.has_method("perform_throw"):
+                    await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
+                    if is_instance_valid(seat):
+                        seat.perform_throw()
     else:
         push_warning("AudienceContainer not found in the current scene!")
     
     # Get all audience members
     for seat in audience_container.get_children():
-        # Only throw if they are a filled, valid audience member
         if seat.is_filled and seat.has_method("perform_throw"):
-            # Add a slight delay for a "shower" effect
-            await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
-            seat.perform_throw()
+            if is_instance_valid(seat):
+                await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
+            
+            # Check if the seat still exists before calling the method
+            if is_instance_valid(seat):
+                seat.perform_throw()
             
     # Optional: Proceed to the UI menu after a delay
     await get_tree().create_timer(1.5).timeout
