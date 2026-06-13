@@ -1,44 +1,40 @@
 # GameManager.gd
 extends Node
 var outline_shader = preload("res://Assets/shaders/outline_shader.gdshader")
-@onready var audience_container = $AudienceContainer
 const AfterBattleScene = preload("res://Scenes/AfterBattle.tscn")
 func go_to_after_battle(result: String):
     battle_over = true
     go_to_after_battle2(result)
-    # Get the root node of the currently active scene
+    
     var current_scene = get_tree().current_scene
+    if not is_instance_valid(current_scene): return
     
-    # Assuming "AudienceContainer" is a direct child of the root
-    # or accessible via a path from the root
     var audience_container = current_scene.find_child("AudienceContainer", true, false)
-    if audience_container:
-        for seat in audience_container.get_children():
-            if is_instance_valid(seat):
-                if seat.is_filled and seat.amfriendly and seat.has_method("goldd"):
-                    if is_instance_valid(seat):
-                        seat.goldd()
-    if audience_container:
-        for seat in audience_container.get_children():
-            if is_instance_valid(seat):
-                if seat.is_filled and seat.has_method("perform_throw"):
-                    await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
-                    if is_instance_valid(seat):
-                        seat.perform_throw()
-    else:
-        push_warning("AudienceContainer not found in the current scene!")
-    
-    # Get all audience members
+    if not is_instance_valid(audience_container): return
+
+    # 1. Perform "Goldd" (Immediate)
     for seat in audience_container.get_children():
+        if is_instance_valid(seat) and seat.is_filled and seat.amfriendly and seat.has_method("goldd"):
+            seat.goldd()
+
+    # 2. Perform "Throw" (Animated with Safety Checks)
+    for seat in audience_container.get_children():
+        # Check if seat is valid before starting the sequence for this seat
+        if not is_instance_valid(current_scene) or not is_instance_valid(seat):
+            continue # Skip to the next seat if this one is already gone
+
         if seat.is_filled and seat.has_method("perform_throw"):
-            if is_instance_valid(seat):
-                await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
-            
-            # Check if the seat still exists before calling the method
-            if is_instance_valid(seat):
-                seat.perform_throw()
-            
-    # Optional: Proceed to the UI menu after a delay
+            # Perform the throw twice
+            for i in range(2):
+                # Check validity again before the wait and before the call
+                if not is_instance_valid(seat): break
+                
+                await get_tree().create_timer(randf_range(0.0, 0.2)).timeout
+                
+                if is_instance_valid(seat):
+                    seat.perform_throw()
+
+    # 3. Final Wait
     await get_tree().create_timer(1.5).timeout
     
 func go_to_after_battle2(result: String):
@@ -175,6 +171,12 @@ func unlock_difficulty_mastery():
 
 var difficulties = ["Easy", "Normal", "Hard", "Insane"]
 
+static func CleanName(stat_name: String) -> String:
+    return stat_name.replace("MAX", "")
+
+static func ReadString(stat_name: String) -> String:
+    return "value" if stat_name.contains("MAX") else "level"
+
 static func _find_passive_data3(stat_name: String,target_stats: Dictionary) -> Dictionary:
     for passive in target_stats["passives"]:
         if passive.get("name") == stat_name:
@@ -182,14 +184,18 @@ static func _find_passive_data3(stat_name: String,target_stats: Dictionary) -> D
     return {} # Return empty if not found
 
 static func addtopassive3(stat_name: String, amount: float,target_stats: Dictionary) -> void:
+    var stat = ReadString(stat_name)
+    stat_name = CleanName(stat_name)
     var passives = _find_passive_data3(stat_name,target_stats)
-    passives["level"] += amount
+    passives[stat] += amount
 
 static func getpassive3(stat_name: String,target_stats: Dictionary) -> float:
+    var stat = ReadString(stat_name)
+    stat_name = CleanName(stat_name)
     var passives = _find_passive_data3(stat_name,target_stats)
     # Check if the stat exists to avoid a "Key not found" error
-    if passives.has("level"):
-        return float(passives["level"])
+    if passives.has(stat):
+        return float(passives[stat])
     
     return 0.0
 
@@ -200,19 +206,24 @@ static func _find_passive_data2(stat_name: String) -> Dictionary:
     return {} # Return empty if not found
 
 static func addtopassive2(stat_name: String, amount: float) -> void:
+    var stat = ReadString(stat_name)
+    stat_name = CleanName(stat_name)
     var passives = _find_passive_data2(stat_name)
-    passives["level"] += amount
+    passives[stat] += amount
 
 static func getpassive2(stat_name: String) -> float:
+    var stat = ReadString(stat_name)
+    stat_name = CleanName(stat_name)
     var passives = _find_passive_data2(stat_name)
     # Check if the stat exists to avoid a "Key not found" error
-    if passives.has("level"):
-        return float(passives["level"])
+    if passives.has(stat):
+        return float(passives[stat])
     
     return 0.0
 
 static func addpassive(stat_name: String) -> Dictionary:
-    # Use the class name directly
+    var stat = ReadString(stat_name)
+    stat_name = CleanName(stat_name)
     var base_data = UpgradeData.get_upgrade_by_name(stat_name)
     
     if base_data.is_empty():
@@ -220,7 +231,7 @@ static func addpassive(stat_name: String) -> Dictionary:
         return {}
 
     var new_passive = base_data.duplicate()
-    new_passive["level"] = 0 
+    new_passive[stat] = 0 
     GameManager.player_profile["passives"].append(new_passive)
     return new_passive
 
@@ -231,17 +242,21 @@ static func removepassive(stat_name: String) -> void:
             passives.remove_at(i)
 
 static func addtopassive(stat_name: String, amount: float) -> void:
+    var stat = ReadString(stat_name)
+    stat_name = CleanName(stat_name)
+    
     var passives = _find_passive_data(stat_name)
     
     # If it doesn't exist, create it
     if passives == null:
         passives = addpassive(stat_name)
     
+    
     # Update the level
-    passives["level"] += amount
+    passives[stat] += amount
     
     # Remove if level drops to or below 0
-    if passives["level"] <= 0:
+    if passives[stat] <= 0:
         removepassive(stat_name)
 
 # Helper to find specific passive dictionary in the profile
@@ -275,6 +290,6 @@ var escaped: bool = false
 # GameManager.gd Additions
 var shop_initialized: bool = false
 var shop_items: Array = []  # Stores item dictionary states and "bought" statuses
-var persistent_reroll_cost: int = 10
+var persistent_reroll_cost: int = 1
 
 var selected_difficulty = 1

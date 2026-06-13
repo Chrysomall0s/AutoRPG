@@ -7,7 +7,6 @@ var monsters = {
 		"icon": "res://Assets/atlas/fruit.tres", "index": 4,
 			"passives": [
 			{"name": "HP", "level": 12},
-			{"name": "MAXHP", "level": 12},
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -16,7 +15,6 @@ var monsters = {
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
 			{"name": "HP", "level": 12},
-			{"name": "MAXHP", "level": 12},
 			],
 			"weapons": ["Club"],
 			"audience": ["Heckler"]
@@ -25,7 +23,6 @@ var monsters = {
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
 			{"name": "HP", "level": 12},
-			{"name": "MAXHP", "level": 12},
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -34,7 +31,6 @@ var monsters = {
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
 			{"name": "HP", "level": 12},
-			{"name": "MAXHP", "level": 12},
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -45,7 +41,6 @@ var monsters = {
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
 			{"name": "HP", "level": 12},
-			{"name": "MAXHP", "level": 12},
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -56,7 +51,6 @@ var monsters = {
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1
 			,"passives":[
 			{"name": "HP", "level": 12},
-			{"name": "MAXHP", "level": 12},
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -67,7 +61,6 @@ var monsters = {
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
 			{"name": "HP", "level": 12},
-			{"name": "MAXHP", "level": 12},
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]

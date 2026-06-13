@@ -132,7 +132,21 @@ func update_character_display():
         audience_container.populate_audience()
     # If you want, you can trigger a visual update in AudienceManager here
     # to highlight the seat corresponding to 'current_character_index'
-
+@onready var textureRect = $TextureRect
+func fit_to_screen():
+    # 1. Disable anchors if you are setting size manually
+    textureRect.anchor_left = 0
+    textureRect.anchor_top = 0
+    textureRect.anchor_right = 0
+    textureRect.anchor_bottom = 0
+    
+    # 2. Set the size to the viewport
+    textureRect.size = get_viewport_rect().size
+    
+    # 3. Ensure the texture stretches to fill that size
+    textureRect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    textureRect.stretch_mode = TextureRect.STRETCH_SCALE
+    
 func _ready():
 
     GameManager.player_profile = {
@@ -143,6 +157,7 @@ func _ready():
     }
     GameManager.selectedCharacter = -1
     DisplayServer.window_set_size(Vector2i(852, 480))	
+    fit_to_screen()
     add_child(time_ctrl)
     time_ctrl.create_difficulty_buttons(self)
     randomize()

@@ -94,7 +94,24 @@ func spend_gold(amount: int) -> bool:
 func add_gold(amount: int) -> void:
     GameManager.addtopassive("Gold",amount)
 
+@onready var textureRect = $TextureRect
+func fit_to_screen():
+    # 1. Disable anchors if you are setting size manually
+    textureRect.anchor_left = 0
+    textureRect.anchor_top = 0
+    textureRect.anchor_right = 0
+    textureRect.anchor_bottom = 0
+    
+    # 2. Set the size to the viewport
+    textureRect.size = get_viewport_rect().size
+    
+    # 3. Ensure the texture stretches to fill that size
+    textureRect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    textureRect.stretch_mode = TextureRect.STRETCH_SCALE
+    
+
 func _ready():
+    fit_to_screen()
     randomize()
     setup_gold_ui()
     setup_statsbook_ui()

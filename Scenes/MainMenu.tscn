@@ -14,10 +14,17 @@ offset_right = 672.0
 offset_bottom = 1107.0
 script = ExtResource("1_tt5f1")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1838137876]
-position = Vector2(2142.5996, 1161.5)
-scale = Vector2(10.120379, 9.448978)
+[node name="TextureRect" type="TextureRect" parent="." unique_id=143443439]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 2278.0
+offset_bottom = 1133.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_8saeu")
+expand_mode = 1
 
 [node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1382867474]
 layout_mode = 0

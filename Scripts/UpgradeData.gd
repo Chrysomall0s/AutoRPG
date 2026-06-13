@@ -7,9 +7,8 @@ static var upgrades = [
 	# --- PASSIVE / NORMAL UPGRADES (Applied directly to Hero) ---
 	{"name": "Gold", "category": "passive", "value": 2, "weight": 0, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 0,  "level": 1},
 	{"name": "HP", "category": "passive", "value": 2, "weight": 6, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 1,  "level": 1},
-	{"name": "MAXHP", "category": "passive", "value": 2, "weight": 6, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 1,  "level": 1},
 	{"name": "DMG", "category": "passive", "value": 2, "weight": 7, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 9,  "level": 1},
-	{"name": "Thorns",     "category": "passive",    "value": 10, "weight": 13,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 7,    "level": 1},
+	{"name": "Thorns", "category": "passive", "value": 10, "weight": 13,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 7,    "level": 1},
 	{"name": "Leech",   "category": "passive", "value": 5, "weight": 30,  "cost": 2, "icon": "res://Assets/atlas/icon.tres","index": 3,  "level": 1},
 	{"name": "DEF",      "category": "passive",  "value": 0, "weight": 20,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 2,    "level": 1},
 	

@@ -7,7 +7,7 @@ extends Node
 var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
 var UpgradeSystem = preload("res://Scripts/UpgradeSystem.gd").new()
 
-var base_reroll_cost: int = 10
+var base_reroll_cost: int = 1
 
 
 # ----------------------------
