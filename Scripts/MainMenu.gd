@@ -83,11 +83,11 @@ func setup_statsbook_ui():
 var atlas_tex: Texture2D = preload("res://Assets/atlas/settings.tres")
 
 func create_nav_buttons():
-    # Increase this value to make the buttons and icons larger
-    var button_size = Vector2(128, 128) 
+    # 1. Increased button size (originally 128, 128)
+    var button_size = Vector2(240, 240)  
     var slow_icon_index = 1 
     
-    # --- Left Button (Horizontally Flipped) ---
+    # --- Left Button ---
     var btn_left = Button.new()
     btn_left.flat = true
     btn_left.custom_minimum_size = button_size
@@ -96,13 +96,13 @@ func create_nav_buttons():
     
     var sprite_left = TextureRect.new()
     sprite_left.texture = _create_atlas_frame(slow_icon_index)
-    sprite_left.flip_h = true # Horizontally flipped
+    sprite_left.flip_h = true 
     sprite_left.set_anchors_preset(Control.PRESET_FULL_RECT)
     sprite_left.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     sprite_left.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
     btn_left.add_child(sprite_left)
     
-    # --- Right Button (Normal) ---
+    # --- Right Button ---
     var btn_right = Button.new()
     btn_right.flat = true
     btn_right.custom_minimum_size = button_size
@@ -111,15 +111,16 @@ func create_nav_buttons():
     
     var sprite_right = TextureRect.new()
     sprite_right.texture = _create_atlas_frame(slow_icon_index)
-    # No flip for the right button
     sprite_right.set_anchors_preset(Control.PRESET_FULL_RECT)
     sprite_right.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     sprite_right.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
     btn_right.add_child(sprite_right)
     
-    # Adjust positions to account for larger size
-    btn_left.position = player_sprite.position + Vector2(-200, -64)
-    btn_right.position = player_sprite.position + Vector2(100, -64)
+    # 2. Adjusted positions to be wider apart
+    # player_sprite.position is the center, so we shift left/right accordingly
+    # -280 (further left) and +120 (further right) creates more space
+    btn_left.position = player_sprite.position + Vector2(-360, -80)
+    btn_right.position = player_sprite.position + Vector2(160, -80)
 
 # Re-use your helper function to get the texture slice
 func _create_atlas_frame(index: int) -> AtlasTexture:
