@@ -1,9 +1,41 @@
 # GameManager.gd
 extends Node
 var outline_shader = preload("res://Assets/shaders/outline_shader.gdshader")
-
+@onready var audience_container = $AudienceContainer
 const AfterBattleScene = preload("res://Scenes/AfterBattle.tscn")
 func go_to_after_battle(result: String):
+    battle_over = true
+    go_to_after_battle2(result)
+    # Get the root node of the currently active scene
+    var current_scene = get_tree().current_scene
+    
+    # Assuming "AudienceContainer" is a direct child of the root
+    # or accessible via a path from the root
+    var audience_container = current_scene.find_child("AudienceContainer", true, false)
+    if audience_container:
+        for seat in audience_container.get_children():
+            if seat.is_filled and seat.amfriendly and seat.has_method("goldd"):
+                seat.goldd()
+    if audience_container:
+        for seat in audience_container.get_children():
+            if seat.is_filled and seat.has_method("perform_throw"):
+                await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
+                seat.perform_throw()
+    else:
+        push_warning("AudienceContainer not found in the current scene!")
+    
+    # Get all audience members
+    for seat in audience_container.get_children():
+        # Only throw if they are a filled, valid audience member
+        if seat.is_filled and seat.has_method("perform_throw"):
+            # Add a slight delay for a "shower" effect
+            await get_tree().create_timer(randf_range(0.0, 0.5)).timeout
+            seat.perform_throw()
+            
+    # Optional: Proceed to the UI menu after a delay
+    await get_tree().create_timer(1.5).timeout
+    
+func go_to_after_battle2(result: String):
     GameManager.after_battle_data = {
         "result": result,
         "round": GameManager.currentRound,
@@ -21,7 +53,6 @@ func go_to_after_battle(result: String):
     get_tree().current_scene.add_child(canvas)
 
     # pause gameplay behind it
-    get_tree().paused = true
 
 # --- Profiles ---
 var player_profile = {
@@ -39,7 +70,6 @@ var current_enemy_profile = {
 
 var audience_mastery := {}
 var selectedCharacter: int = 0
-var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
 # Inside GameManager.gd
 # Inside GameManager.gd
 # Use "Node" instead of "Control" to accept both Sprite2D and TextureRect
@@ -175,23 +205,56 @@ static func getpassive2(stat_name: String) -> float:
     
     return 0.0
 
-static func _find_passive_data(stat_name: String) -> Dictionary:
-    for passive in GameManager.player_profile["passives"]:
-        if passive.get("name") == stat_name:
-            return passive
-    return {} # Return empty if not found
+static func addpassive(stat_name: String) -> Dictionary:
+    # Use the class name directly
+    var base_data = UpgradeData.get_upgrade_by_name(stat_name)
+    
+    if base_data.is_empty():
+        push_error("Passive not found: " + stat_name)
+        return {}
+
+    var new_passive = base_data.duplicate()
+    new_passive["level"] = 0 
+    GameManager.player_profile["passives"].append(new_passive)
+    return new_passive
+
+static func removepassive(stat_name: String) -> void:
+    var passives = GameManager.player_profile["passives"]
+    for i in range(passives.size() - 1, -1, -1):
+        if passives[i]["name"] == stat_name:
+            passives.remove_at(i)
 
 static func addtopassive(stat_name: String, amount: float) -> void:
     var passives = _find_passive_data(stat_name)
+    
+    # If it doesn't exist, create it
+    if passives == null:
+        passives = addpassive(stat_name)
+    
+    # Update the level
     passives["level"] += amount
+    
+    # Remove if level drops to or below 0
+    if passives["level"] <= 0:
+        removepassive(stat_name)
+
+# Helper to find specific passive dictionary in the profile
+static func _find_passive_data(stat_name: String):
+    # Safety: Ensure player_profile exists before trying to access it
+    if not GameManager.player_profile.has("passives"):
+        return null
+        
+    for p in GameManager.player_profile["passives"]:
+        if p.get("name") == stat_name: # .get() is safer than ["name"]
+            return p
+    return null
 
 static func getpassive(stat_name: String) -> float:
     var passives = _find_passive_data(stat_name)
-    # Check if the stat exists to avoid a "Key not found" error
-    if passives.has("level"):
-        return float(passives["level"])
     
-    return 0.0
+    # If passives is null, get() won't be called.
+    # Otherwise, it attempts to return "level", defaulting to 0.0 if missing.
+    return float(passives.get("level", 0.0)) if passives != null else 0.0
 
 func get_difficulty_key() -> String:
     if selected_difficulty < 0 or selected_difficulty >= difficulties.size():

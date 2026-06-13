@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameManager="*uid://bif2nyd620gfx"
 ShopSystem="*uid://b5l70t0lw62cb"
 MonsterData="*uid://b7qmjew23wbdb"
+UpgradeData="*uid://cswodbvc0ox4e"
 
 [display]
 

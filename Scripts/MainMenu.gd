@@ -25,7 +25,6 @@ var current_character_index: int = 0
 var characters = ["char_slot1", "char_slot2", "char_slot3"]
 var selected_audience_member: Node = null
 
-var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
 var UpgradeSystem = preload("res://Scripts/UpgradeSystem.gd").new()
 
 var weapon_sprites: Array[Sprite2D] = []

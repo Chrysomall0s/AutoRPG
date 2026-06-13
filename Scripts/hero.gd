@@ -18,8 +18,7 @@ var weapon_sprites: Array[Sprite2D] = []
 var floating_time := 0.0
 
 func _find_upgrade_by_name(target_name: String) -> Dictionary:
-	var upgrade_data = preload("res://Scripts/UpgradeData.gd").new()
-	for upgrade in upgrade_data.upgrades:
+	for upgrade in UpgradeData.upgrades:
 		if upgrade["name"] == target_name: return upgrade
 	return {}
 
@@ -123,14 +122,13 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
 	var count = 0
 	
 	# --- ADDED: Load UpgradeData to resolve names ---
-	var upgrade_data_source = preload("res://Scripts/UpgradeData.gd").new()
 	# -------------------------------------------------
 
 	for item in passives:
 		# Resolve string to full dictionary if necessary
 		var upgrade = item
 		if upgrade is String:
-			for data in upgrade_data_source.upgrades:
+			for data in UpgradeData.upgrades:
 				if data["name"] == upgrade:
 					upgrade = data
 					break

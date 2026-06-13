@@ -14,10 +14,8 @@ var base_reroll_cost: int = 10
 # SHOP GENERATION
 # ----------------------------
 func reroll() -> void:
-	if GameManager.getpassive("Gold") < GameManager.persistent_reroll_cost:
-		return
 
-	GameManager.addtopassive("Gold",-GameManager.persistent_reroll_cost)
+
 
 	_generate_fresh_shop_pool()
 	GameManager.persistent_reroll_cost = base_reroll_cost

@@ -43,9 +43,9 @@ var utility_button_container: HBoxContainer
 var slot_button_container: GridContainer
 
 var upgrade_buttons = []
-var base_reroll_cost: int = 10
+var base_reroll_cost: int = 1
 
-var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
+
 var UpgradeSystem = preload("res://Scripts/UpgradeSystem.gd").new()
 var reroll_button: Button
 
@@ -121,7 +121,7 @@ func _ready():
     slot_button_container.add_theme_constant_override("h_separation", 15)
     slot_button_container.add_theme_constant_override("v_separation", 15)
     master_shop_container.add_child(slot_button_container)
-
+    
     if not GameManager.get("shop_initialized"):
         generate_fresh_shop_pool()
         GameManager.shop_initialized = true
@@ -133,10 +133,10 @@ func _ready():
     setup_six_slots_ui()
     #setup_statsbook_ui()
     refresh_character_and_weapons()
-    
+    reroll_shop()
     await get_tree().process_frame
     adjust_layout_containers()
-    reroll_shop()
+    
 
 func _process(delta: float) -> void:
     # 3. Delegate the movement calculations to the Hero node
@@ -189,7 +189,14 @@ func generate_fresh_shop_pool():
     GameManager.shop_items.clear()
     var raw_upgrades = get_random_upgrades(3)
     for upgrade in raw_upgrades:
-        GameManager.shop_items.append({"upgrade": upgrade, "bought": false})
+        # Create a deep copy so we don't modify the master data
+        var item_instance = upgrade.duplicate(true)
+        
+        # Ensure a unique ID exists
+        if not item_instance.has("unique_id"):
+            item_instance["unique_id"] = str(Time.get_ticks_usec()) + "_" + str(randi())
+            
+        GameManager.shop_items.append({"upgrade": item_instance, "bought": false})
 
 func draw_shop_from_persistent_memory():
     # 1. Clear existing buttons
@@ -500,7 +507,7 @@ func create_reroll_button():
     update_reroll_text()
     reroll_button.custom_minimum_size = Vector2(screen_size.x * shop_item_width_ratio, screen_size.y * shop_item_height_ratio)
     reroll_button.add_theme_font_size_override("font_size", int(screen_size.y * shop_button_font_ratio))
-    reroll_button.pressed.connect(reroll_shop)
+    reroll_button.pressed.connect(reroll_shop2)
     utility_button_container.add_child(reroll_button)
 
 func create_button(text, callback):
@@ -525,6 +532,12 @@ func update_upgrade_colors():
         button.modulate = Color(1, 0.4, 0.4) if get_gold() < upgrade["cost"] else Color(1, 1, 1) 
     if reroll_button:
         reroll_button.modulate = Color(1, 0.4, 0.4) if get_gold() < GameManager.persistent_reroll_cost else Color(1, 1, 1)
+
+func reroll_shop2():
+    if GameManager.getpassive("Gold") < GameManager.persistent_reroll_cost:
+        return
+    GameManager.addtopassive("Gold",-GameManager.persistent_reroll_cost)
+    reroll_shop()
 
 func reroll_shop():
     ShopSystem.reroll()

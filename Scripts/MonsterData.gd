@@ -143,8 +143,6 @@ func get_monster(difficulty_key: String, round: int) -> Dictionary:
 	return monster_profile
 	
 func _find_upgrade_by_name(target_name: String) -> Dictionary:
-	var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
-
 	for upgrade in UpgradeData.upgrades:
 		if upgrade.get("name") == target_name:
 			return upgrade
