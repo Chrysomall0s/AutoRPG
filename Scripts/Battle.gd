@@ -13,10 +13,6 @@ const TimeController = preload("res://Scripts/time.gd")
 @export_group("Text Typography Scaling")
 @export var run_button_font_ratio: float = 0.024
 
-
-
-var surrender_button: Button
-
 var time_ctrl = TimeController.new()
 var battle_timeline: Array = [] 
 var elapsed_time: float = 0.0
@@ -25,7 +21,6 @@ var battle_over := false
 func _ready():
 	add_child(time_ctrl)
 	time_ctrl.create_time_buttons(self)
-	create_surrender_button()
 	setup_battlefield()
 	
 	# Pre-calculate everything before the battle starts
@@ -40,38 +35,6 @@ func _ready():
 	if audience_container.has_method("populate_audience"):
 		audience_container.populate_audience()
 
-func _on_surrender_pressed():
-	if battle_over: return
-	
-	battle_over = true
-	# Use your existing logic to trigger the loss UI
-	go_to_after_battle("lose")
-
-func create_surrender_button():
-	var screen_size = get_viewport_rect().size
-	surrender_button = Button.new()
-	surrender_button.text = "Surrender"
-	
-	# Use the same size ratios as the Run button
-	var btn_size = Vector2(screen_size.x * run_btn_width_ratio, screen_size.y * run_btn_height_ratio)
-	surrender_button.custom_minimum_size = btn_size
-	
-	# Position: Place it exactly above the run button (subtract an extra margin)
-	var run_btn_y = screen_size.y - btn_size.y - (screen_size.y * run_btn_bottom_margin_ratio)
-	surrender_button.position = Vector2((screen_size.x - btn_size.x) / 2.0, run_btn_y - btn_size.y - 10)
-	
-	surrender_button.add_theme_font_size_override("font_size", int(screen_size.y * run_button_font_ratio))
-	
-	# Start as disabled
-	surrender_button.disabled = true
-	surrender_button.pressed.connect(_on_surrender_pressed)
-	
-	add_child(surrender_button)
-	
-	# 5-second activation delay
-	await get_tree().create_timer(5.0, true).timeout
-	if is_instance_valid(surrender_button):
-		surrender_button.disabled = false
 
 
 
@@ -305,34 +268,15 @@ func check_game_state():
 	if battle_over: return
 	if GameManager.getpassive("HP")<= 0:
 		battle_over = false
-		go_to_after_battle("lose")
+		GameManager.go_to_after_battle("lose")
 	if GameManager.getpassive2("HP")<= 0:
 		battle_over = true
-		go_to_after_battle("win")
+		GameManager.go_to_after_battle("win")
 			
 # =================================================================
 # GAME STATE & TOURNAMENT LOGIC
 # =================================================================
-const AfterBattleScene = preload("res://Scenes/AfterBattle.tscn")
-func go_to_after_battle(result: String):
-	GameManager.after_battle_data = {
-		"result": result,
-		"round": GameManager.currentRound,
-		"player": GameManager.player_profile,
-		"enemy": GameManager.current_enemy_profile
-	}
 
-	var after = AfterBattleScene.instantiate()
-
-	# optional: make it fullscreen UI layer
-	var canvas = CanvasLayer.new()
-	canvas.layer = 100
-
-	canvas.add_child(after)
-	get_tree().current_scene.add_child(canvas)
-
-	# pause gameplay behind it
-	get_tree().paused = true
 
 #func advance_or_finish_tournament():
 	#var diff_key = GameManager.get_difficulty_key()

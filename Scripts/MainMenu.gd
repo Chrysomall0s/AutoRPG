@@ -3,15 +3,8 @@ extends Control
 # =================================================================
 # GAME CONFIGURATION SETTINGS
 # =================================================================
-@export_group("Text Typography Scaling")
-@export var run_button_font_ratio: float = 0.024
 
 var current_character_index: int = 0
-
-@export_group("Run Button Layout")
-@export var run_btn_width_ratio: float = 0.80
-@export var run_btn_height_ratio: float = 0.09
-@export var run_btn_bottom_margin_ratio: float = 0.04
 
 @export_group("Hero Preview Position")
 @export var hero_display_position_ratio: Vector2 = Vector2(0.5, 0.32)
@@ -30,7 +23,6 @@ var current_character_index: int = 0
 @onready var player_sprite: Sprite2D = $Hero
 
 var characters = ["char_slot1", "char_slot2", "char_slot3"]
-var run_button: Button
 var selected_audience_member: Node = null
 
 var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
@@ -156,7 +148,6 @@ func _ready():
     time_ctrl.create_difficulty_buttons(self)
     randomize()
     setup_hero_preview_position()
-    create_run_button()
      # Explicitly set to "unselected"
     setup_statsbook_ui()
     create_nav_buttons() # Add this
@@ -257,21 +248,3 @@ func _find_upgrade_by_name(target_name: String) -> Dictionary:
     for upgrade in UpgradeData.upgrades:
         if upgrade["name"] == target_name: return upgrade
     return {}
-
-func create_run_button():
-    var screen_size = get_viewport_rect().size
-    run_button = Button.new()
-    run_button.text = "Run"
-    var btn_size = Vector2(screen_size.x * run_btn_width_ratio, screen_size.y * run_btn_height_ratio)
-    run_button.custom_minimum_size = btn_size
-    run_button.position = Vector2((screen_size.x - btn_size.x) / 2.0, screen_size.y - btn_size.y - (screen_size.y * run_btn_bottom_margin_ratio))
-    run_button.add_theme_font_size_override("font_size", int(screen_size.y * run_button_font_ratio))
-    run_button.pressed.connect(func():
-        # Double check that a character is actually selected
-        if GameManager.selectedCharacter != -1:
-            GameManager.currentRound = 0
-            get_tree().change_scene_to_file("res://Scenes/Store.tscn")
-        else:
-            print("Action blocked: No character selected.")
-    )
-    add_child(run_button)

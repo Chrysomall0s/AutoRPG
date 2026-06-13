@@ -2,7 +2,26 @@
 extends Node
 var outline_shader = preload("res://Assets/shaders/outline_shader.gdshader")
 
+const AfterBattleScene = preload("res://Scenes/AfterBattle.tscn")
+func go_to_after_battle(result: String):
+    GameManager.after_battle_data = {
+        "result": result,
+        "round": GameManager.currentRound,
+        "player": GameManager.player_profile,
+        "enemy": GameManager.current_enemy_profile
+    }
 
+    var after = AfterBattleScene.instantiate()
+
+    # optional: make it fullscreen UI layer
+    var canvas = CanvasLayer.new()
+    canvas.layer = 100
+
+    canvas.add_child(after)
+    get_tree().current_scene.add_child(canvas)
+
+    # pause gameplay behind it
+    get_tree().paused = true
 
 # --- Profiles ---
 var player_profile = {
