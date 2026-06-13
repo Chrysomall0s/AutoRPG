@@ -109,19 +109,23 @@ func fit_to_screen():
     textureRect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     textureRect.stretch_mode = TextureRect.STRETCH_SCALE
     
+@onready var audience_container = $AudienceContainer
 
 func _ready():
     fit_to_screen()
     randomize()
     setup_gold_ui()
     setup_statsbook_ui()
-    
+    audience_container.z_index = 0
+    if audience_container.has_method("populate_audience"):
+        audience_container.populate_audience()
     #update_stats_display()
     master_shop_container = VBoxContainer.new()
     master_shop_container.set_anchors_preset(Control.PRESET_CENTER_TOP)
     master_shop_container.add_theme_constant_override("separation", 25)
     add_child(master_shop_container)
 
+    master_shop_container.z_index = 1000
     main_button_container = HBoxContainer.new()
     main_button_container.alignment = BoxContainer.ALIGNMENT_CENTER
     main_button_container.add_theme_constant_override("separation", 15)

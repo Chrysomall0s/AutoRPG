@@ -86,6 +86,18 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
             -sin(angle) * rainbow_radius_y + rainbow_y_offset + float_off
         )
         weapon.position = weapon.position.lerp(target, delta * weapon_follow_smoothness)
+# 2. NEW: Update Passive Shader Parameters
+    for sprite in layers.get_children():
+        if sprite is Sprite2D and sprite.material is ShaderMaterial:
+            # We need to find the data associated with this sprite. 
+            # Storing the upgrade dictionary as meta is the cleanest way.
+            var upgrade = sprite.get_meta("upgrade_data")
+            if upgrade:
+                var value = float(upgrade.get("value", 0.0))
+                var level = float(upgrade.get("level", 1.0))
+                var progress = clamp(level / value, 0.0, 1.0)
+                
+                sprite.material.set_shader_parameter("charge_progress", progress)
 
 func attack_target(weapon: Sprite2D, target_pos: Vector2, duration: float):
     weapon.set_meta("is_attacking", true)
@@ -154,11 +166,16 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
         # Now 'upgrade' is a dictionary (if found)
         if upgrade is Dictionary and upgrade.has("icon"):
             var sprite = Sprite2D.new()
-            
+            sprite.set_meta("upgrade_data", upgrade)
             # --- APPLY SHADER ---
             var mat = ShaderMaterial.new()
             mat.shader = outline_shader
             mat.set_shader_parameter("level", float(upgrade.get("level", 1.0)))
+            mat.set_shader_parameter("index", upgrade.get("index", 0))
+            
+            # Enable the charge shader and set progress
+            mat.set_shader_parameter("use_charge_shader", true)
+            mat.set_shader_parameter("charge_progress", upgrade.get("value", 1.0)/upgrade.get("level", 1.0))
             sprite.material = mat
             # --------------------
             
@@ -170,7 +187,7 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
                 
                 atlas.region = Rect2(Vector2((index % 4) * tile_size.x, (index / 4) * tile_size.y), tile_size)
                 sprite.texture = atlas
-                sprite.scale = Vector2(0.2, 0.2)
+                sprite.scale = Vector2(0.3, 0.3)
                 
                 var row = count / 5
                 var col = count % 5

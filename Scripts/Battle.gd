@@ -276,8 +276,8 @@ func execute_weapon_event(weapon, weapon_data: Dictionary):
     Stats_Handler.execute_weapon(self, target_node, attacker_node, weapon, weapon_data, target_stats, attacker_stats)
     
     # UI Refresh
-    player_sprite.draw_health(GameManager.player_profile)
-    enemy_sprite.draw_health(GameManager.current_enemy_profile)
+    #player_sprite.draw_health(GameManager.player_profile)
+    #enemy_sprite.draw_health(GameManager.current_enemy_profile)
     
     await get_tree().create_timer(0.8).timeout
     weapon.set_meta("last_fired_tick", current_tick)
