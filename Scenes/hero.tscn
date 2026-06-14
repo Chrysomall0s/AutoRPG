@@ -1,8 +1,13 @@
 [gd_scene format=3 uid="uid://0obra7qp5v18"]
 
 [ext_resource type="Script" uid="uid://ux8hp21t7h6d" path="res://Scripts/hero.gd" id="1_qhmnl"]
+[ext_resource type="Texture2D" uid="uid://pk84jhnrg8pl" path="res://Assets/atlas/icon2.tres" id="2_stlmo"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_qhmnl"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_awl7p"]
+atlas = ExtResource("2_stlmo")
+region = Rect2(250, 500, 250, 250)
 
 [node name="Hero" type="Sprite2D" unique_id=448655595]
 scale = Vector2(0.1, 0.1)
@@ -12,3 +17,7 @@ script = ExtResource("1_qhmnl")
 [node name="UpgradeLayers" type="Node2D" parent="." unique_id=1340055554]
 position = Vector2(0, -130)
 scale = Vector2(2, 2)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2046634779]
+visible = false
+texture = SubResource("AtlasTexture_awl7p")

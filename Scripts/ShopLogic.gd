@@ -5,10 +5,8 @@ extends Node
 # =========================================================
 
 var UpgradeData = preload("res://Scripts/UpgradeData.gd").new()
-var UpgradeSystem = preload("res://Scripts/UpgradeSystem.gd").new()
 
 var base_reroll_cost: int = 1
-
 
 # ----------------------------
 # SHOP GENERATION
@@ -67,69 +65,3 @@ func _get_weighted_random(pool: Array) -> Dictionary:
 			return item
 
 	return pool[0]
-
-
-# ----------------------------
-# WEAPON EQUIPMENT
-# ----------------------------
-func equip_weapon(weapon: Dictionary, slot_index: int) -> void:
-	var weapons = GameManager.player_profile.get("weapons", [])
-	while weapons.size() <= slot_index:
-		weapons.append(null)
-
-	var new_weapon = weapon.duplicate()
-	# Assign the ID here if it doesn't exist
-	if not new_weapon.has("unique_id"):
-		new_weapon["unique_id"] = "player_" + str(slot_index) + "_" + str(Time.get_ticks_usec())
-		
-	weapons[slot_index] = new_weapon
-
-
-func unequip_weapon(slot_index: int) -> void:
-	var weapons = GameManager.player_profile.get("weapons", [])
-	if slot_index < weapons.size():
-		weapons[slot_index] = null
-
-
-func use_upgrade_on_weapon(upgrade: Dictionary, slot_index: int) -> void:
-	var weapons = GameManager.player_profile.get("weapons", [])
-
-	if slot_index >= weapons.size():
-		return
-
-	var weapon = weapons[slot_index]
-	if weapon == null:
-		return
-
-	if upgrade.get("category") == "weapon_mod":
-		weapon["level"] = weapon.get("level", 1) + 1
-		weapon["damage"] = weapon.get("damage", 0) + upgrade.get("damage_bonus", 0)
-
-		UpgradeSystem.apply_upgrade(upgrade, str(slot_index))
-
-
-# ----------------------------
-# PASSIVE UPGRADES
-# ----------------------------
-func buy_passive_upgrade(upgrade: Dictionary) -> bool:
-	var cost = upgrade.get("cost", 0)
-
-	if GameManager.player_profile["stats"]["gold"] < cost:
-		return false
-
-	GameManager.player_profile["stats"]["gold"] -= cost
-
-	var profile = GameManager.player_profile
-
-	if upgrade.get("category") == "viewer":
-		if not profile.has("audience_members"):
-			profile["audience_members"] = []
-		profile["audience_members"].append(upgrade.duplicate())
-	else:
-		if not profile.has("passives"):
-			profile["passives"] = []
-		profile["passives"].append(upgrade.duplicate())
-
-		UpgradeSystem.upgradeStats(upgrade.duplicate())
-
-	return true

@@ -14,15 +14,21 @@ var health_bar: ProgressBar = null
 @export var float_wave_speed: float = 2.5
 @export var weapon_follow_smoothness: float = 8.0
 
-var weapon_sprites: Array[Sprite2D] = []
+@export var show_placeholders: bool = false
+@export var placeholder_texture: Texture2D
+
+var weapon_sprites: Array[Area2D] = []
 var floating_time := 0.0
+
+func _ready():
+    # If the inspector didn't set a value, grab it from the node
+    if placeholder_texture == null:
+        placeholder_texture = $Sprite2D.texture
 
 func _find_upgrade_by_name(target_name: String) -> Dictionary:
     for upgrade in UpgradeData.upgrades:
         if upgrade["name"] == target_name: return upgrade
     return {}
-
-#func _ready() -> void:
 
 func draw_health(target: Dictionary):
 
@@ -46,30 +52,68 @@ func draw_health(target: Dictionary):
     health_bar.value = GameManager.getpassive3("HP",target)
 
 func spawn_weapons(weapon_data_array: Array):
-    weapon_sprites.clear()
+    const MAX_SLOTS = 5 
+    
+    # Clean up old weapons
     for child in get_children():
         if child.has_meta("slot_index"): child.queue_free()
+    weapon_sprites.clear()
         
-    for i in range(weapon_data_array.size()):
-        var data = weapon_data_array[i]
-        if not data: continue
+    for i in range(MAX_SLOTS):
+        var weapon_container: Area2D = null
+        var visual_sprite: Sprite2D = null
         
-        var weapon_info = _find_upgrade_by_name(data) if data is String else data
-        if weapon_info.is_empty(): continue
+        # Check if we have data
+        if i < weapon_data_array.size() and weapon_data_array[i]:
+            var data = weapon_data_array[i]
+            var weapon_info = _find_upgrade_by_name(data) if data is String else data
+            
+            if not weapon_info.is_empty():
+                # Create the Area2D container
+                weapon_container = Area2D.new()
+                # Create the visual sprite and add to container
+                visual_sprite = GameManager._create_weapon_sprite(weapon_info)
+                weapon_container.add_child(visual_sprite)
+                
+                # IMPORTANT: Add a collision shape so the Area2D works
+                var shape = CollisionShape2D.new()
+                shape.shape = RectangleShape2D.new() # Adjust size as needed
+                weapon_container.add_child(shape)
+        
+        # Placeholder handling
+        elif show_placeholders and placeholder_texture:
+            weapon_container = Area2D.new()
+            visual_sprite = Sprite2D.new()
+            visual_sprite.texture = placeholder_texture
+            visual_sprite.modulate = Color(1, 1, 1, 0.3)
+            weapon_container.add_child(visual_sprite)
+        
+        if weapon_container:
+            weapon_container.set_meta("slot_index", i)
+            # Store a reference to the visual sprite for shaders/tweens
+            weapon_container.set_meta("sprite", visual_sprite) 
+            add_child(weapon_container)
+            weapon_sprites.append(weapon_container)
 
-        # Reuse the helper function
-        var weapon = GameManager._create_weapon_sprite(weapon_info)
-        
-        # Set slot-specific meta and store
-        weapon.set_meta("slot_index", i)
-        add_child(weapon)
-        weapon_sprites.append(weapon)
+# Toggle function to be called from elsewhere
+func set_show_placeholders(enabled: bool):
+    show_placeholders = enabled
+
+## Increases the orbit radius of the floating weapons.
+## @param multiplier: The factor to multiply the current radius by (e.g., 1.1 for a 10% increase).
+func increase_weapon_orbit_radius(multiplier: float) -> void:
+    rainbow_radius_x *= multiplier
+    rainbow_radius_y *= multiplier
+    
+    # Optional: Print to verify the change
+    print("Weapon orbit radius updated to: ", rainbow_radius_x, ", ", rainbow_radius_y)
 
 # Inside Hero.gd
 func activate_battle_mode():
-    for weapon in weapon_sprites:
-        if weapon.material is ShaderMaterial:
-            weapon.material.set_shader_parameter("use_charge_shader", true)
+    for weapon_area in weapon_sprites:
+        var sprite = weapon_area.get_meta("sprite")
+        if sprite and sprite.material is ShaderMaterial:
+            sprite.material.set_shader_parameter("use_charge_shader", true)
             
 func update_weapon_movements(delta: float, _player_pos: Vector2):
     floating_time += delta
@@ -99,7 +143,7 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
                 
                 sprite.material.set_shader_parameter("charge_progress", progress)
 
-func attack_target(weapon: Sprite2D, target_pos: Vector2, duration: float):
+func attack_target(weapon: Area2D, target_pos: Vector2, duration: float):
     weapon.set_meta("is_attacking", true)
     var local_target = to_local(target_pos)
     var tween = create_tween()
