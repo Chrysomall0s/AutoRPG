@@ -87,7 +87,7 @@ func perform_throw():
 		
 	else:
 		atlas = load("res://Assets/atlas/icon2.tres") # Use the base texture
-		index = 3
+		index = 2
 	
 	# 2. Create the AtlasTexture resource
 	var atlas_texture = AtlasTexture.new()

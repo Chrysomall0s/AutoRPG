@@ -118,20 +118,29 @@ var tickcount = 0
 
 
 func find_weapon_node_from_data(data: Dictionary) -> Node:
+	var target_id = data.get("unique_id")
+	if target_id == null: return null
+
 	# Check player sprites
-	var id = data["unique_id"]
 	for w in player_sprite.weapon_sprites:
 		var index = w.get_meta("slot_index", -1)
-		# Check index bounds and data match
-		if index != -1 and index < GameManager.player_profile["weapons"].size():
-			if GameManager.player_profile["weapons"][index].get("unique_id") == data.get("unique_id"):
+		var weapons_list = GameManager.player_profile.get("weapons", [])
+		
+		# Check index bounds and ensure the entry is not null
+		if index != -1 and index < weapons_list.size():
+			var weapon_entry = weapons_list[index]
+			# Skip if null, otherwise check for matching unique_id
+			if weapon_entry is Dictionary and weapon_entry.get("unique_id") == target_id:
 				return w
 
-	# Check enemy sprites (ensure this block is at the same indentation level as the first loop)
+	# Check enemy sprites
 	for w in enemy_sprite.weapon_sprites:
 		var index = w.get_meta("slot_index", -1)
-		if index != -1 and index < GameManager.current_enemy_profile["weapons"].size():
-			if GameManager.current_enemy_profile["weapons"][index].get("unique_id") == data.get("unique_id"):
+		var weapons_list = GameManager.current_enemy_profile.get("weapons", [])
+		
+		if index != -1 and index < weapons_list.size():
+			var weapon_entry = weapons_list[index]
+			if weapon_entry is Dictionary and weapon_entry.get("unique_id") == target_id:
 				return w
 				
 	return null

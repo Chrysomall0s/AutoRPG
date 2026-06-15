@@ -70,6 +70,29 @@ var current_enemy_profile = {
     "audience": []
 }
 
+var GlobalUpgrades: Array = [null, null, null]
+
+# Adds an item to the first available null slot
+func add_to_global_upgrades(item_data: Dictionary) -> bool:
+    for i in range(GlobalUpgrades.size()):
+        if GlobalUpgrades[i] == null:
+            GlobalUpgrades[i] = item_data
+            print("Added to global slot: ", i)
+            return true
+    print("No free global slots!")
+    return false
+
+# Removes an item by index
+func remove_from_global_upgrades(index: int):
+    if index >= 0 and index < GlobalUpgrades.size():
+        GlobalUpgrades[index] = null
+
+# Swaps two items in the global slots
+func swap_global_upgrades(idx_a: int, idx_b: int):
+    var temp = GlobalUpgrades[idx_a]
+    GlobalUpgrades[idx_a] = GlobalUpgrades[idx_b]
+    GlobalUpgrades[idx_b] = temp
+
 var audience_mastery := {}
 var selectedCharacter: int = 0
 # Inside GameManager.gd

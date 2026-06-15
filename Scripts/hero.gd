@@ -54,6 +54,20 @@ func draw_health(target: Dictionary):
     health_bar.max_value = GameManager.getpassive3("MAXHP",target)
     health_bar.value = GameManager.getpassive3("HP",target)
 
+func _update_placeholder_position(weapon: Area2D, index: int, delta: float):
+    # Calculate the bobbing effect (using the same logic as the main weapons)
+    # Adding 'index' inside sin() gives each a slightly different phase
+    var float_off = sin(floating_time * float_wave_speed + (index + 6)) * float_amplitude
+    
+    # Calculate X and Y base positions
+    var x_offset = rainbow_radius_x * (index + 2)
+    var y_offset = (-rainbow_radius_y / 4.0) + float_off # Add the bob here
+    
+    var target = Vector2(x_offset, y_offset)
+    
+    # Move the placeholder to the target position
+    weapon.position = weapon.position.lerp(target, delta * weapon_follow_smoothness)
+    
 func spawn_weapons(weapon_data_array: Array):
     const MAX_SLOTS = 6 
     
@@ -104,6 +118,14 @@ func spawn_weapons(weapon_data_array: Array):
         
         add_child(weapon_container)
         weapon_sprites.append(weapon_container) # Now all slots are tracked!
+    if show_placeholders:
+        for i in range(3): # Draw 3 placeholders
+            var p = _create_mirrored_placeholder(i)
+            # Add to the node and track them
+            add_child(p)
+            weapon_sprites.append(p) 
+            # Note: You might want a separate array for placeholders 
+            # if you don't want them interacting with the same logic
 
 func _on_weapon_input(_viewport, event: InputEvent, _shape_idx, weapon: Area2D):
     if not show_placeholders: return
@@ -161,47 +183,69 @@ func _input(event):
         _check_drop(dragging_weapon)
         dragging_weapon = null
 
+func _create_mirrored_placeholder(index: int) -> Area2D:
+    var placeholder = Area2D.new()
+    # Assign the meta data here! 
+    # We use 6+index so it doesn't conflict with main slots 0-5
+    placeholder.set_meta("slot_index", 6 + index) 
+    
+    var visual = Sprite2D.new()
+    visual.texture = placeholder_texture
+    visual.modulate = Color(1, 1, 1, 0.3)
+    placeholder.add_child(visual)
+    
+    # REQUIRED: Add the collision shape AND the meta for dragging to work
+    var shape = CollisionShape2D.new()
+    shape.shape = RectangleShape2D.new()
+    shape.shape.size = placeholder_texture.get_size()
+    placeholder.add_child(shape)
+    placeholder.set_meta("collision_shape", shape) # <--- IMPORTANT
+    # Mirroring logic: flip the X offset
+    var x_offset = (rainbow_radius_x + 100) * (1 if index % 2 == 0 else -1)
+    var y_offset = (index * 60) - 60 # Vertical spacing
+    placeholder.position = Vector2(x_offset, y_offset)
+    
+    return placeholder
+
 func _check_drop(dropped_weapon: Area2D):
-    # Get the current mouse position in global coordinates
     var mouse_pos = get_global_mouse_position()
     var target_weapon: Area2D = null
 
-    # Iterate through all weapon slots to see if the mouse is hovering over one
     for weapon in weapon_sprites:
-        if weapon == dropped_weapon: 
-            continue
+        if weapon == dropped_weapon: continue
         
-        # Calculate the bounding box for this weapon's collision shape
         var collision_shape = weapon.get_meta("collision_shape")
-        var shape_size = collision_shape.shape.size
-        # Create a Rect2 centered on the weapon's global_position
-        var global_rect = Rect2(weapon.global_position - (shape_size / 2), shape_size)
+        var global_rect = Rect2(weapon.global_position - (collision_shape.shape.size / 2), collision_shape.shape.size)
         
-        # Check if the mouse is inside this rect
         if global_rect.has_point(mouse_pos):
             target_weapon = weapon
             break
     
-    # If a target was found, perform the swap
     if target_weapon:
         var dropped_idx = dropped_weapon.get_meta("slot_index")
         var target_idx = target_weapon.get_meta("slot_index")
         
-        # Swap meta indices
+        # 1. Swap Meta
         dropped_weapon.set_meta("slot_index", target_idx)
         target_weapon.set_meta("slot_index", dropped_idx)
         
-        # Swap references in the array
+        # 2. Swap References in array
         weapon_sprites[dropped_idx] = target_weapon
         weapon_sprites[target_idx] = dropped_weapon
         
-        # Animate positions
+        # 3. Update Data (Only if indices are within the valid weapon array range)
+        var weapons_data = GameManager.player_profile["weapons"]
+        
+        # We only swap in the data array if both indices point to real weapon slots
+        if dropped_idx < weapons_data.size() and target_idx < weapons_data.size():
+            var temp_data = weapons_data[dropped_idx]
+            weapons_data[dropped_idx] = weapons_data[target_idx]
+            weapons_data[target_idx] = temp_data
+            
+        # 4. Animate
         var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC)
         tween.tween_property(dropped_weapon, "global_position", target_weapon.global_position, 0.3)
         tween.tween_property(target_weapon, "global_position", dropped_weapon.global_position, 0.3)
-        
-        print("Swapped slot ", dropped_idx, " with ", target_idx)
-
 # Toggle function to be called from elsewhere
 func set_show_placeholders(enabled: bool):
     show_placeholders = enabled
@@ -211,7 +255,7 @@ func set_show_placeholders(enabled: bool):
 func increase_weapon_orbit_radius(multiplier: float) -> void:
     rainbow_radius_x *= multiplier
     rainbow_radius_y *= multiplier
-    
+    rainbow_y_offset += 100.0
     # Optional: Print to verify the change
     print("Weapon orbit radius updated to: ", rainbow_radius_x, ", ", rainbow_radius_y)
 
@@ -231,7 +275,10 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
         if weapon.get_meta("is_attacking", false): continue
         
         var slot_idx = weapon.get_meta("slot_index")
-        var angle = float(slot_idx) * (PI / 5.0)
+        if slot_idx >= 6:
+            _update_placeholder_position(weapon, slot_idx - 6, delta)
+            continue # Skips the rest of the loop for this item
+        var angle = (slot_idx as float) * (PI / 5.0)        
         var float_off = sin(floating_time * float_wave_speed + slot_idx) * float_amplitude
         
         var target = rainbow_offset + Vector2(
