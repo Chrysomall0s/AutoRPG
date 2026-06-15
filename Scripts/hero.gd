@@ -162,39 +162,45 @@ func _input(event):
         dragging_weapon = null
 
 func _check_drop(dropped_weapon: Area2D):
-    # Find all areas overlapping the dropped weapon
-    var overlapping_areas = dropped_weapon.get_overlapping_areas()
+    # Get the current mouse position in global coordinates
+    var mouse_pos = get_global_mouse_position()
     var target_weapon: Area2D = null
 
-    for area in overlapping_areas:
-        # Check if we hit another weapon (excluding the weapon itself)
-        if area != dropped_weapon and area in weapon_sprites:
-            target_weapon = area
+    # Iterate through all weapon slots to see if the mouse is hovering over one
+    for weapon in weapon_sprites:
+        if weapon == dropped_weapon: 
+            continue
+        
+        # Calculate the bounding box for this weapon's collision shape
+        var collision_shape = weapon.get_meta("collision_shape")
+        var shape_size = collision_shape.shape.size
+        # Create a Rect2 centered on the weapon's global_position
+        var global_rect = Rect2(weapon.global_position - (shape_size / 2), shape_size)
+        
+        # Check if the mouse is inside this rect
+        if global_rect.has_point(mouse_pos):
+            target_weapon = weapon
             break
     
+    # If a target was found, perform the swap
     if target_weapon:
-        # SWAP LOGIC
         var dropped_idx = dropped_weapon.get_meta("slot_index")
         var target_idx = target_weapon.get_meta("slot_index")
         
-        # Swap the meta indices
+        # Swap meta indices
         dropped_weapon.set_meta("slot_index", target_idx)
         target_weapon.set_meta("slot_index", dropped_idx)
         
-        # Swap the references in the array
+        # Swap references in the array
         weapon_sprites[dropped_idx] = target_weapon
         weapon_sprites[target_idx] = dropped_weapon
         
-        # Optional: Tween them to each other's global position for a "swap" animation
+        # Animate positions
         var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC)
         tween.tween_property(dropped_weapon, "global_position", target_weapon.global_position, 0.3)
         tween.tween_property(target_weapon, "global_position", dropped_weapon.global_position, 0.3)
         
         print("Swapped slot ", dropped_idx, " with ", target_idx)
-    else:
-        # If dropped in empty space, it will naturally return to its target orbit
-        # via the update_weapon_movements function in the next frame.
-        pass
 
 # Toggle function to be called from elsewhere
 func set_show_placeholders(enabled: bool):
