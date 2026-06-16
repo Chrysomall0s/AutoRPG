@@ -214,7 +214,7 @@ func add_weapon_type_overlay(parent_node: Node, weapon_type: String, value):
 
 func _create_weapon_sprite(weapon_info: Dictionary) -> Sprite2D:
     var weapon = Sprite2D.new()
-    
+
     # Setup Material
     var mat = ShaderMaterial.new()
     mat.shader = outline_shader

@@ -97,6 +97,10 @@ func spawn_weapons(weapon_data_array: Array):
             if not weapon_info.is_empty():
                 visual_sprite = GameManager._create_weapon_sprite(weapon_info)
                 weapon_container.add_child(visual_sprite)
+                if(weapon_info.get("category") == "viewer"):
+                    weapon_container.set_meta("Item", true)
+                if(weapon_info.get("category") == "passive"):
+                    weapon_container.set_meta("Item", false)
         
         # --- PATH 3: Empty Placeholders ---
         elif show_placeholders and placeholder_texture:
@@ -180,6 +184,14 @@ func _input(event):
             var global_rect = Rect2(weapon.global_position - (shape_size / 2), shape_size)
             
             if global_rect.has_point(event.position):
+                if(weapon.has_meta("Item")):
+                    if(weapon.get_meta("Item")):
+                        #is passive item
+                        return
+                    else:
+                        #is audience item
+                         return
+                        
                 dragging_weapon = weapon
                 drag_offset = weapon.global_position - event.position
                 
@@ -433,6 +445,7 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
         if upgrade is Dictionary and upgrade.has("icon"):
             var sprite = Sprite2D.new()
             sprite.set_meta("upgrade_data", upgrade)
+            
             # --- Create and attach label ---
             update_label(sprite, upgrade)
             # --- APPLY SHADER ---
