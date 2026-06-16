@@ -12,12 +12,12 @@ static func execute_weapon(battle_node: Node, target_node: Node, attacker_node: 
 	if !isShield:
 		var attacker_DMG = GameManager.getpassive3("DMG",attacker_stats)
 		
-		var final_Famage = attacker_DMG
+		var final_Damage = attacker_DMG
 		match type:
 			"DMG":
-				final_Famage += attacker_DMG
+				final_Damage += attacker_DMG
 				
-		GameManager.addtopassive3("HP",final_Famage,target_stats)
+		GameManager.addtopassive3("HP",-final_Damage,target_stats)
 	else:
 		match type:
 			"DMG":
