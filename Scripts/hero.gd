@@ -327,18 +327,21 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
             continue
         if weapon.get_meta("is_attacking", false): continue
         
+        
         var slot_idx = weapon.get_meta("slot_index")
         if slot_idx < 6 and weapon.has_meta("sprite"):
             # Ensure default
             var visual_sprite = weapon.get_meta("sprite") # Get the sprite
             if (visual_sprite):
                 var upgrade = visual_sprite.get_meta("upgrade_data", {}) 
-                update_label(visual_sprite, upgrade,"")
+                var Text =  "\n\n\n" + str(upgrade.get("cost", 0)) + "G: " if(show_placeholders) else ""
+                update_label(visual_sprite, upgrade,Text)
         if slot_idx >= 6:
             # Ensure default
             var visual_sprite = weapon.get_meta("sprite") # Get the sprite
             var upgrade = visual_sprite.get_meta("upgrade_data", {}) 
-            var desc = "\n\n\n" + upgrade.get("Description", "")
+            var Text =  "\n\n\n" + str(upgrade.get("cost", 0)) + "G: "
+            var desc = Text + upgrade.get("Description", "")
             update_label(visual_sprite, upgrade,desc)
             _update_placeholder_position(weapon, slot_idx - 6, delta)
             continue # Skips the rest of the loop for this item
@@ -520,7 +523,7 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
                 
                 var row = count / 6
                 var col = count % 6
-                sprite.position = Vector2(-80, 150) + Vector2(col * 40.0, row * 40.0)
+                sprite.position = Vector2(-110, 150) + Vector2(col * 40.0, row * 40.0)
                 
                 layers.add_child(sprite)
                 count += 1
