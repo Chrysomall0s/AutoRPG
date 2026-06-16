@@ -16,10 +16,10 @@ var atlas_tex2: Texture2D = preload("res://Assets/atlas/icon2.tres")
 
 # Update the public API to support 5 buttons
 func create_time_buttons(parent: Control):
-    _generate_row(parent, 0, [0, 1, 2, 3, 4], ["Pause", "Slow", "Normal", "Fast", "Surrender"])
+    _generate_row(parent, 0, [0, 1, 2, 3, 16], ["Pause", "Slow", "Normal", "Fast", "Surrender"])
 
 func create_difficulty_buttons(parent: Control):
-    _generate_row(parent, 1, [4, 5, 6, 7, 16], ["Easy", "Normal", "Hard", "Insane", "Impossible"])
+    _generate_row(parent, 1, [4, 5, 6, 7, 16], ["Tournament 1", "Tournament 2", "Tournament 3", "Tournament 4", "Go"])
 
 func create_shop_buttons(parent: Control):
     _generate_row(parent, 2, [19, 20, 21, 22, 23], ["Reroll", "", "", "", "Go"])
@@ -96,9 +96,15 @@ func _create_btn(parent: Control, text: String, row: int, index: int, pos: Vecto
     btn.position = pos
     parent.add_child(btn)
 
+    var icon_size = screen_size.x * 0.1
     var sprite = TextureRect.new()
-    sprite.set_anchors_preset(Control.PRESET_FULL_RECT)
-    # Force texture to fit the button and stay centered
+    # Set the size explicitly
+    sprite.custom_minimum_size = Vector2(icon_size, icon_size)
+    # Center it within the button
+    sprite.set_anchors_preset(Control.PRESET_CENTER)
+    # Adjust position to center the rect correctly
+    sprite.position = (btn.custom_minimum_size / 2) - (sprite.custom_minimum_size / 2)
+    
     sprite.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
     sprite.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
     sprite.texture = _create_atlas_frame(atlas_index)
@@ -130,7 +136,7 @@ func insanedifficulty(): GameManager.selected_difficulty = 0
 func reroll_shop():
     var has_any_upgrades = GameManager.GlobalUpgrades.any(func(item): return item != null)
     if(GameManager.getpassive("MAXGold") > 0 or !has_any_upgrades):
-        if(!has_any_upgrades):
+        if(has_any_upgrades):
             GameManager.addtopassive("MAXGold",-1)
         GameManager.Reroll() 
         var hero = get_tree().current_scene.find_child("Hero", true, false)
@@ -170,7 +176,9 @@ func _on_play_pressed():
 func _on_surrender_pressed():
     # Ensure 'battle_over' is defined in this script
     if get("battle_over") == true: return
-    
+    Engine.time_scale = 1.0
+    GameManager.Defeats +=1 
+    GameManager.DidWin = false
     GameManager.battle_over = true
     GameManager.go_to_after_battle("lose")
 

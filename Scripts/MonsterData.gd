@@ -18,8 +18,8 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 20},
-			{"name": "DMG", "level": 0, "value": 3},
+			{"name": "HP", "level": 0, "value": 30},
+			{"name": "DMG", "level": 0, "value": 4},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
@@ -30,8 +30,8 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 20},
-			{"name": "DMG", "level": 0, "value": 3},
+			{"name": "HP", "level": 0, "value": 50},
+			{"name": "DMG", "level": 0, "value": 5},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
@@ -42,8 +42,8 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 20},
-			{"name": "DMG", "level": 0, "value": 3},
+			{"name": "HP", "level": 0, "value": 80},
+			{"name": "DMG", "level": 0, "value": 6},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
@@ -51,13 +51,11 @@ var monsters = {
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
 		},
-	],
-	"Normal": [
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 20},
-			{"name": "DMG", "level": 0, "value": 3},
+			{"name": "HP", "level": 0, "value": 130},
+			{"name": "DMG", "level": 0, "value": 7},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
@@ -65,13 +63,11 @@ var monsters = {
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
 		},
-	],
-	"Hard": [
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 20},
-			{"name": "DMG", "level": 0, "value": 3},
+			{"name": "HP", "level": 0, "value": 210},
+			{"name": "DMG", "level": 0, "value": 8},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
@@ -79,13 +75,23 @@ var monsters = {
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
 		},
-	],
-	"Insane": [
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 20},
-			{"name": "DMG", "level": 0, "value": 3},
+			{"name": "HP", "level": 0, "value": 340},
+			{"name": "DMG", "level": 0, "value": 9},
+			{"name": "Thorns", "level": 0, "value":0},
+			{"name": "DEF", "level": 0, "value": 0},
+			{"name": "REG", "level": 0, "value":0 },
+			],
+			"weapons": ["Staff"],
+			"audience": ["Heckler"]
+		},
+			{
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			"passives": [
+			{"name": "HP", "level": 0, "value": 550},
+			{"name": "DMG", "level": 0, "value": 10},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
@@ -94,6 +100,48 @@ var monsters = {
 			"audience": ["Heckler"]
 		},
 	],
+	#"Normal": [
+		#{
+			#"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			#"passives": [
+			#{"name": "HP", "level": 0, "value": 20},
+			#{"name": "DMG", "level": 0, "value": 3},
+			#{"name": "Thorns", "level": 0, "value":0},
+			#{"name": "DEF", "level": 0, "value": 0},
+			#{"name": "REG", "level": 0, "value":0 },
+			#],
+			#"weapons": ["Staff"],
+			#"audience": ["Heckler"]
+		#},
+	#],
+	#"Hard": [
+		#{
+			#"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			#"passives": [
+			#{"name": "HP", "level": 0, "value": 20},
+			#{"name": "DMG", "level": 0, "value": 3},
+			#{"name": "Thorns", "level": 0, "value":0},
+			#{"name": "DEF", "level": 0, "value": 0},
+			#{"name": "REG", "level": 0, "value":0 },
+			#],
+			#"weapons": ["Staff"],
+			#"audience": ["Heckler"]
+		#},
+	#],
+	#"Insane": [
+		#{
+			#"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			#"passives": [
+			#{"name": "HP", "level": 0, "value": 20},
+			#{"name": "DMG", "level": 0, "value": 3},
+			#{"name": "Thorns", "level": 0, "value":0},
+			#{"name": "DEF", "level": 0, "value": 0},
+			#{"name": "REG", "level": 0, "value":0 },
+			#],
+			#"weapons": ["Staff"],
+			#"audience": ["Heckler"]
+		#},
+	#],
 }
 
 func has_next_round(difficulty_key: int, round: int) -> bool:

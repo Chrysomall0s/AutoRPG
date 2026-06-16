@@ -209,7 +209,7 @@ func _input(event):
                     
                     # Corrected the typo below
                     if is_too_expensive2:
-                        return
+                        continue
             if global_rect.has_point(event.position):
                 if(weapon.has_meta("Item")):
                     item_data = GameManager.GlobalUpgrades[slot_idx]
@@ -283,8 +283,8 @@ func _check_drop(dropped_weapon: Area2D):
             var shop_data = GameManager.GlobalUpgrades[dropped_idx - 6]
             var own_data = GameManager.player_profile["weapons"][target_idx]  
             if(shop_data and own_data) :
-                if (shop_data.get("type", 0) == shop_data.get("type", 0)):
-                    if (shop_data.get("friendly", 0) == shop_data.get("friendly", 0)):
+                if (shop_data.get("type", 0) == own_data.get("type", 0)):
+                    if (shop_data.get("friendly", 0) == own_data.get("friendly", 0)):
                         own_data["speed"] += shop_data["speed"]
                         own_data["level"] += shop_data["level"]
                         GameManager.addtopassive("MAXGold", -shop_data["cost"])
@@ -384,14 +384,14 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
             var visual_sprite = weapon.get_meta("sprite") # Get the sprite
             if (visual_sprite):
                 var upgrade = visual_sprite.get_meta("upgrade_data", {}) 
-                var Text =  "\n\n\n" + str(upgrade.get("cost", 0)) + "G: " if(show_placeholders) else ""
+                var Text =  "\n\n\n" + str(upgrade.get("cost", 0)) + "$: " if(show_placeholders) else ""
                 update_label(visual_sprite, upgrade,Text)
         if slot_idx >= 6:
             # Ensure default
             var visual_sprite = weapon.get_meta("sprite") # Get the sprite
             var upgrade = visual_sprite.get_meta("upgrade_data", {}) 
             var cost = int(upgrade.get("cost", 0))
-            var Text =  "\n\n\n" + str(cost) + "G: "
+            var Text =  "\n\n\n" + str(cost) + "$: "
             var desc = Text + upgrade.get("Description", "")
             var label = update_label(visual_sprite, upgrade,desc)
             var is_too_expensive = cost > GameManager.getpassive("MAXGold")

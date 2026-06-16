@@ -1,102 +1,159 @@
 extends Control
 
-var battle_data: Dictionary = {}
+var atlas_tex = preload("res://Assets/atlas/flower.tres")
 
-var panel: Panel
-var title_label: Label
-var subtitle_label: Label
+const IDX_GOLD = 3
+const IDX_GRAY = 2
+const IDX_HEART = 0
+const IDX_BROKEN = 1
+
+var battle_data: Dictionary
+var trophy_container: HBoxContainer
+var heart_container: HBoxContainer
+var central_icon: TextureRect
 var continue_button: Button
 
+var status_label: Label # Define this as a class variable
 
 func _ready():
-	battle_data = GameManager.after_battle_data
-	build_ui()
-	apply_data()
+    battle_data = GameManager.after_battle_data
+    setup_layout()
+    call_deferred("display_results")
+
+func _create_atlas_frame(index: int) -> AtlasTexture:
+    var atlas = AtlasTexture.new()
+    atlas.atlas = atlas_tex
+    var region_size = 250
+    atlas.region = Rect2(Vector2((index % 4) * region_size, (index / 4) * region_size), Vector2(region_size, region_size))
+    return atlas
+
+func setup_layout():
+    var screen_size = get_viewport_rect().size
+    var margin = screen_size.x * 0.05
+    
+    # Dynamic Sizing Calculations
+    var btn_width = screen_size.x * 0.66  # 2/3 width
+    var btn_height = screen_size.y * 0.12 # Relative height
+    var icon_size = screen_size.y * 0.25  # Central icon size
+    var item_size = screen_size.y * 0.08  # Trophies/Hearts size
+
+    # 1. Background Overlay
+    var overlay = ColorRect.new()
+    overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
+    overlay.offset_left = margin
+    overlay.offset_top = margin
+    overlay.offset_right = -margin
+    overlay.offset_bottom = -margin
+    overlay.color = Color(0, 0, 0, 0.6) 
+    add_child(overlay)
+
+    # 2. Main Content Container
+    var margin_container = MarginContainer.new()
+    margin_container.set_anchors_preset(Control.PRESET_FULL_RECT)
+    add_child(margin_container)
+
+    var v_box = VBoxContainer.new()
+    v_box.alignment = BoxContainer.ALIGNMENT_CENTER
+    v_box.add_theme_constant_override("separation", screen_size.y * 0.03)
+    margin_container.add_child(v_box)
+
+    # Status Label (2/3 width)
+    status_label = Label.new()
+    status_label.custom_minimum_size = Vector2(btn_width, btn_height)
+    status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    status_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    status_label.add_theme_font_size_override("font_size", int(screen_size.y * 0.04))
+    v_box.add_child(status_label)
+
+    # Trophies
+    trophy_container = HBoxContainer.new()
+    trophy_container.alignment = BoxContainer.ALIGNMENT_CENTER
+    v_box.add_child(trophy_container)
+
+    # Central Icon
+    central_icon = TextureRect.new()
+    central_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+    central_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+    central_icon.custom_minimum_size = Vector2(icon_size, icon_size)
+    v_box.add_child(central_icon)
+    
+    # Hearts
+    heart_container = HBoxContainer.new()
+    heart_container.alignment = BoxContainer.ALIGNMENT_CENTER
+    v_box.add_child(heart_container)
+
+    # Huge Continue Button
+    continue_button = Button.new()
+    continue_button.text = "CONTINUE"
+    continue_button.custom_minimum_size = Vector2(btn_width, btn_height)
+    continue_button.add_theme_font_size_override("font_size", int(screen_size.y * 0.05))
+    continue_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+    continue_button.pressed.connect(_on_continue_pressed)
+    v_box.add_child(continue_button)
+
+    # Update item sizes in display_results loop as well:
+    # Use 'item_size' for trophy_container and heart_container children
 
 
-# =========================
-# UI BUILDING
-# =========================
-func build_ui():
-	# full screen container background
-	var center = CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
+func display_results():
+    var won = battle_data.get("result") == "win"
+    
+    # Set the label text
+    if won:
+        match GameManager.Victories:
+            1: status_label.text = "Victory! Just the first step of many."
+            2: status_label.text = "Two in a row! You're getting the hang of it."
+            3: status_label.text = "Three wins! Making it look easy."
+            4: status_label.text = "Four victories! A solid streak."
+            5: status_label.text = "Halfway there! Keep that momentum going."
+            6: status_label.text = "Six wins! You are becoming a force to be reckoned with."
+            7: status_label.text = "Seven! Only a few more to go."
+            8: status_label.text = "One more before the finaly!"
+            9: status_label.text = "Final showdown! Show them what you've got!"
+            _: status_label.text = "Another victory for your collection!"
+    else:
+        match GameManager.Defeats:
+            1: status_label.text = "Everybody loses sometimes. Shake it off!"
+            2: status_label.text = "Watch out! one more loss and you're out!"
+            3: status_label.text = "You've been knocked out of the tournament!"
+            _: status_label.text = "A tough loss, but the journey continues."
+    
+    # Populate Trophies
+    for i in range(9):
+        var tex = TextureRect.new()
+        tex.texture = _create_atlas_frame(IDX_GRAY if i < GameManager.Victories else IDX_GOLD)
+        tex.custom_minimum_size = Vector2(80, 80)
+        trophy_container.add_child(tex)
+        tex.force_update_transform()
+        tex.pivot_offset = tex.size / 2.0
+        
+        if won:
+            tex.scale = Vector2.ZERO
+            create_tween().tween_property(tex, "scale", Vector2.ONE, 0.5).set_delay(i * 0.05).set_trans(Tween.TRANS_BACK)
 
-	panel = Panel.new()
-	panel.custom_minimum_size = Vector2(600, 400)
-	center.add_child(panel)
+    # Populate Hearts (Animation removed)
+    for i in range(3):
+        var tex = TextureRect.new()
+        # If defeat, show broken heart for the last index, otherwise show heart
+        tex.texture = _create_atlas_frame(IDX_BROKEN if i < GameManager.Defeats else IDX_HEART)
+        tex.custom_minimum_size = Vector2(80, 80)
+        heart_container.add_child(tex)
 
-	var vbox = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 20)
-	panel.add_child(vbox)
+    # Central Icon
+    central_icon.texture = _create_atlas_frame(IDX_GRAY if GameManager.DidWin else IDX_BROKEN)
+    central_icon.custom_minimum_size = Vector2(300, 300)
+    central_icon.force_update_transform()
+    central_icon.pivot_offset = central_icon.size / 2.0
+    
+    var tween = create_tween().set_loops()
+    tween.tween_property(central_icon, "rotation_degrees", 15, 1.0).set_trans(Tween.TRANS_SINE)
+    tween.tween_property(central_icon, "rotation_degrees", -15, 1.0).set_trans(Tween.TRANS_SINE)
 
-	# TITLE
-	title_label = Label.new()
-	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title_label.add_theme_font_size_override("font_size", 64)
-	vbox.add_child(title_label)
-
-	# SUBTITLE
-	subtitle_label = Label.new()
-	subtitle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	subtitle_label.add_theme_font_size_override("font_size", 24)
-	vbox.add_child(subtitle_label)
-
-	# SPACER
-	var spacer = Control.new()
-	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.add_child(spacer)
-
-	# BUTTON
-	continue_button = Button.new()
-	continue_button.text = "Continue"
-	continue_button.custom_minimum_size = Vector2(300, 80)
-	continue_button.add_theme_font_size_override("font_size", 28)
-	continue_button.pressed.connect(_on_continue_pressed)
-	continue_button.process_mode = Node.PROCESS_MODE_ALWAYS
-	vbox.add_child(continue_button)
-
-
-# =========================
-# DATA DISPLAY
-# =========================
-var is_tournament_complete := false
-func apply_data():
-	var result = battle_data.get("result", "lose")
-
-	if result != "win":
-		title_label.text = "DEFEAT"
-		subtitle_label.text = "You were overwhelmed..."
-		return
-
-	var difficulty = GameManager.selected_difficulty
-	var round = GameManager.currentRound
-
-	var MonsterData = preload("res://Scripts/MonsterData.gd").new()
-	is_tournament_complete = !MonsterData.has_next_round(difficulty, round)
-
-	if is_tournament_complete:
-		title_label.text = "TOURNAMENT CLEARED"
-		subtitle_label.text = "All opponents defeated!"
-	else:
-		title_label.text = "VICTORY"
-		subtitle_label.text = "You defeated your opponent!"
-
-
-# =========================
-# BUTTON ACTION
-# =========================
 func _on_continue_pressed():
-	get_tree().paused = false
-	Engine.time_scale = 1.0
-
-	var result = GameManager.after_battle_data.get("result", "lose")
-
-	if result == "win":
-		if is_tournament_complete:
-			get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
-		else:
-			get_tree().change_scene_to_file("res://Scenes/Store.tscn")
-	else:
-		get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
+    var won = GameManager.Defeats == 3 ||   GameManager.Victories == 9
+    if !won:
+        get_tree().change_scene_to_file("res://Scenes/Store.tscn")
+    else:
+        GameManager.Defeats = 0
+        GameManager.Victories = 0
+        get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")

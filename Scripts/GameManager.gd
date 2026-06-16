@@ -55,7 +55,9 @@ func go_to_after_battle2(result: String):
     get_tree().current_scene.add_child(canvas)
 
     # pause gameplay behind it
-
+var Victories = 0
+var Defeats = 0
+var DidWin = true
 # --- Profiles ---
 var player_profile = {
     "stats": {},
