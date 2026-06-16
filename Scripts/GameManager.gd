@@ -80,7 +80,7 @@ func Reroll():
     # 2. Extract potential passives for the "Type" pool
     var passive_pool = []
     for upg in UpgradeData.upgrades:
-        if upg["category"] == "passive" and upg.get("weight", 0) > 0:
+        if upg["category"] == "passive":
             passive_pool.append(upg)
 
     # 3. Setup global pool for the items themselves
@@ -108,7 +108,7 @@ func Reroll():
                 
                 # Logic: If it's a weapon, assign a random passive as its type
                 if selected["category"] == "weapon" and !passive_pool.is_empty():
-                    var random_passive = _get_weighted_random(passive_pool)
+                    var random_passive = _get_no_weighted_random(passive_pool)
                     selected["type"] = random_passive["name"]
                 
                 selected["unique_id"] = str(Time.get_ticks_usec()) + "_" + selected.get("name", "item") + "_" + str(i)
@@ -116,7 +116,16 @@ func Reroll():
                 item_pool.remove_at(idx) # Prevent duplicate items in one reroll
                 break
 
-
+func _get_no_weighted_random(pool: Array) -> Dictionary:
+    var total_w = 0.0
+    for p in pool: total_w += 1
+    
+    var roll = randf() * total_w
+    var sum = 0.0
+    for p in pool:
+        sum += 1
+        if roll <= sum: return p
+    return pool[0]
 # Helper to pick from the passive pool based on weight
 func _get_weighted_random(pool: Array) -> Dictionary:
     var total_w = 0.0

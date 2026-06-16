@@ -5,23 +5,23 @@ extends Node
 
 static var upgrades = [
 	# --- PASSIVE / NORMAL UPGRADES (Applied directly to Hero) ---
-	{"name": "Gold", "category": "passive", "value": 1, "weight": 0, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 0,  "level": 1},
-	{"name": "HP", "category": "passive", "value": 1, "weight": 6, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 1,  "level": 1},
-	{"name": "DMG", "category": "passive", "value": 1, "weight": 7, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 9,  "level": 1},
-	{"name": "Thorns", "category": "passive", "value": 1, "weight": 13,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 7,    "level": 1},
-	{"name": "REG",   "category": "passive", "value": 1, "weight": 30,  "cost": 2, "icon": "res://Assets/atlas/icon.tres","index": 3,  "level": 1},
-	{"name": "DEF",      "category": "passive",  "value": 1, "weight": 20,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 2,    "level": 1},
+	{"name": "Gold", "category": "passive", "value": 1, "weight": 0, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 0,  "level": 1, "Description": "Gold: Can be spend in shop"},
+	{"name": "HP", "category": "passive", "value": 1, "weight": 6, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 1,  "level": 1, "Description": "HP: Keeps you alive"},
+	{"name": "DMG", "category": "passive", "value": 1, "weight": 7, "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 9,  "level": 1, "Description": "Damage: your enemies"},
+	{"name": "Thorns", "category": "passive", "value": 1, "weight": 13,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 7,    "level": 1, "Description": "Thorn: any attacker. (They receive damage for attacking)"},
+	{"name": "REG",   "category": "passive", "value": 1, "weight": 30,  "cost": 2, "icon": "res://Assets/atlas/icon.tres","index": 3,  "level": 1, "Description": "Heal: yourself each turn"},
+	{"name": "DEF",      "category": "passive",  "value": 1, "weight": 20,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 2,    "level": 1, "Description": "DEF: prevents damage"},
 	#{"name": "Burn",      "category": "passive",  "value": 1, "weight": 20,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 4,    "level": 1},
 	
 	# --- BASE WEAPONS (Equipped into any empty slot or replaces old weapon) ---
-	{"name": "Club","friendly":true, "category": "weapon", "type": "DMG","weight": 100, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 12, "amount": 10, "speed": 4, "level": 0},
-	{"name": "Staff","friendly":false,    "category": "weapon", "type": "DMG","weight": 100, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 14,   "amount": 8,  "speed": 6, "level": 0},
+	{"name": "Club","friendly":true, "category": "weapon", "type": "DMG","weight": 100, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 12, "amount": 10, "speed": 4, "level": 0, "Description": "Shield: add stats to yourself"},
+	{"name": "Staff","friendly":false,    "category": "weapon", "type": "DMG","weight": 100, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 14,   "amount": 8,  "speed": 6, "level": 0, "Description": "Sword: multi per type"},
 	
 	# --- AUDIENCE UPGRADES ---
-	{"name": "Patron", "category": "viewer", "type": "heal",   "value": 5,"weight": 30, "throw_chance": 0.005, "cost": 3, "icon":  "res://Assets/atlas/fruit.tres","index": 12, "level": 0},
-	{"name": "Hooligan",   "category": "viewer", "type": "damage", "value": 10,"weight": 20, "throw_chance": 0.003, "cost": 3, "icon":  "res://Assets/atlas/fruit.tres","index": 7, "level": 0},
-	{"name": "Zealot", "category": "viewer", "type": "damage", "value": 50,"weight": 11, "throw_chance": 0.001, "cost": 5, "icon":  "res://Assets/atlas/fruit.tres","index": 11, "level": 0},
-	{"name": "Heckler", "category": "viewer", "type": "damage", "value": 0,"weight": 24, "throw_chance": 0.000, "cost": 5, "icon":  "res://Assets/atlas/fruit.tres","index": 15, "level": 0},
+	{"name": "Patron", "category": "viewer", "type": "heal",   "value": 5,"weight": 30, "throw_chance": 0.005, "cost": 3, "icon":  "res://Assets/atlas/fruit.tres","index": 12, "level": 0, "Description": "Fans: give you more gold"},
+	{"name": "Hooligan",   "category": "viewer", "type": "damage", "value": 10,"weight": 20, "throw_chance": 0.003, "cost": 3, "icon":  "res://Assets/atlas/fruit.tres","index": 7, "level": 0, "Description": "Fans: give you more gold"},
+	{"name": "Zealot", "category": "viewer", "type": "damage", "value": 50,"weight": 11, "throw_chance": 0.001, "cost": 5, "icon":  "res://Assets/atlas/fruit.tres","index": 11, "level": 0, "Description": "Fans: give you more gold"},
+	{"name": "Heckler", "category": "viewer", "type": "damage", "value": 0,"weight": 24, "throw_chance": 0.000, "cost": 5, "icon":  "res://Assets/atlas/fruit.tres","index": 15, "level": 0, "Description": "Fans: give you more gold"},
 ]
 
 static func get_upgrade_by_name(target_name: String) -> Dictionary:

@@ -16,7 +16,7 @@ var atlas_tex2: Texture2D = preload("res://Assets/atlas/icon2.tres")
 
 # Update the public API to support 5 buttons
 func create_time_buttons(parent: Control):
-    _generate_row(parent, 0, [0, 1, 2, 3, 4], ["Pause", "Slow", "Normal", "Fast", "Extra"])
+    _generate_row(parent, 0, [0, 1, 2, 3, 4], ["Pause", "Slow", "Normal", "Fast", "Surrender"])
 
 func create_difficulty_buttons(parent: Control):
     _generate_row(parent, 1, [4, 5, 6, 7, 16], ["Easy", "Normal", "Hard", "Insane", "Impossible"])

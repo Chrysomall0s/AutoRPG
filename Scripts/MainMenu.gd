@@ -39,7 +39,7 @@ var character_starting_loadouts: Dictionary = {
 			{"name": "REG", "level": 0, "value":0 },
 			{"name": "Gold", "level": 0, "value":0 },
 			],
-		"weapons": ["Club",{"name": "Staff", "level": -1}],
+		"weapons": [{"name": "Staff","type":"HP", "level": -1}],
 		"audience": ["Zealot"]
 	},
 	"char_slot2": {
