@@ -7,7 +7,7 @@ uniform int index = 0; // 0 to 15 (4x4)
 
 // New Toggle and Charge uniforms
 uniform bool use_charge_shader = false;
-uniform float charge_progress : hint_range(0.0, 1.0) = 0.5;
+uniform float charge_progress : hint_range(0.0, 1.0) = 1.0;
 uniform vec4 charge_color : source_color = vec4(0.0, 1.0, 0.0, 0.5);
 
 // --- New Level Color Logic ---

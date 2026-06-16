@@ -333,7 +333,7 @@ func ValueToLevel(profile: Dictionary):
         if passive is Dictionary:
             if passive.has("level") and passive.has("value"):
                 # Set the 'value' to the current 'level'
-                passive["value"] = passive["level"]
+                passive["level"] = passive["value"]
                 
                 # Optional: print for debugging
                 # print("Updated ", passive.get("name", "unknown"), " value to: ", passive["level"])
@@ -443,7 +443,11 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
             
             # Enable the charge shader and set progress
             mat.set_shader_parameter("use_charge_shader", true)
-            mat.set_shader_parameter("charge_progress", upgrade.get("value", 1.0)/upgrade.get("level", 1.0))
+            var lvl = upgrade.get("level", 1.0)
+            var val = upgrade.get("value", 1.0)
+
+            # Safety check: if lvl is 0, we treat it as 1 to avoid the crash
+            mat.set_shader_parameter("charge_progress", val / max(1.0, float(lvl)))
             sprite.material = mat
             # --------------------
             
