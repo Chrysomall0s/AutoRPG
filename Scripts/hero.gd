@@ -87,6 +87,7 @@ func spawn_weapons(weapon_data_array: Array):
             
             if not weapon_info.is_empty():
                 visual_sprite = GameManager._create_weapon_sprite(weapon_info)
+                visual_sprite.set_meta("upgrade_data", weapon_info)
                 weapon_container.add_child(visual_sprite)
         
         # --- PATH 2: Placeholders (GlobalUpgrades) ---
@@ -96,6 +97,7 @@ func spawn_weapons(weapon_data_array: Array):
             
             if not weapon_info.is_empty():
                 visual_sprite = GameManager._create_weapon_sprite(weapon_info)
+                visual_sprite.set_meta("upgrade_data", weapon_info)
                 weapon_container.add_child(visual_sprite)
                 if(weapon_info.get("category") == "viewer"):
                     weapon_container.set_meta("Item", true)
@@ -327,6 +329,11 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
         
         var slot_idx = weapon.get_meta("slot_index")
         if slot_idx >= 6:
+            # Ensure default
+            var visual_sprite = weapon.get_meta("sprite") # Get the sprite
+            var upgrade = visual_sprite.get_meta("upgrade_data", {}) 
+            var desc = "\n\n\n" + upgrade.get("Description", "")
+            update_label(visual_sprite, upgrade,desc)
             _update_placeholder_position(weapon, slot_idx - 6, delta)
             continue # Skips the rest of the loop for this item
         var angle = (slot_idx as float) * (PI / 5.0)        
@@ -419,28 +426,35 @@ static func afterv(val: int) -> String:
         return "F" # Good practice to provide a fallback
 
 static func setup_or_update_label(sprite: Sprite2D, upgrade: Dictionary) -> Label:
-        var label = Label.new()
-        if sprite.has_meta("text_label"):
-            label = sprite.get_meta("text_label")
-        else:
+    var label: Label
+    if sprite.has_meta("text_label"):
+        label = sprite.get_meta("text_label")
+    else:
+        var sprite_size = sprite.get_rect().size * sprite.global_scale
+        var ratio = 270/sprite_size.x
+        label = Label.new()
+        sprite.add_child(label)
+        sprite.set_meta("text_label", label)
+        label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        label.custom_minimum_size = Vector2(sprite_size.x*0.6, 0)
+        # Styling
+        var settings = LabelSettings.new()
+        settings.font_size = 80 *ratio
+        settings.font_color = Color.BLACK
+        settings.outline_size = 30
+        settings.outline_color = Color.WHITE
+        label.label_settings = settings
         
-            sprite.add_child(label)
-            sprite.set_meta("text_label", label)
-            
-            # Initial Styling (Only needs to be set once)
-            var settings = LabelSettings.new()
-            settings.font_size = 80
-            settings.font_color = Color.BLACK
-            settings.outline_size = 30
-            settings.outline_color = Color.WHITE
-            label.label_settings = settings
-            
-            # Positioning
-            label.position = Vector2(-80, -150) 
-            label.size = Vector2(160, 80)
-            label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-        return label
+        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
         
+        # Since it is a child, position it relative to the Sprite2D's center
+        # Assuming the Sprite is 250x250 based on your code:
+        label.size = Vector2(250, 250)
+        label.position = Vector2(-125, -125) 
+    label.z_index = 10
+    return label
+
 static func update_label(sprite: Sprite2D, upgrade: Dictionary, meta_key: String = "text_label") -> void:
     var label: Label = setup_or_update_label(sprite, upgrade)
     label.text = meta_key
@@ -471,7 +485,7 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
             sprite.set_meta("upgrade_data", upgrade)
             
             # --- Create and attach label ---
-            update_label(sprite, upgrade)
+            
             # --- APPLY SHADER ---
             var mat = ShaderMaterial.new()
             mat.shader = outline_shader
