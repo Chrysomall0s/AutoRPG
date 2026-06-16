@@ -127,14 +127,18 @@ func easydifficulty(): GameManager.selected_difficulty = 0
 func normaldifficulty(): GameManager.selected_difficulty = 0
 func harddifficulty(): GameManager.selected_difficulty = 0
 func insanedifficulty(): GameManager.selected_difficulty = 0
-func reroll_shop(): 
-    GameManager.Reroll() 
-    var hero = get_tree().current_scene.find_child("Hero", true, false)
-    
-    if hero and hero.has_method("refresh_character_and_weapons"):
-        hero.refresh_character_and_weapons(GameManager.player_profile)
-    else:
-        print("Hero node not found or missing refresh method")
+func reroll_shop():
+    var has_any_upgrades = GameManager.GlobalUpgrades.any(func(item): return item != null)
+    if(GameManager.getpassive("MAXGold") > 0 or !has_any_upgrades):
+        if(!has_any_upgrades):
+            GameManager.addtopassive("MAXGold",-1)
+        GameManager.Reroll() 
+        var hero = get_tree().current_scene.find_child("Hero", true, false)
+        
+        if hero and hero.has_method("refresh_character_and_weapons"):
+            hero.refresh_character_and_weapons(GameManager.player_profile)
+        else:
+            print("Hero node not found or missing refresh method")
 func buy_item_one(): print("Buying slot 1...")
 func buy_item_two(): print("Buying slot 2...")
 func buy_item_three(): print("Buying slot 3...")

@@ -198,18 +198,33 @@ func _input(event):
             var shape_size = collision_shape.shape.size
             var global_rect = Rect2(weapon.global_position - (shape_size / 2), shape_size)
             
+            var slot_idx = weapon.get_meta("slot_index")-6
+            var item_data
+            var cost
+            if(slot_idx >= 0):
+                item_data = GameManager.GlobalUpgrades[slot_idx]
+                if(slot_idx >= 0 and item_data):
+                    cost = item_data["cost"]
+                    var is_too_expensive2 = cost > GameManager.getpassive("MAXGold")
+                    
+                    # Corrected the typo below
+                    if is_too_expensive2:
+                        return
             if global_rect.has_point(event.position):
                 if(weapon.has_meta("Item")):
-                    var slot_idx = weapon.get_meta("slot_index")-6
-                    var item_data = GameManager.GlobalUpgrades[slot_idx]
+                    item_data = GameManager.GlobalUpgrades[slot_idx]
+                    cost = item_data["cost"]
+                    
                     if(!weapon.get_meta("Item")):
                         #is passive item
+                        GameManager.addtopassive("MAXGold", -cost)
                         GameManager.addtopassive("MAX"+item_data["name"], 1)
                         GameManager.GlobalUpgrades[slot_idx] = null
                         refresh_character_and_weapons(GameManager.player_profile)
                         return
                     else:
                         #is audience item
+                        GameManager.addtopassive("MAXGold", -cost)
                         GameManager.player_profile["audience"].append(item_data)
                         GameManager.GlobalUpgrades[slot_idx] = null
                         var container = get_audience_container()
@@ -260,10 +275,31 @@ func _check_drop(dropped_weapon: Area2D):
     if target_weapon:
         var dropped_idx = dropped_weapon.get_meta("slot_index")
         var target_idx = target_weapon.get_meta("slot_index")
-        
         if(target_idx >=6):
             if weapon_sprites[target_idx].has_meta("Item"):
                 return
+        if (dropped_idx >= 6 and target_idx < 6) or (target_idx >= 6 and dropped_idx < 6):
+            var shop = dropped_idx
+            var own = target_idx
+            if(target_idx >= 6 ):
+                shop = target_idx
+                own = dropped_idx
+            var shop_data = GameManager.GlobalUpgrades[shop - 6]
+            var own_data = GameManager.player_profile["weapons"][own]
+            
+            var cost_shop = 0 
+            if (shop_data):
+                cost_shop = int(shop_data.get("cost", 0))
+            var cost_own = 0 
+            if (own_data):
+                cost_own = int(own_data.get("cost", 0))
+            if cost_shop > GameManager.getpassive("MAXGold") + cost_own:
+                # Play an error sound or UI feedback here if desired
+                print("Not enough gold to equip this weapon!")
+                return # Stop the swap
+            else:
+                GameManager.addtopassive("MAXGold", cost_own - cost_shop)
+
         # 1. Swap Meta
         dropped_weapon.set_meta("slot_index", target_idx)
         target_weapon.set_meta("slot_index", dropped_idx)
@@ -340,9 +376,12 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
             # Ensure default
             var visual_sprite = weapon.get_meta("sprite") # Get the sprite
             var upgrade = visual_sprite.get_meta("upgrade_data", {}) 
-            var Text =  "\n\n\n" + str(upgrade.get("cost", 0)) + "G: "
+            var cost = int(upgrade.get("cost", 0))
+            var Text =  "\n\n\n" + str(cost) + "G: "
             var desc = Text + upgrade.get("Description", "")
-            update_label(visual_sprite, upgrade,desc)
+            var label = update_label(visual_sprite, upgrade,desc)
+            var is_too_expensive = cost > GameManager.getpassive("MAXGold")
+            set_label_color(label, is_too_expensive)
             _update_placeholder_position(weapon, slot_idx - 6, delta)
             continue # Skips the rest of the loop for this item
         var angle = (slot_idx as float) * (PI / 5.0)        
@@ -464,9 +503,17 @@ static func setup_or_update_label(sprite: Sprite2D, upgrade: Dictionary) -> Labe
     label.z_index = 10
     return label
 
-static func update_label(sprite: Sprite2D, upgrade: Dictionary, meta_key: String = "text_label") -> void:
+static func update_label(sprite: Sprite2D, upgrade: Dictionary, meta_key: String = "text_label") -> Label:
     var label: Label = setup_or_update_label(sprite, upgrade)
     label.text = meta_key
+    return label
+
+static func set_label_color(label: Label, is_too_expensive: bool) -> void:
+    if label.label_settings:
+        if is_too_expensive:
+            label.label_settings.font_color = Color.RED
+        else:
+            label.label_settings.font_color = Color.BLACK
 
 func load_upgrade_sprites(profile: Dictionary) -> void:
     # Clear existing icons

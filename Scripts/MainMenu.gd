@@ -37,7 +37,7 @@ var character_starting_loadouts: Dictionary = {
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "Gold", "level": 0, "value":6 },
 			],
 		"weapons": [{"name": "Staff","type":"HP", "level": -1}],
 		"audience": ["Zealot"]
@@ -50,7 +50,7 @@ var character_starting_loadouts: Dictionary = {
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
-			{"name": "Dolf", "level": 0, "value":0 },
+			{"name": "Gold", "level": 0, "value":6 },
 			],
 		"weapons": ["Club" ],
 		"audience": ["Patron", "Hooligan","Hooligan"]
@@ -63,7 +63,7 @@ var character_starting_loadouts: Dictionary = {
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "Gold", "level": 0, "value":6 },
 			],
 		"weapons": ["Staff"],
 		"audience": ["Patron"]

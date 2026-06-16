@@ -110,6 +110,7 @@ func Reroll():
                 if selected["category"] == "weapon" and !passive_pool.is_empty():
                     var random_passive = _get_no_weighted_random(passive_pool)
                     selected["type"] = random_passive["name"]
+                    selected["cost"] += random_passive["cost"]
                 
                 selected["unique_id"] = str(Time.get_ticks_usec()) + "_" + selected.get("name", "item") + "_" + str(i)
                 GlobalUpgrades[i] = selected
@@ -323,15 +324,18 @@ static func addtopassiveREV(stat_name: String, amount: float,target_stats: Dicti
     # If it doesn't exist, create it
     if passives == null:
         passives = addpassive(stat_name,target_stats)
+        
     # Update the level
     passives[stat] += amount
     # Remove if level drops to or below 0
-    if passives[stat] <= 0:
-        removepassive(stat_name,target_stats)
+    #if passives[stat] <= 0:
+        #removepassive(stat_name,target_stats)
 
 static func getpassiveREV(stat_name: String,target_stats: Dictionary) -> float:
+    var stat = ReadString(stat_name)
+    stat_name = CleanName(stat_name)
     var passives = _find_passive_dataREV(stat_name,target_stats)
-    return float(passives.get("level", 0.0)) if passives != null else 0.0
+    return float(passives.get(stat, 0.0)) if passives != null else 0.0
 
 func get_difficulty_key() -> String:
     if selected_difficulty < 0 or selected_difficulty >= difficulties.size():
