@@ -6,10 +6,10 @@ var outline_shader = preload("res://Assets/shaders/outline_shader.gdshader")
 var health_bar: ProgressBar = null
 
 @export_group("Floating Rainbow Settings")
-@export var rainbow_radius_x: float = 150.0
-@export var rainbow_radius_y: float = 150.0
+@export var rainbow_radius_x: float = 300.0
+@export var rainbow_radius_y: float = 300.0
 @export var rainbow_offset: Vector2 = Vector2(0, 0)
-@export var rainbow_y_offset: float = -100.0
+@export var rainbow_y_offset: float = 0.0
 @export var float_amplitude: float = 4.0
 @export var float_wave_speed: float = 2.5
 @export var weapon_follow_smoothness: float = 8.0
@@ -80,6 +80,7 @@ func spawn_weapons(weapon_data_array: Array):
         var visual_sprite: Sprite2D = null
         
         # Check if we have data
+        # --- PATH 1: Real Weapons ---
         if i < weapon_data_array.size() and weapon_data_array[i]:
             var data = weapon_data_array[i]
             var weapon_info = _find_upgrade_by_name(data) if data is String else data
@@ -87,40 +88,33 @@ func spawn_weapons(weapon_data_array: Array):
             if not weapon_info.is_empty():
                 visual_sprite = GameManager._create_weapon_sprite(weapon_info)
                 weapon_container.add_child(visual_sprite)
-                
-                # Collision setup (Existing code)
-                var shape = CollisionShape2D.new()
-                shape.shape = RectangleShape2D.new()
-                shape.shape.size = visual_sprite.get_rect().size * visual_sprite.scale
-                weapon_container.add_child(shape)
-                weapon_container.set_meta("collision_shape", shape)
         
-        # Placeholder handling
+        # --- PATH 2: Placeholders (GlobalUpgrades) ---
         elif i >= 6 and GameManager.GlobalUpgrades[i-6]:
-            var data = GameManager.GlobalUpgrades [i-6]
+            var data = GameManager.GlobalUpgrades[i-6]
             var weapon_info = _find_upgrade_by_name(data) if data is String else data
             
             if not weapon_info.is_empty():
                 visual_sprite = GameManager._create_weapon_sprite(weapon_info)
                 weapon_container.add_child(visual_sprite)
-                
-                # Collision setup (Existing code)
-                var shape = CollisionShape2D.new()
-                shape.shape = RectangleShape2D.new()
-                shape.shape.size = visual_sprite.get_rect().size * visual_sprite.scale
-                weapon_container.add_child(shape)
-                weapon_container.set_meta("collision_shape", shape)
         
+        # --- PATH 3: Empty Placeholders ---
         elif show_placeholders and placeholder_texture:
             visual_sprite = Sprite2D.new()
             visual_sprite.texture = placeholder_texture
             visual_sprite.modulate = Color(1, 1, 1, 0.3)
             weapon_container.add_child(visual_sprite)
+        
+        # --- CRITICAL FIX: ALWAYS SET META IF SPRITE EXISTS ---
+        if visual_sprite:
+            weapon_container.set_meta("sprite", visual_sprite)
             
-            # Placeholders need a collision shape too if you want to drop things on them!
+            # Setup Collision for any created sprite
             var shape = CollisionShape2D.new()
             shape.shape = RectangleShape2D.new()
-            shape.shape.size = placeholder_texture.get_size()
+            # Use visual_sprite.get_rect() or fallback to texture size
+            var rect = visual_sprite.get_rect()
+            shape.shape.size = rect.size * visual_sprite.scale
             weapon_container.add_child(shape)
             weapon_container.set_meta("collision_shape", shape)
         
@@ -268,12 +262,12 @@ func set_show_placeholders(enabled: bool):
 
 ## Increases the orbit radius of the floating weapons.
 ## @param multiplier: The factor to multiply the current radius by (e.g., 1.1 for a 10% increase).
-func increase_weapon_orbit_radius(multiplier: float) -> void:
-    rainbow_radius_x *= multiplier
-    rainbow_radius_y *= multiplier
-    rainbow_y_offset += 100.0
-    # Optional: Print to verify the change
-    print("Weapon orbit radius updated to: ", rainbow_radius_x, ", ", rainbow_radius_y)
+#func increase_weapon_orbit_radius(multiplier: float) -> void:
+    #rainbow_radius_x *= multiplier
+    #rainbow_radius_y *= multiplier
+    #rainbow_y_offset += 100.0
+    ## Optional: Print to verify the change
+    #print("Weapon orbit radius updated to: ", rainbow_radius_x, ", ", rainbow_radius_y)
 
 # Inside Hero.gd
 func activate_battle_mode():
@@ -314,7 +308,7 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
                 var value = float(upgrade.get("value", 0.0))
                 var level = float(upgrade.get("level", 1.0))
                 var progress = clamp(level / value, 0.0, 1.0)
-                
+                #health
                 sprite.material.set_shader_parameter("charge_progress", progress)
 
 func attack_target(weapon: Area2D, target_pos: Vector2, duration: float):
@@ -410,9 +404,6 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
                 var row = count / 5
                 var col = count % 5
                 sprite.position = Vector2(-80, 150) + Vector2(col * 40.0, row * 40.0)
-                
-                if upgrade.has("layer"):
-                    sprite.z_index = clamp(upgrade["layer"], -4096, 4096)
                 
                 layers.add_child(sprite)
                 count += 1

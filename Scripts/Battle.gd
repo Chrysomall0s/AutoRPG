@@ -180,11 +180,12 @@ func _process(delta):
 			progress = clamp(progress, 0.0, 1.0)
 		#progress *= 0.25   
 		#progress += 0.7
-		if weapon.material is ShaderMaterial:
-			weapon.material.set_shader_parameter("charge_progress", progress)
+		var sprite = weapon.get_meta("sprite")
+		if sprite.material is ShaderMaterial:
+			sprite.material.set_shader_parameter("charge_progress", progress)
 
 			var index = weapondata["index"]
-			weapon.material.set_shader_parameter("index", index) #how_much_down = index/4;
+			sprite.material.set_shader_parameter("index", index) #how_much_down = index/4;
 
 	# 2. Existing Combat Logic (Unchanged)
 	if battle_over:

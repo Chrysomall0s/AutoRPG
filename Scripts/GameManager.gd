@@ -220,7 +220,7 @@ func _create_weapon_sprite(weapon_info: Dictionary) -> Sprite2D:
     mat.shader = outline_shader
     var lvl = weapon_info.get("level", 1.0)
     mat.set_shader_parameter("level", float(lvl))
-    mat.set_shader_parameter("use_charge_shader", false)
+    mat.set_shader_parameter("use_charge_shader", true)
     weapon.material = mat
     
     # Setup Texture

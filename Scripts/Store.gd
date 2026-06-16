@@ -30,7 +30,7 @@ func _ready():
 		audience_container.populate_audience()
 	player_sprite.set_show_placeholders(true)    
 	player_sprite.refresh_character_and_weapons(GameManager.player_profile)
-	player_sprite.increase_weapon_orbit_radius(2.0)
+	#player_sprite.increase_weapon_orbit_radius(2.0)
 
 func _process(delta: float) -> void:
 	# 3. Delegate the movement calculations to the Hero node

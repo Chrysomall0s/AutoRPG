@@ -14,7 +14,7 @@ static var upgrades = [
 	
 	# --- BASE WEAPONS (Equipped into any empty slot or replaces old weapon) ---
 	{"name": "Club","friendly":true, "category": "weapon", "type": "DMG","weight": 200000, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 12, "amount": 10, "speed": 4, "level": 1},
-	{"name": "Staff","friendly":false,    "category": "weapon", "type": "Thorns","weight": 200000, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 14,   "amount": 8,  "speed": 6, "level": 1},
+	{"name": "Staff","friendly":false,    "category": "weapon", "type": "DMG","weight": 200000, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 14,   "amount": 8,  "speed": 6, "level": 1},
 	
 	# --- AUDIENCE UPGRADES ---
 	{"name": "Patron", "category": "viewer", "type": "heal",   "value": 5,"weight": 30, "throw_chance": 0.005, "cost": 3, "icon":  "res://Assets/atlas/fruit.tres","index": 12, "level": 1},
