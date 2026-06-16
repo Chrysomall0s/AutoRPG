@@ -304,12 +304,15 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
             # We need to find the data associated with this sprite. 
             # Storing the upgrade dictionary as meta is the cleanest way.
             var upgrade = sprite.get_meta("upgrade_data")
+            var label = sprite.get_meta("text_label")
             if upgrade:
                 var value = float(upgrade.get("value", 0.0))
                 var level = float(upgrade.get("level", 1.0))
+                update_label(sprite, upgrade)
                 var progress = clamp(level / value, 0.0, 1.0)
                 #health
                 sprite.material.set_shader_parameter("charge_progress", progress)
+                #help draw over the sprite and under the sprite the numbers of value and level
 
 func attack_target(weapon: Area2D, target_pos: Vector2, duration: float):
     weapon.set_meta("is_attacking", true)
@@ -352,8 +355,53 @@ func refresh_character_and_weapons(profile: Dictionary):
     # you can call these methods directly
     load_upgrade_sprites(profile)
     spawn_weapons(profile["weapons"])
+  
+static func afterv(val: int) -> String:
+    if val < 10:
+        return "A"
+    elif val < 100:
+        return "B"
+    elif val < 1000:
+        return "C"
+    elif val < 10000:
+        return "D"
+    else:
+        return "E" # Good practice to provide a fallback
+        
+static func update_label(sprite: Sprite2D, upgrade: Dictionary) -> void:
+    var label: Label = null
     
+    # 1. Try to get existing label from meta, or create a new one
+    if sprite.has_meta("text_label"):
+        label = sprite.get_meta("text_label")
+    else:
+        label = Label.new()
+        sprite.add_child(label)
+        sprite.set_meta("text_label", label)
+        
+        # Initial Styling (Only needs to be set once)
+        var settings = LabelSettings.new()
+        settings.font_size = 80
+        settings.font_color = Color.BLACK
+        settings.outline_size = 30
+        settings.outline_color = Color.WHITE
+        label.label_settings = settings
+        
+        # Positioning
+        label.position = Vector2(-80, -150) 
+        label.size = Vector2(160, 80)
+        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    
+    # 2. Update the text based on values
+    var val = int(upgrade.get("value", 0))
+    var level = int(upgrade.get("level", 0))
 
+    # Formatted for the first two digits of the base value if needed
+    # Using str(val).left(2) ensures we only show the first two characters
+    
+    var val_str = str(val).left(2) + afterv(val)
+    var lvl_str = str(level).left(2) + afterv(level)
+    label.text = lvl_str + "\n" + "\n" + val_str
 
 func load_upgrade_sprites(profile: Dictionary) -> void:
     # Clear existing icons
@@ -379,6 +427,8 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
         if upgrade is Dictionary and upgrade.has("icon"):
             var sprite = Sprite2D.new()
             sprite.set_meta("upgrade_data", upgrade)
+            # --- Create and attach label ---
+            update_label(sprite, upgrade)
             # --- APPLY SHADER ---
             var mat = ShaderMaterial.new()
             mat.shader = outline_shader
