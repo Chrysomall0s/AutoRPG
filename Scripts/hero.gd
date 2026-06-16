@@ -171,6 +171,19 @@ func _on_weapon_input(_viewport, event: InputEvent, _shape_idx, weapon: Area2D):
 # For mobile, it is often smoother to update position in _input
 var drag_tween: Tween = null
 
+func _find_node_by_name(parent: Node, name: String) -> Node:
+    for child in parent.get_children():
+        if child.name == name:
+            return child
+        var found = _find_node_by_name(child, name)
+        if found:
+            return found
+    return null
+
+func get_audience_container():
+    # Get the root node of the current scene
+    return get_parent().get_node_or_null("AudienceContainer")
+
 func _input(event):
     if not show_placeholders: return
 
@@ -185,12 +198,23 @@ func _input(event):
             
             if global_rect.has_point(event.position):
                 if(weapon.has_meta("Item")):
-                    if(weapon.get_meta("Item")):
+                    var slot_idx = weapon.get_meta("slot_index")-6
+                    var item_data = GameManager.GlobalUpgrades[slot_idx]
+                    if(!weapon.get_meta("Item")):
                         #is passive item
+                        GameManager.addtopassive("MAX"+item_data["name"], 1)
+                        GameManager.GlobalUpgrades[slot_idx] = null
+                        refresh_character_and_weapons(GameManager.player_profile)
                         return
                     else:
                         #is audience item
-                         return
+                        GameManager.player_profile["audience"].append(item_data)
+                        GameManager.GlobalUpgrades[slot_idx] = null
+                        var container = get_audience_container()
+                        refresh_character_and_weapons(GameManager.player_profile)
+                        if container and container.has_method("populate_audience"):
+                            container.populate_audience()
+                        return
                         
                 dragging_weapon = weapon
                 drag_offset = weapon.global_position - event.position
@@ -235,6 +259,9 @@ func _check_drop(dropped_weapon: Area2D):
         var dropped_idx = dropped_weapon.get_meta("slot_index")
         var target_idx = target_weapon.get_meta("slot_index")
         
+        if(target_idx >=6):
+            if weapon_sprites[target_idx].has_meta("Item"):
+                return
         # 1. Swap Meta
         dropped_weapon.set_meta("slot_index", target_idx)
         target_weapon.set_meta("slot_index", dropped_idx)
@@ -474,8 +501,8 @@ func load_upgrade_sprites(profile: Dictionary) -> void:
                 sprite.texture = atlas
                 sprite.scale = Vector2(0.3, 0.3)
                 
-                var row = count / 5
-                var col = count % 5
+                var row = count / 6
+                var col = count % 6
                 sprite.position = Vector2(-80, 150) + Vector2(col * 40.0, row * 40.0)
                 
                 layers.add_child(sprite)

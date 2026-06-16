@@ -6,11 +6,11 @@ var monsters = {
 		{
 		"icon": "res://Assets/atlas/fruit.tres", "index": 4,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 12},
+			{"name": "HP", "level": 0, "value": 20},
 			{"name": "DMG", "level": 0, "value": 3},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "REG", "level": 0, "value":0 },
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -18,11 +18,11 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 12},
+			{"name": "HP", "level": 0, "value": 20},
 			{"name": "DMG", "level": 0, "value": 3},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "REG", "level": 0, "value":0 },
 			],
 			"weapons": ["Club"],
 			"audience": ["Heckler"]
@@ -30,11 +30,11 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 12},
+			{"name": "HP", "level": 0, "value": 20},
 			{"name": "DMG", "level": 0, "value": 3},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "REG", "level": 0, "value":0 },
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -42,11 +42,11 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 12},
+			{"name": "HP", "level": 0, "value": 20},
 			{"name": "DMG", "level": 0, "value": 3},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "REG", "level": 0, "value":0 },
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -56,11 +56,11 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 12},
+			{"name": "HP", "level": 0, "value": 20},
 			{"name": "DMG", "level": 0, "value": 3},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "REG", "level": 0, "value":0 },
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -70,11 +70,11 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 12},
+			{"name": "HP", "level": 0, "value": 20},
 			{"name": "DMG", "level": 0, "value": 3},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "REG", "level": 0, "value":0 },
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]
@@ -84,11 +84,11 @@ var monsters = {
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
 			"passives": [
-			{"name": "HP", "level": 0, "value": 12},
+			{"name": "HP", "level": 0, "value": 20},
 			{"name": "DMG", "level": 0, "value": 3},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
-			{"name": "Gold", "level": 0, "value":0 },
+			{"name": "REG", "level": 0, "value":0 },
 			],
 			"weapons": ["Staff"],
 			"audience": ["Heckler"]

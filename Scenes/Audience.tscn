@@ -44,7 +44,7 @@ script = ExtResource("1_6fy64")
 
 [node name="Person" type="Sprite2D" parent="." unique_id=1194428705]
 material = SubResource("ShaderMaterial_128j7")
-position = Vector2(1.1718776, 5.0781207)
+position = Vector2(1.875, 18.124998)
 scale = Vector2(0.31062502, 0.339375)
 texture = SubResource("AtlasTexture_mxbuo")
 

@@ -8,7 +8,7 @@ extends Node2D
 @export var seat_size: float = 0.042    # 5% of screen width
 @export var gap_x: float = 0.01       # 1% of screen width
 @export var gap_y: float = -0.04       # 2% of screen height
-@export var starting_y: float = 0.72  # Starts 20% down from top
+@export var starting_y: float = 0.77  # Starts 20% down from top
 
 @onready var AudienceScene = preload("res://Scenes/Audience.tscn")
 
