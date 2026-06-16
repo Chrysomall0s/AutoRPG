@@ -72,6 +72,62 @@ var current_enemy_profile = {
 
 var GlobalUpgrades: Array = [null, null, null]
 
+
+func Reroll():
+    # 1. Clear existing slots
+    GlobalUpgrades = [null, null, null]
+
+    # 2. Extract potential passives for the "Type" pool
+    var passive_pool = []
+    for upg in UpgradeData.upgrades:
+        if upg["category"] == "passive" and upg.get("weight", 0) > 0:
+            passive_pool.append(upg)
+
+    # 3. Setup global pool for the items themselves
+    var item_pool = []
+    for upg in UpgradeData.upgrades:
+        if upg.get("weight", 0) > 0:
+            item_pool.append(upg.duplicate())
+
+    # 4. Fill 3 slots
+    for i in range(3):
+        if item_pool.is_empty(): break
+        
+        # Calculate total weight for current pool
+        var total_weight = 0.0
+        for item in item_pool: total_weight += item["weight"]
+        
+        # Weighted roll
+        var roll = randf() * total_weight
+        var current_sum = 0.0
+        
+        for idx in range(item_pool.size()):
+            current_sum += item_pool[idx]["weight"]
+            if roll <= current_sum:
+                var selected = item_pool[idx]
+                
+                # Logic: If it's a weapon, assign a random passive as its type
+                if selected["category"] == "weapon" and !passive_pool.is_empty():
+                    var random_passive = _get_weighted_random(passive_pool)
+                    selected["type"] = random_passive["name"]
+                
+                GlobalUpgrades[i] = selected
+                item_pool.remove_at(idx) # Prevent duplicate items in one reroll
+                break
+
+# Helper to pick from the passive pool based on weight
+func _get_weighted_random(pool: Array) -> Dictionary:
+    var total_w = 0.0
+    for p in pool: total_w += p["weight"]
+    
+    var roll = randf() * total_w
+    var sum = 0.0
+    for p in pool:
+        sum += p["weight"]
+        if roll <= sum: return p
+    return pool[0]
+    #reroll GlobalUpgrades
+
 # Adds an item to the first available null slot
 func add_to_global_upgrades(item_data: Dictionary) -> bool:
     for i in range(GlobalUpgrades.size()):
@@ -98,6 +154,7 @@ var selectedCharacter: int = 0
 # Inside GameManager.gd
 # Inside GameManager.gd
 # Use "Node" instead of "Control" to accept both Sprite2D and TextureRect
+
 func add_weapon_type_overlay(parent_node: Node, weapon_type: String, value):
     # 1. Find the item data in UpgradeData
     var item_data = null

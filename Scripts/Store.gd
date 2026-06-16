@@ -21,6 +21,7 @@ func fit_to_screen():
 @onready var audience_container = $AudienceContainer
 
 func _ready():
+	GameManager.Reroll()
 	fit_to_screen()
 	randomize()
 	add_child(time_ctrl)
