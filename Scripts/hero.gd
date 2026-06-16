@@ -358,15 +358,21 @@ func refresh_character_and_weapons(profile: Dictionary):
   
 static func afterv(val: int) -> String:
     if val < 10:
-        return "A"
+        return ""
     elif val < 100:
-        return "B"
+        return ""
     elif val < 1000:
+        return "A"
+    elif val < 10000:
+        return "B"
+    elif val < 10000:
         return "C"
     elif val < 10000:
         return "D"
+    elif val < 10000:
+        return "E"
     else:
-        return "E" # Good practice to provide a fallback
+        return "F" # Good practice to provide a fallback
         
 static func update_label(sprite: Sprite2D, upgrade: Dictionary) -> void:
     var label: Label = null
