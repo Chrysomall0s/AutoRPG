@@ -328,6 +328,12 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
         if weapon.get_meta("is_attacking", false): continue
         
         var slot_idx = weapon.get_meta("slot_index")
+        if slot_idx < 6 and weapon.has_meta("sprite"):
+            # Ensure default
+            var visual_sprite = weapon.get_meta("sprite") # Get the sprite
+            if (visual_sprite):
+                var upgrade = visual_sprite.get_meta("upgrade_data", {}) 
+                update_label(visual_sprite, upgrade,"")
         if slot_idx >= 6:
             # Ensure default
             var visual_sprite = weapon.get_meta("sprite") # Get the sprite
