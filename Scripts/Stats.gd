@@ -18,6 +18,7 @@ static func execute_weapon(battle_node: Node, target_node: Node, attacker_node: 
 				final_Damage += attacker_DMG
 				
 		GameManager.addtopassive3("HP",-final_Damage,target_stats)
+		show_damage_dealt(battle_node,target_node,-final_Damage)
 	else:
 		match type:
 			"DMG":
@@ -35,5 +36,5 @@ static func show_damage_dealt(battle_node, target_node, amount):
 	var floating_text = FloatingTextScene.instantiate()
 	battle_node.add_child(floating_text) # Use the battle_node passed in
 	
-	floating_text.global_position = target_node.global_position + Vector2(randf_range(-20, 20), -80)
+	floating_text.global_position = target_node.global_position + Vector2(randf_range(-20, 20), +80)
 	floating_text.setup(amount,(amount > 0),0)

@@ -17,7 +17,7 @@ func setup(amount: int, is_heal: bool, icon_index: int):
 	
 	# --- ADD THIS TO SCALE FONT SIZE ---
 	# Define a base size and increase it if the hit is large
-	var base_font_size = 60
+	var base_font_size = 120
 	var final_size = base_font_size + min(amount / 10, 20) # Increases size based on damage
 	label.add_theme_font_size_override("font_size", final_size)
 	# ------------------------------------

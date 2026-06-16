@@ -36,14 +36,6 @@ alignment = 1
 position = Vector2(1286, 1174)
 scale = Vector2(2, 2)
 texture = SubResource("AtlasTexture_8saeu")
-rainbow_radius_x = null
-rainbow_radius_y = null
-rainbow_offset = null
-rainbow_y_offset = null
-float_amplitude = null
-float_wave_speed = null
-weapon_follow_smoothness = null
-show_placeholders = null
 
 [node name="AudienceContainer" type="Node2D" parent="." unique_id=1917706470]
 script = ExtResource("3_ghw46")

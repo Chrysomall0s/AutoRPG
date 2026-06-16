@@ -74,7 +74,7 @@ func set_filled(value: bool):
 		#perform_throw()
 
 func goldd():
-	GameManager.addtopassive("Gold",2)
+	GameManager.addtopassive("MAXGold",2)
 
 func perform_throw():
 	var projectile = Sprite2D.new()
@@ -114,7 +114,7 @@ func perform_throw():
 	# Random x between 20% and 80% of screen width
 	var random_x = randf_range(screen_size.x * 0.2, screen_size.x * 0.8)
 	# Fixed height for the floor (e.g., 60% down the screen)
-	var target_y = screen_size.y * 0.6
+	var target_y = screen_size.y * 0.72
 	var target_pos = Vector2(random_x, target_y)
 	
 	# Animate the movement
