@@ -111,9 +111,11 @@ func Reroll():
                     var random_passive = _get_weighted_random(passive_pool)
                     selected["type"] = random_passive["name"]
                 
+                selected["unique_id"] = str(Time.get_ticks_usec()) + "_" + selected.get("name", "item") + "_" + str(i)
                 GlobalUpgrades[i] = selected
                 item_pool.remove_at(idx) # Prevent duplicate items in one reroll
                 break
+
 
 # Helper to pick from the passive pool based on weight
 func _get_weighted_random(pool: Array) -> Dictionary:

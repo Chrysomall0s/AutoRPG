@@ -124,11 +124,29 @@ func spawn_weapons(weapon_data_array: Array):
             weapon_container.add_child(shape)
             weapon_container.set_meta("collision_shape", shape)
         
-        if(i >= 6):
-            var x_offset = (rainbow_radius_x + 100) * (1 if i % 2 == 0 else -1)
-            var y_offset = (i * 60) - 60 # Vertical spacing
-            weapon_container.position = Vector2(x_offset, y_offset)
-        # --- NEW: Always register the container ---
+       # --- MODIFICATION START ---
+        var target_pos: Vector2
+        
+        if i >= 6:
+            # Matches the logic in _update_placeholder_position
+            var idx = i - 6
+            var float_off = sin(floating_time * float_wave_speed + (idx + 6)) * float_amplitude
+            var x_offset = rainbow_radius_x * (idx + 2)
+            var y_offset = (-rainbow_radius_y / 4.0) + float_off
+            target_pos = Vector2(x_offset, y_offset)
+        else:
+            # Existing orbital logic for slots 0-5
+            var angle = (i as float) * (PI / 5.0)      
+            var float_off = sin(floating_time * float_wave_speed + i) * float_amplitude
+            target_pos = rainbow_offset + Vector2(
+                -cos(angle) * rainbow_radius_x, 
+                -sin(angle) * rainbow_radius_y + rainbow_y_offset + float_off
+            )
+        
+        # Apply the position directly
+        weapon_container.position = target_pos
+        # --- MODIFICATION END ---
+        
         weapon_container.set_meta("slot_index", i)
         weapon_container.set_meta("sprite", visual_sprite)
         weapon_container.input_pickable = true
