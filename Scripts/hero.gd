@@ -343,11 +343,16 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
             # We need to find the data associated with this sprite. 
             # Storing the upgrade dictionary as meta is the cleanest way.
             var upgrade = sprite.get_meta("upgrade_data")
-            var label = sprite.get_meta("text_label")
             if upgrade:
+                var valueint = int(upgrade.get("value", 0.0))
+                var levelint = int(upgrade.get("level", 1.0))
+                
                 var value = float(upgrade.get("value", 0.0))
                 var level = float(upgrade.get("level", 1.0))
-                update_label(sprite, upgrade)
+                var val_str = str(valueint).left(2) + afterv(value)
+                var lvl_str = str(levelint).left(2) + afterv(level)
+                var text = lvl_str + "\n" + "\n" + val_str
+                update_label(sprite, upgrade,text)
                 var progress = clamp(level / value, 0.0, 1.0)
                 #health
                 sprite.material.set_shader_parameter("charge_progress", progress)
@@ -412,41 +417,33 @@ static func afterv(val: int) -> String:
         return "E"
     else:
         return "F" # Good practice to provide a fallback
-        
-static func update_label(sprite: Sprite2D, upgrade: Dictionary) -> void:
-    var label: Label = null
-    
-    # 1. Try to get existing label from meta, or create a new one
-    if sprite.has_meta("text_label"):
-        label = sprite.get_meta("text_label")
-    else:
-        label = Label.new()
-        sprite.add_child(label)
-        sprite.set_meta("text_label", label)
-        
-        # Initial Styling (Only needs to be set once)
-        var settings = LabelSettings.new()
-        settings.font_size = 80
-        settings.font_color = Color.BLACK
-        settings.outline_size = 30
-        settings.outline_color = Color.WHITE
-        label.label_settings = settings
-        
-        # Positioning
-        label.position = Vector2(-80, -150) 
-        label.size = Vector2(160, 80)
-        label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    
-    # 2. Update the text based on values
-    var val = int(upgrade.get("value", 0))
-    var level = int(upgrade.get("level", 0))
 
-    # Formatted for the first two digits of the base value if needed
-    # Using str(val).left(2) ensures we only show the first two characters
-    
-    var val_str = str(val).left(2) + afterv(val)
-    var lvl_str = str(level).left(2) + afterv(level)
-    label.text = lvl_str + "\n" + "\n" + val_str
+static func setup_or_update_label(sprite: Sprite2D, upgrade: Dictionary) -> Label:
+        var label = Label.new()
+        if sprite.has_meta("text_label"):
+            label = sprite.get_meta("text_label")
+        else:
+        
+            sprite.add_child(label)
+            sprite.set_meta("text_label", label)
+            
+            # Initial Styling (Only needs to be set once)
+            var settings = LabelSettings.new()
+            settings.font_size = 80
+            settings.font_color = Color.BLACK
+            settings.outline_size = 30
+            settings.outline_color = Color.WHITE
+            label.label_settings = settings
+            
+            # Positioning
+            label.position = Vector2(-80, -150) 
+            label.size = Vector2(160, 80)
+            label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        return label
+        
+static func update_label(sprite: Sprite2D, upgrade: Dictionary, meta_key: String = "text_label") -> void:
+    var label: Label = setup_or_update_label(sprite, upgrade)
+    label.text = meta_key
 
 func load_upgrade_sprites(profile: Dictionary) -> void:
     # Clear existing icons
