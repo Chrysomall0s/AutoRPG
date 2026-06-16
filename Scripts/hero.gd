@@ -278,6 +278,20 @@ func _check_drop(dropped_weapon: Area2D):
         if(target_idx >=6):
             if weapon_sprites[target_idx].has_meta("Item"):
                 return
+                
+        if (dropped_idx >= 6 and target_idx < 6): 
+            var shop_data = GameManager.GlobalUpgrades[dropped_idx - 6]
+            var own_data = GameManager.player_profile["weapons"][target_idx]  
+            if(shop_data and own_data) :
+                if (shop_data.get("type", 0) == shop_data.get("type", 0)):
+                    if (shop_data.get("friendly", 0) == shop_data.get("friendly", 0)):
+                        own_data["speed"] += shop_data["speed"]
+                        own_data["level"] += shop_data["level"]
+                        GameManager.addtopassive("MAXGold", -shop_data["cost"])
+                        GameManager.GlobalUpgrades[dropped_idx - 6] = null
+                        refresh_character_and_weapons(GameManager.player_profile)
+                        return
+        #we switch
         if (dropped_idx >= 6 and target_idx < 6) or (target_idx >= 6 and dropped_idx < 6):
             var shop = dropped_idx
             var own = target_idx

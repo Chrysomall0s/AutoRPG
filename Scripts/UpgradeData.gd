@@ -14,8 +14,8 @@ static var upgrades = [
 	#{"name": "Burn",      "category": "passive",  "value": 1, "weight": 20,  "cost": 1, "icon": "res://Assets/atlas/icon.tres","index": 4,    "level": 1},
 	
 	# --- BASE WEAPONS (Equipped into any empty slot or replaces old weapon) ---
-	{"name": "Club","friendly":true, "category": "weapon", "type": "DMG","weight": 100, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 12, "amount": 10, "speed": 4, "level": 0, "Description": "Shield: add stats to yourself"},
-	{"name": "Staff","friendly":false,    "category": "weapon", "type": "DMG","weight": 100, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 14,   "amount": 8,  "speed": 6, "level": 0, "Description": "Sword: multi per type"},
+	{"name": "Club","friendly":true, "category": "weapon", "type": "DMG","weight": 100, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 12, "amount": 10, "speed": 4, "level": -1, "Description": "Shield: add stats to yourself"},
+	{"name": "Staff","friendly":false,    "category": "weapon", "type": "DMG","weight": 100, "cost": 2, "icon":           "res://Assets/atlas/icon.tres","index": 14,   "amount": 8,  "speed": 6, "level": -1, "Description": "Sword: multi per type"},
 	
 	# --- AUDIENCE UPGRADES ---
 	{"name": "Patron", "category": "viewer", "type": "heal",   "value": 5,"weight": 30, "throw_chance": 0.005, "cost": 3, "icon":  "res://Assets/atlas/fruit.tres","index": 12, "level": 0, "Description": "Fans: give you more gold"},

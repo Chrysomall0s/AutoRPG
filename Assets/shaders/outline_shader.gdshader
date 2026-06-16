@@ -12,11 +12,11 @@ uniform vec4 charge_color : source_color = vec4(0.0, 1.0, 0.0, 0.5);
 
 // --- New Level Color Logic ---
 vec4 get_color_for_level(float lvl) {
-    if (lvl >= 0.0)  return vec4(1.0, 1.0, 1.0, 1.0);       // White
-    if (lvl >= -1.0) return vec4(1.0, 1.0, 0.0, 1.0);       // Yellow
-    if (lvl >= -2.0) return vec4(0.0, 1.0, 0.0, 1.0);       // Green
-    if (lvl >= -3.0) return vec4(0.0, 1.0, 1.0, 1.0);       // Cyan (Bright Blue)
-    if (lvl >= -4.0) return vec4(0.5, 0.0, 1.0, 1.0);       // Violet
+    if (lvl >= -1.0)  return vec4(1.0, 1.0, 1.0, 1.0);       // White
+    if (lvl >= -2.0) return vec4(1.0, 1.0, 0.0, 1.0);       // Yellow
+    if (lvl >= -3.0) return vec4(0.0, 1.0, 0.0, 1.0);       // Green
+    if (lvl >= -4.0) return vec4(0.0, 1.0, 1.0, 1.0);       // Cyan (Bright Blue)
+    if (lvl >= -5.0) return vec4(0.5, 0.0, 1.0, 1.0);       // Violet
     return vec4(1.0, 0.4, 0.7, 1.0);                        // Pink (Bright)
 }
 
