@@ -33,26 +33,26 @@ func _find_upgrade_by_name(target_name: String) -> Dictionary:
         if upgrade["name"] == target_name: return upgrade
     return {}
 
-func draw_health(target: Dictionary):
-
-    if not health_bar:
-        health_bar = ProgressBar.new()
-        health_bar.size = Vector2(100, 20)
-        health_bar.position = Vector2(-50, 150)
-        health_bar.z_index = 4096
-
-        var style_bg = StyleBoxFlat.new()
-        style_bg.bg_color = Color.BLACK
-        health_bar.add_theme_stylebox_override("background", style_bg)
-
-        var style_fg = StyleBoxFlat.new()
-        style_fg.bg_color = Color.GREEN
-        health_bar.add_theme_stylebox_override("fill", style_fg)
-
-        add_child(health_bar)
-
-    health_bar.max_value = GameManager.getpassive3("MAXHP",target)
-    health_bar.value = GameManager.getpassive3("HP",target)
+#func draw_health(target: Dictionary):
+#
+    #if not health_bar:
+        #health_bar = ProgressBar.new()
+        #health_bar.size = Vector2(100, 20)
+        #health_bar.position = Vector2(-50, 150)
+        #health_bar.z_index = 4096
+#
+        #var style_bg = StyleBoxFlat.new()
+        #style_bg.bg_color = Color.BLACK
+        #health_bar.add_theme_stylebox_override("background", style_bg)
+#
+        #var style_fg = StyleBoxFlat.new()
+        #style_fg.bg_color = Color.GREEN
+        #health_bar.add_theme_stylebox_override("fill", style_fg)
+#
+        #add_child(health_bar)
+#
+    #health_bar.max_value = GameManager.getpassive3("MAXHP",target)
+    #health_bar.value = GameManager.getpassive3("HP",target)
 
 func _update_placeholder_position(weapon: Area2D, index: int, delta: float):
     # Calculate the bobbing effect (using the same logic as the main weapons)

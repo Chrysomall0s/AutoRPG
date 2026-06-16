@@ -22,7 +22,7 @@ func create_difficulty_buttons(parent: Control):
     _generate_row(parent, 1, [4, 5, 6, 7, 16], ["Easy", "Normal", "Hard", "Insane", "Impossible"])
 
 func create_shop_buttons(parent: Control):
-    _generate_row(parent, 2, [19, 20, 21, 22, 23], ["Reroll", "One", "Two", "Three", "Go"])
+    _generate_row(parent, 2, [19, 20, 21, 22, 23], ["Reroll", "", "", "", "Go"])
 # Update the lookup function
 func _get_callback_for_row(row: int, index: int) -> Callable:
     if row == 0:
@@ -124,9 +124,9 @@ func slowspeed(): Engine.time_scale = 0.5
 func normalspeed(): Engine.time_scale = 2.0
 func fastspeed(): Engine.time_scale = 8.0
 func easydifficulty(): GameManager.selected_difficulty = 0
-func normaldifficulty(): GameManager.selected_difficulty = 1
-func harddifficulty(): GameManager.selected_difficulty = 2
-func insanedifficulty(): GameManager.selected_difficulty = 3
+func normaldifficulty(): GameManager.selected_difficulty = 0
+func harddifficulty(): GameManager.selected_difficulty = 0
+func insanedifficulty(): GameManager.selected_difficulty = 0
 func reroll_shop(): 
     GameManager.Reroll() 
     var hero = get_tree().current_scene.find_child("Hero", true, false)

@@ -1,7 +1,7 @@
 shader_type canvas_item;
 
 // --- Uniforms ---
-uniform float level = 1.0; 
+uniform float level = 0.0; 
 uniform float outline_width : hint_range(0.0, 10.0) = 8.0;
 uniform int index = 0; // 0 to 15 (4x4)
 
@@ -10,13 +10,14 @@ uniform bool use_charge_shader = false;
 uniform float charge_progress : hint_range(0.0, 1.0) = 0.5;
 uniform vec4 charge_color : source_color = vec4(0.0, 1.0, 0.0, 0.5);
 
-// --- Level Color Logic ---
+// --- New Level Color Logic ---
 vec4 get_color_for_level(float lvl) {
-    if (lvl <= 20.0) return mix(vec4(1.0, 1.0, 1.0, 1.0), vec4(1.0, 1.0, 0.0, 1.0), (lvl - 1.0) / 19.0);
-    if (lvl <= 40.0) return mix(vec4(1.0, 1.0, 0.0, 1.0), vec4(0.0, 1.0, 0.0, 1.0), (lvl - 21.0) / 19.0);
-    if (lvl <= 60.0) return mix(vec4(0.0, 1.0, 0.0, 1.0), vec4(0.0, 0.0, 1.0, 1.0), (lvl - 41.0) / 19.0);
-    if (lvl <= 80.0) return mix(vec4(0.0, 0.0, 1.0, 1.0), vec4(0.5, 0.0, 0.5, 1.0), (lvl - 61.0) / 19.0);
-    return mix(vec4(0.5, 0.0, 0.5, 1.0), vec4(1.0, 0.75, 0.8, 1.0), (lvl - 81.0) / 19.0);
+    if (lvl >= 0.0)  return vec4(1.0, 1.0, 1.0, 1.0);       // White
+    if (lvl >= -1.0) return vec4(1.0, 1.0, 0.0, 1.0);       // Yellow
+    if (lvl >= -2.0) return vec4(0.0, 1.0, 0.0, 1.0);       // Green
+    if (lvl >= -3.0) return vec4(0.0, 1.0, 1.0, 1.0);       // Cyan (Bright Blue)
+    if (lvl >= -4.0) return vec4(0.5, 0.0, 1.0, 1.0);       // Violet
+    return vec4(1.0, 0.4, 0.7, 1.0);                        // Pink (Bright)
 }
 
 void fragment() {
@@ -45,9 +46,8 @@ void fragment() {
         }
     } else if (use_charge_shader) {
         float line_position = 1.0 - charge_progress;
-        float line_thickness = 0.01; // Increased slightly for visibility
+        float line_thickness = 0.01;
 
-        // Use local_uv.y so the charge line is relative to the sprite cell
         if (abs(local_uv.y - line_position) < line_thickness) {
             final_color = vec4(0.0, 0.0, 0.0, current_color.a);
         } else if (local_uv.y > line_position) {

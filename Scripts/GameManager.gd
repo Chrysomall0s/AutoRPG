@@ -259,51 +259,25 @@ static func CleanName(stat_name: String) -> String:
 static func ReadString(stat_name: String) -> String:
     return "value" if stat_name.contains("MAX") else "level"
 
-static func _find_passive_data3(stat_name: String,target_stats: Dictionary) -> Dictionary:
-    for passive in target_stats["passives"]:
-        if passive.get("name") == stat_name:
-            return passive
-    return {} # Return empty if not found
-
 static func addtopassive3(stat_name: String, amount: float,target_stats: Dictionary) -> void:
-    var stat = ReadString(stat_name)
-    stat_name = CleanName(stat_name)
-    var passives = _find_passive_data3(stat_name,target_stats)
-    passives[stat] += amount
+    return addtopassiveREV(stat_name,amount, target_stats)
 
 static func getpassive3(stat_name: String,target_stats: Dictionary) -> float:
-    var stat = ReadString(stat_name)
-    stat_name = CleanName(stat_name)
-    var passives = _find_passive_data3(stat_name,target_stats)
-    # Check if the stat exists to avoid a "Key not found" error
-    if passives.has(stat):
-        return float(passives[stat])
+    return getpassiveREV(stat_name, target_stats)
     
-    return 0.0
-
-static func _find_passive_data2(stat_name: String) -> Dictionary:
-    for passive in GameManager.current_enemy_profile["passives"]:
-        if passive.get("name") == stat_name:
-            return passive
-    return {} # Return empty if not found
+static func getpassive2(stat_name: String) -> float:
+    return getpassiveREV(stat_name, GameManager.current_enemy_profile)
 
 static func addtopassive2(stat_name: String, amount: float) -> void:
-    var stat = ReadString(stat_name)
-    stat_name = CleanName(stat_name)
-    var passives = _find_passive_data2(stat_name)
-    passives[stat] += amount
+    return addtopassiveREV(stat_name,amount, GameManager.current_enemy_profile)
 
-static func getpassive2(stat_name: String) -> float:
-    var stat = ReadString(stat_name)
-    stat_name = CleanName(stat_name)
-    var passives = _find_passive_data2(stat_name)
-    # Check if the stat exists to avoid a "Key not found" error
-    if passives.has(stat):
-        return float(passives[stat])
-    
-    return 0.0
+static func getpassive(stat_name: String) -> float:
+    return getpassiveREV(stat_name, GameManager.player_profile)
 
-static func addpassive(stat_name: String) -> Dictionary:
+static func addtopassive(stat_name: String, amount: float) -> void:
+    return addtopassiveREV(stat_name,amount, GameManager.player_profile)
+
+static func addpassive(stat_name: String,target_stats: Dictionary) -> Dictionary:
     var stat = ReadString(stat_name)
     stat_name = CleanName(stat_name)
     var base_data = UpgradeData.get_upgrade_by_name(stat_name)
@@ -314,49 +288,40 @@ static func addpassive(stat_name: String) -> Dictionary:
 
     var new_passive = base_data.duplicate()
     new_passive[stat] = 0 
-    GameManager.player_profile["passives"].append(new_passive)
+    target_stats["passives"].append(new_passive)
     return new_passive
 
-static func removepassive(stat_name: String) -> void:
-    var passives = GameManager.player_profile["passives"]
+static func removepassive(stat_name: String,target_stats: Dictionary) -> void:
+    var passives = target_stats["passives"]
     for i in range(passives.size() - 1, -1, -1):
         if passives[i]["name"] == stat_name:
             passives.remove_at(i)
 
-static func addtopassive(stat_name: String, amount: float) -> void:
-    var stat = ReadString(stat_name)
-    stat_name = CleanName(stat_name)
-    
-    var passives = _find_passive_data(stat_name)
-    
-    # If it doesn't exist, create it
-    if passives == null:
-        passives = addpassive(stat_name)
-    
-    
-    # Update the level
-    passives[stat] += amount
-    
-    # Remove if level drops to or below 0
-    if passives[stat] <= 0:
-        removepassive(stat_name)
-
-# Helper to find specific passive dictionary in the profile
-static func _find_passive_data(stat_name: String):
+static func _find_passive_dataREV(stat_name: String,target_stats: Dictionary):
     # Safety: Ensure player_profile exists before trying to access it
-    if not GameManager.player_profile.has("passives"):
+    if not target_stats.has("passives"):
         return null
         
-    for p in GameManager.player_profile["passives"]:
+    for p in target_stats["passives"]:
         if p.get("name") == stat_name: # .get() is safer than ["name"]
             return p
     return null
+        
+static func addtopassiveREV(stat_name: String, amount: float,target_stats: Dictionary) -> void:
+    var stat = ReadString(stat_name)
+    stat_name = CleanName(stat_name)
+    var passives = _find_passive_dataREV(stat_name,target_stats)
+    # If it doesn't exist, create it
+    if passives == null:
+        passives = addpassive(stat_name,target_stats)
+    # Update the level
+    passives[stat] += amount
+    # Remove if level drops to or below 0
+    if passives[stat] <= 0:
+        removepassive(stat_name,target_stats)
 
-static func getpassive(stat_name: String) -> float:
-    var passives = _find_passive_data(stat_name)
-    
-    # If passives is null, get() won't be called.
-    # Otherwise, it attempts to return "level", defaulting to 0.0 if missing.
+static func getpassiveREV(stat_name: String,target_stats: Dictionary) -> float:
+    var passives = _find_passive_dataREV(stat_name,target_stats)
     return float(passives.get("level", 0.0)) if passives != null else 0.0
 
 func get_difficulty_key() -> String:
@@ -374,4 +339,4 @@ var shop_initialized: bool = false
 var shop_items: Array = []  # Stores item dictionary states and "bought" statuses
 var persistent_reroll_cost: int = 1
 
-var selected_difficulty = 1
+var selected_difficulty = 0
