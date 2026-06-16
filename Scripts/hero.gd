@@ -69,8 +69,7 @@ func _update_placeholder_position(weapon: Area2D, index: int, delta: float):
     weapon.position = weapon.position.lerp(target, delta * weapon_follow_smoothness)
     
 func spawn_weapons(weapon_data_array: Array):
-    const MAX_SLOTS = 6 
-    
+    var MAX_SLOTS = 9 if show_placeholders else 6
     # Clean up old weapons
     for child in get_children():
         if child.has_meta("slot_index"): child.queue_free()
@@ -97,6 +96,21 @@ func spawn_weapons(weapon_data_array: Array):
                 weapon_container.set_meta("collision_shape", shape)
         
         # Placeholder handling
+        elif i >= 6 and GameManager.GlobalUpgrades[i-6]:
+            var data = GameManager.GlobalUpgrades [i-6]
+            var weapon_info = _find_upgrade_by_name(data) if data is String else data
+            
+            if not weapon_info.is_empty():
+                visual_sprite = GameManager._create_weapon_sprite(weapon_info)
+                weapon_container.add_child(visual_sprite)
+                
+                # Collision setup (Existing code)
+                var shape = CollisionShape2D.new()
+                shape.shape = RectangleShape2D.new()
+                shape.shape.size = visual_sprite.get_rect().size * visual_sprite.scale
+                weapon_container.add_child(shape)
+                weapon_container.set_meta("collision_shape", shape)
+        
         elif show_placeholders and placeholder_texture:
             visual_sprite = Sprite2D.new()
             visual_sprite.texture = placeholder_texture
@@ -110,6 +124,10 @@ func spawn_weapons(weapon_data_array: Array):
             weapon_container.add_child(shape)
             weapon_container.set_meta("collision_shape", shape)
         
+        if(i >= 6):
+            var x_offset = (rainbow_radius_x + 100) * (1 if i % 2 == 0 else -1)
+            var y_offset = (i * 60) - 60 # Vertical spacing
+            weapon_container.position = Vector2(x_offset, y_offset)
         # --- NEW: Always register the container ---
         weapon_container.set_meta("slot_index", i)
         weapon_container.set_meta("sprite", visual_sprite)
@@ -118,14 +136,6 @@ func spawn_weapons(weapon_data_array: Array):
         
         add_child(weapon_container)
         weapon_sprites.append(weapon_container) # Now all slots are tracked!
-    if show_placeholders:
-        for i in range(3): # Draw 3 placeholders
-            var p = _create_mirrored_placeholder(i)
-            # Add to the node and track them
-            add_child(p)
-            weapon_sprites.append(p) 
-            # Note: You might want a separate array for placeholders 
-            # if you don't want them interacting with the same logic
 
 func _on_weapon_input(_viewport, event: InputEvent, _shape_idx, weapon: Area2D):
     if not show_placeholders: return
@@ -183,30 +193,6 @@ func _input(event):
         _check_drop(dragging_weapon)
         dragging_weapon = null
 
-func _create_mirrored_placeholder(index: int) -> Area2D:
-    var placeholder = Area2D.new()
-    # Assign the meta data here! 
-    # We use 6+index so it doesn't conflict with main slots 0-5
-    placeholder.set_meta("slot_index", 6 + index) 
-    
-    var visual = Sprite2D.new()
-    visual.texture = placeholder_texture
-    visual.modulate = Color(1, 1, 1, 0.3)
-    placeholder.add_child(visual)
-    
-    # REQUIRED: Add the collision shape AND the meta for dragging to work
-    var shape = CollisionShape2D.new()
-    shape.shape = RectangleShape2D.new()
-    shape.shape.size = placeholder_texture.get_size()
-    placeholder.add_child(shape)
-    placeholder.set_meta("collision_shape", shape) # <--- IMPORTANT
-    # Mirroring logic: flip the X offset
-    var x_offset = (rainbow_radius_x + 100) * (1 if index % 2 == 0 else -1)
-    var y_offset = (index * 60) - 60 # Vertical spacing
-    placeholder.position = Vector2(x_offset, y_offset)
-    
-    return placeholder
-
 func _check_drop(dropped_weapon: Area2D):
     var mouse_pos = get_global_mouse_position()
     var target_weapon: Area2D = null
@@ -241,6 +227,18 @@ func _check_drop(dropped_weapon: Area2D):
             var temp_data = weapons_data[dropped_idx]
             weapons_data[dropped_idx] = weapons_data[target_idx]
             weapons_data[target_idx] = temp_data
+        elif dropped_idx < weapons_data.size() and target_idx >= weapons_data.size():
+            var temp_data = weapons_data[dropped_idx]
+            weapons_data[dropped_idx] = GameManager.GlobalUpgrades[target_idx-6]
+            GameManager.GlobalUpgrades[target_idx-6] = temp_data
+        elif dropped_idx >= weapons_data.size() and target_idx < weapons_data.size():
+            var temp_data = weapons_data[target_idx]
+            weapons_data[target_idx] = GameManager.GlobalUpgrades[dropped_idx-6]
+            GameManager.GlobalUpgrades[dropped_idx-6] = temp_data
+        elif dropped_idx >= weapons_data.size() and target_idx >= weapons_data.size():
+            var temp_data = GameManager.GlobalUpgrades[target_idx-6]
+            GameManager.GlobalUpgrades[target_idx-6] = GameManager.GlobalUpgrades[dropped_idx-6]
+            GameManager.GlobalUpgrades[dropped_idx-6] = temp_data
             
         # 4. Animate
         var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC)
@@ -262,6 +260,8 @@ func increase_weapon_orbit_radius(multiplier: float) -> void:
 # Inside Hero.gd
 func activate_battle_mode():
     for weapon_area in weapon_sprites:
+        if not weapon_area.has_meta("sprite"): continue
+
         var sprite = weapon_area.get_meta("sprite")
         if sprite and sprite.material is ShaderMaterial:
             sprite.material.set_shader_parameter("use_charge_shader", true)
