@@ -14,7 +14,7 @@ var central_icon: TextureRect
 var continue_button: Button
 
 var status_label: Label # Define this as a class variable
-
+var leave_button: Button # Add this
 func _ready():
     battle_data = GameManager.after_battle_data
     setup_layout()
@@ -91,9 +91,22 @@ func setup_layout():
     continue_button.pressed.connect(_on_continue_pressed)
     v_box.add_child(continue_button)
 
+    # NEW: Leave Tournament Button
+    leave_button = Button.new()
+    leave_button.text = "LEAVE TOURNAMENT"
+    leave_button.custom_minimum_size = Vector2(btn_width, btn_height)
+    leave_button.add_theme_font_size_override("font_size", int(screen_size.y * 0.04))
+    leave_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+    leave_button.pressed.connect(_on_leave_pressed)
+    v_box.add_child(leave_button)
     # Update item sizes in display_results loop as well:
     # Use 'item_size' for trophy_container and heart_container children
 
+func _on_leave_pressed():
+    # Reset game state if necessary before leaving
+    GameManager.Defeats = 0
+    GameManager.Victories = 0
+    get_tree().change_scene_to_file("res://Scenes/MainMenu.tscn")
 
 func display_results():
     var won = battle_data.get("result") == "win"

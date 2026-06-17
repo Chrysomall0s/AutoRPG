@@ -120,7 +120,7 @@ func spawn_weapons(weapon_data_array: Array):
             shape.shape = RectangleShape2D.new()
             # Use visual_sprite.get_rect() or fallback to texture size
             var rect = visual_sprite.get_rect()
-            shape.shape.size = rect.size * visual_sprite.scale
+            shape.shape.size = rect.size * visual_sprite.scale *1.5
             weapon_container.add_child(shape)
             weapon_container.set_meta("collision_shape", shape)
         

@@ -80,7 +80,7 @@ func get_lcm(a: int, b: int) -> int:
     if a == 0 or b == 0: return 0
     return abs(a * b) / get_gcd(a, b)
 
-func get_sorted_weapons(data: Dictionary) -> Array:
+func get_sorted_weapons(data: Dictionary, truth: bool) -> Array:
     var weapons = data.get("weapons", [])
     if weapons == null: return []
     
@@ -90,25 +90,22 @@ func get_sorted_weapons(data: Dictionary) -> Array:
             # Explicitly attach the index to the weapon data so it is 
             # easily accessible during sorting later
             var weapon_data = weapons[i].duplicate()
-            weapon_data["index"] = i 
+            weapon_data["im"] = i*2
+            if(!truth):
+                weapon_data["im"] += 1
             processed_weapons.append(weapon_data)
             
     return processed_weapons
 
 func calculate_timeline():
-    var p_weapons = get_sorted_weapons(GameManager.player_profile)
-    var e_weapons = get_sorted_weapons(GameManager.current_enemy_profile)
-    
+    var p_weapons = get_sorted_weapons(GameManager.player_profile, true)
+    var e_weapons = get_sorted_weapons(GameManager.current_enemy_profile, false)
     var all_weapons = p_weapons + e_weapons
+    all_weapons.sort_custom(func(a, b): return a["im"] < b["im"])
+    if not all_weapons.is_empty():
+        var last_item = all_weapons.pop_back()
+        all_weapons.push_front(last_item)
     
-    all_weapons.sort_custom(func(a, b):
-        return a["index"] > b["index"]
-    )
-    #var all_weapons = []
-    #for w in all_weaponsss:
-        #if w != null:
-            #all_weapons.append(w)
-    # 1. Find the cycle length (LCM of all speeds)
     var cycle_length = 1
     for w in all_weapons:
         var speed = int(w["speed"])
@@ -120,6 +117,7 @@ func calculate_timeline():
         for weapon in all_weapons:
             var speed = cycle_length / int(weapon["speed"])
             if tick % speed == 0:
+                var index = weapon["im"]
                 cycle_pattern.append({
                     "type": "weapon",
                     "tick": tick,
