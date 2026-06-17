@@ -218,6 +218,7 @@ func _input(event):
                     if(!weapon.get_meta("Item")):
                         #is passive item
                         GameManager.addtopassive("MAXGold", -cost)
+                        GameManager.addtopassive("Gold", -cost)
                         GameManager.addtopassive("MAX"+item_data["name"], 1)
                         GameManager.GlobalUpgrades[slot_idx] = null
                         refresh_character_and_weapons(GameManager.player_profile)
@@ -225,6 +226,7 @@ func _input(event):
                     else:
                         #is audience item
                         GameManager.addtopassive("MAXGold", -cost)
+                        GameManager.addtopassive("Gold", -cost)
                         GameManager.player_profile["audience"].append(item_data)
                         GameManager.GlobalUpgrades[slot_idx] = null
                         var container = get_audience_container()
@@ -290,6 +292,7 @@ func _check_drop(dropped_weapon: Area2D):
                         own_data["level"] += shop_data["level"]
                         own_data["cost"] += shop_data["cost"]
                         GameManager.addtopassive("MAXGold", -shop_data["cost"])
+                        GameManager.addtopassive("Gold", -shop_data["cost"])
                         GameManager.GlobalUpgrades[dropped_idx - 6] = null
                         refresh_character_and_weapons(GameManager.player_profile)
                         return
@@ -306,6 +309,7 @@ func _check_drop(dropped_weapon: Area2D):
                         own_data["level"] += shop_data["level"]
                         own_data["cost"] += shop_data["cost"]
                         GameManager.addtopassive("MAXGold", -shop_data["cost"])
+                        GameManager.addtopassive("Gold", -shop_data["cost"])
                         GameManager.player_profile["weapons"][dropped_idx] = null
                         refresh_character_and_weapons(GameManager.player_profile)
                         return         
@@ -320,34 +324,32 @@ func _check_drop(dropped_weapon: Area2D):
                     var cost = shop_data["cost"]
                     if cost <= GameManager.getpassive("MAXGold") + own_data["cost"]:
                         GameManager.addtopassive("MAXGold", -shop_data["cost"] + own_data["cost"])
+                        GameManager.addtopassive("Gold", -shop_data["cost"]+ own_data["cost"])
                         GameManager.GlobalUpgrades[target_idx - 6] = own_data 
                         GameManager.player_profile["weapons"][dropped_idx] = null
                         refresh_character_and_weapons(GameManager.player_profile)
                         return
         # --- NEW PURCHASE LOGIC ---
-        if dropped_idx >= 6 and target_idx < 6:
-            var shop_item = GameManager.GlobalUpgrades[dropped_idx - 6]
-            if shop_item and shop_item.has("cost"):
-                var cost = shop_item["cost"]
-                # Check if enough money
-                if cost <= GameManager.getpassive("MAXGold"):
-                    # Set the item slot to your weapon
-                    GameManager.player_profile["weapons"][target_idx] = shop_item
-                    # Buy the item and set the dragged slot to null
-                    GameManager.GlobalUpgrades[dropped_idx - 6] = null
-                    # Exchange the money
-                    GameManager.addtopassive("MAXGold", -cost)
-                    
-                    # Refresh UI
-                    refresh_character_and_weapons(GameManager.player_profile)
-                    return # Return after successful purchase
-                else:
-                    print("Not enough gold!")
+        #if dropped_idx >= 6 and target_idx < 6:
+            #var shop_item = GameManager.GlobalUpgrades[dropped_idx - 6]
+            #if shop_item and shop_item.has("cost"):
+                #var cost = shop_item["cost"]
+                ## Check if enough money
+                #if cost <= GameManager.getpassive("MAXGold"):
+                    ## Set the item slot to your weapon
+                    #GameManager.player_profile["weapons"][target_idx] = shop_item
+                    ## Buy the item and set the dragged slot to null
+                    #GameManager.GlobalUpgrades[dropped_idx - 6] = null
+                    ## Exchange the money
+                    #GameManager.addtopassive("MAXGold", -cost)
+                    #
+                    ## Refresh UI
+                    #refresh_character_and_weapons(GameManager.player_profile)
+                    #return # Return after successful purchase
+                #else:
+                    #print("Not enough gold!")
         # ---------------------------
                         
-        if(target_idx >=6):
-            if weapon_sprites[target_idx].has_meta("Item"):
-                return
         #we switch
         if (dropped_idx >= 6 and target_idx < 6) or (target_idx >= 6 and dropped_idx < 6):
             var shop = dropped_idx
@@ -370,6 +372,7 @@ func _check_drop(dropped_weapon: Area2D):
                 return # Stop the swap
             else:
                 GameManager.addtopassive("MAXGold", cost_own - cost_shop)
+                GameManager.addtopassive("Gold", cost_own - cost_shop)
 
         # 1. Swap Meta
         dropped_weapon.set_meta("slot_index", target_idx)
@@ -477,7 +480,7 @@ func update_weapon_movements(delta: float, _player_pos: Vector2):
                 var level = float(upgrade.get("level", 1.0))
                 var val_str = str(valueint).left(2) + afterv(value)
                 var lvl_str = str(levelint).left(2) + afterv(level)
-                var text = lvl_str + "\n" + "\n" + val_str
+                var text =  "\n" + "\n" + lvl_str
                 update_label(sprite, upgrade,text)
                 var progress = clamp(level / value, 0.0, 1.0)
                 #health

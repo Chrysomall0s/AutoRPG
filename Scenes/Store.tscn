@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://d3a2rmy55yye0"]
 
 [ext_resource type="Script" uid="uid://b2jfxrl34sxfk" path="res://Scripts/Store.gd" id="1_voxcw"]
-[ext_resource type="Texture2D" uid="uid://dtdbrfi3sq4l6" path="res://Assets/Arena.png" id="2_fy3ub"]
+[ext_resource type="Texture2D" uid="uid://dpcpinb4p8phw" path="res://Assets/Arena2.png" id="2_huyxd"]
 [ext_resource type="PackedScene" uid="uid://0obra7qp5v18" path="res://Scenes/hero.tscn" id="3_fy3ub"]
 [ext_resource type="Script" uid="uid://btebqoe7vm7fj" path="res://Scripts/AudienceManager.gd" id="4_huyxd"]
 
@@ -23,7 +23,7 @@ offset_right = 4221.0
 offset_bottom = 2200.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_fy3ub")
+texture = ExtResource("2_huyxd")
 expand_mode = 1
 
 [node name="ButtonContainer" type="VBoxContainer" parent="." unique_id=1727398375]
