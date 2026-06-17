@@ -34,38 +34,38 @@ var character_starting_loadouts: Dictionary = {
 		"passives": [
 			{"name": "HP", "level": 0, "value": 12},
 			{"name": "DMG", "level": 0, "value": 3},
-			{"name": "Thorns", "level": 0, "value":0},
+			{"name": "Thorns", "level": 0, "value":3},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			{"name": "Gold", "level": 0, "value":6 },
 			],
-		"weapons": [{"name": "Staff","type":"HP", "level": -1}],
+		"weapons": [{"name": "Staff","type":"Thorns", "level": -1},{"name": "Club","type":"Thorns", "level": -1}],
 		"audience": ["Zealot"]
 	},
 	"char_slot2": {
 		"icon": "res://Assets/atlas/fruit.tres", "index": 0,
 		"passives": [
 			{"name": "HP", "level": 0, "value": 12},
-			{"name": "DMG", "level": 0, "value": 3},
+			{"name": "DMG", "level": 0, "value": 8},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			{"name": "Gold", "level": 0, "value":6 },
 			],
-		"weapons": ["Club" ],
-		"audience": ["Patron", "Hooligan","Hooligan"]
+		"weapons": [{"name": "Staff","type":"DMG", "level": -1},{"name": "Club","type":"DMG", "level": -1}],
+		"audience": ["Hooligan"]
 	},
 	"char_slot3": {
 		"icon": "res://Assets/atlas/fruit.tres", "index": 2,
 		"passives": [
 			{"name": "HP", "level": 0, "value": 12},
-			{"name": "DMG", "level": 0, "value": 3},
+			{"name": "DMG", "level": 0, "value": 0},
 			{"name": "Thorns", "level": 0, "value":0},
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
-			{"name": "Gold", "level": 0, "value":6 },
+			{"name": "Gold", "level": 0, "value":12 },
 			],
-		"weapons": ["Staff"],
+		"weapons": [{"name": "Staff","type":"Gold", "level": -1},{"name": "Club","type":"Gold", "level": -1}],
 		"audience": ["Patron"]
 	}
 }

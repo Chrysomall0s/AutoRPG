@@ -35,6 +35,7 @@ func fit_to_screen():
     
 
 func _ready():
+
     fit_to_screen()
     GameManager.battle_over = false
     add_child(time_ctrl)

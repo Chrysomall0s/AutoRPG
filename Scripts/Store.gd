@@ -21,6 +21,11 @@ func fit_to_screen():
 @onready var audience_container = $AudienceContainer
 
 func _ready():
+	GameManager.current_enemy_profile = {
+		"passives": [],
+		"weapons": [], # We will fill this below
+		"audience": []
+	}
 	GameManager.Reroll()
 	fit_to_screen()
 	randomize()

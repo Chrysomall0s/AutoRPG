@@ -12,7 +12,9 @@ var monsters = {
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			],
-			"weapons": ["Staff"],
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
 			"audience": ["Heckler"]
 		},
 		{
@@ -24,8 +26,10 @@ var monsters = {
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			],
-			"weapons": ["Club"],
-			"audience": ["Heckler"]
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
+			"audience": ["Heckler","Zealot"]
 		},
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
@@ -36,8 +40,10 @@ var monsters = {
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			],
-			"weapons": ["Staff"],
-			"audience": ["Heckler"]
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
+			"audience": ["Heckler","Zealot","Patron"]
 		},
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
@@ -48,8 +54,10 @@ var monsters = {
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			],
-			"weapons": ["Staff"],
-			"audience": ["Heckler"]
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
+			"audience": ["Heckler","Zealot","Patron","Hooligan"]
 		},
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
@@ -60,8 +68,10 @@ var monsters = {
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			],
-			"weapons": ["Staff"],
-			"audience": ["Heckler"]
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
+			"audience": ["Heckler","Zealot","Patron","Hooligan","Heckler","Zealot",]
 		},
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
@@ -72,8 +82,10 @@ var monsters = {
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			],
-			"weapons": ["Staff"],
-			"audience": ["Heckler"]
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+			],
+			"audience": ["Heckler","Zealot","Patron","Hooligan","Heckler","Zealot","Patron","Hooligan","Heckler","Zealot",]
 		},
 		{
 			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
@@ -84,7 +96,81 @@ var monsters = {
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			],
-			"weapons": ["Staff"],
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+			],
+			"audience": ["Heckler","Zealot","Patron","Hooligan","Heckler","Zealot","Patron","Hooligan","Heckler","Zealot",
+			"Heckler","Zealot","Patron","Hooligan","Heckler","Zealot","Patron","Hooligan","Heckler","Zealot",
+			]
+		},
+			{
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			"passives": [
+			{"name": "HP", "level": 0, "value": 550},
+			{"name": "DMG", "level": 0, "value": 10},
+			{"name": "Thorns", "level": 0, "value":0},
+			{"name": "DEF", "level": 0, "value": 0},
+			{"name": "REG", "level": 0, "value":0 },
+			],
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
+			"audience": ["Heckler"]
+		},
+			{
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			"passives": [
+			{"name": "HP", "level": 0, "value": 890},
+			{"name": "DMG", "level": 0, "value": 10},
+			{"name": "Thorns", "level": 0, "value":0},
+			{"name": "DEF", "level": 0, "value": 0},
+			{"name": "REG", "level": 0, "value":0 },
+			],
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
+			"audience": ["Heckler"]
+		},
+			{
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			"passives": [
+			{"name": "HP", "level": 0, "value": 1450},
+			{"name": "DMG", "level": 0, "value": 10},
+			{"name": "Thorns", "level": 0, "value":0},
+			{"name": "DEF", "level": 0, "value": 0},
+			{"name": "REG", "level": 0, "value":0 },
+			],
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
+			"audience": ["Heckler"]
+		},
+			{
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			"passives": [
+			{"name": "HP", "level": 0, "value": 2350},
+			{"name": "DMG", "level": 0, "value": 10},
+			{"name": "Thorns", "level": 0, "value":0},
+			{"name": "DEF", "level": 0, "value": 0},
+			{"name": "REG", "level": 0, "value":0 },
+			],
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
+			"audience": ["Heckler"]
+		},
+			{
+			"icon": "res://Assets/atlas/fruit.tres", "index": 1,
+			"passives": [
+			{"name": "HP", "level": 0, "value": 3800},
+			{"name": "DMG", "level": 0, "value": 10},
+			{"name": "Thorns", "level": 0, "value":0},
+			{"name": "DEF", "level": 0, "value": 0},
+			{"name": "REG", "level": 0, "value":0 },
+			],
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
 			"audience": ["Heckler"]
 		},
 			{
@@ -96,7 +182,9 @@ var monsters = {
 			{"name": "DEF", "level": 0, "value": 0},
 			{"name": "REG", "level": 0, "value":0 },
 			],
-			"weapons": ["Staff"],
+			"weapons": [
+				{"name": "Staff","type":"DMG", "level": -1},
+				],
 			"audience": ["Heckler"]
 		},
 	],

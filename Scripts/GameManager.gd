@@ -16,6 +16,8 @@ func go_to_after_battle(result: String):
     for seat in audience_container.get_children():
         if is_instance_valid(seat) and seat.is_filled and seat.amfriendly and seat.has_method("goldd"):
             seat.goldd()
+            if(GameManager.DidWin):
+                seat.goldd()
 
     # 2. Perform "Throw" (Animated with Safety Checks)
     for seat in audience_container.get_children():
@@ -25,7 +27,8 @@ func go_to_after_battle(result: String):
 
         if seat.is_filled and seat.has_method("perform_throw"):
             # Perform the throw twice
-            for i in range(2):
+            var before = GameManager.DidWin
+            for i in range(1):
                 # Check validity again before the wait and before the call
                 if not is_instance_valid(seat): break
                 
@@ -33,6 +36,17 @@ func go_to_after_battle(result: String):
                 
                 if is_instance_valid(seat):
                     seat.perform_throw()
+            if(!GameManager.DidWin):
+                GameManager.DidWin = true;
+            for i in range(1):
+                    # Check validity again before the wait and before the call
+                    if not is_instance_valid(seat): break
+                    
+                    await get_tree().create_timer(randf_range(0.0, 0.2)).timeout
+                    
+                    if is_instance_valid(seat):
+                        seat.perform_throw()
+            GameManager.DidWin = before
 
     # 3. Final Wait
     await get_tree().create_timer(1.5).timeout

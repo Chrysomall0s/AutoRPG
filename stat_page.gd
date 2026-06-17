@@ -11,21 +11,21 @@ var margin_node: MarginContainer
 
 var pages = [
 	{"title": "Tutorial (1/16)", "body": "This is an early demo for an auto JRPG Battler."},
-	{"title": "Tutorial (2/16)", "body": "Pick a character. They are your squire. You want to make a hero out of them."},
-	{"title": "Tutorial (3/16)", "body": "Select a difficulty tournament and equip them with gear in the shop."},
-	{"title": "Tutorial (4/16)", "body": "Survive 10 rounds and voila... they are your champions!"},
-	{"title": "Tutorial (5/16)", "body": "Looking for tips? The weapons in the shop can be merged if they are the same type."},
-	{"title": "Tutorial (6/16)", "body": "You can hold and drag items to equip or move them around."},
-	{"title": "Feedback (7/16)", "body": "We are mainly looking in this stage to find the fun.\n\nWhat if weapon slots had different curses?"},
-	{"title": "Feedback (8/16)", "body": "What if each fight had a special scene?\n\nFor example: fighting in a forest might buff fire attacks!"},
-	{"title": "Tutorial (9/16)", "body": "This is an early demo for an auto JRPG Battler."},
-	{"title": "Tutorial (10/16)", "body": "Pick a character. They are your squire. You want to make a hero out of them."},
-	{"title": "Tutorial (11/16)", "body": "Select a difficulty tournament and equip them with gear in the shop."},
-	{"title": "Tutorial (12/16)", "body": "Survive 10 rounds and voila... they are your champions!"},
+	{"title": "Tutorial (2/16)", "body": "Your goal is to win a tournament!"},
+	{"title": "Tutorial (3/16)", "body": "You are a Squire. Your job is to help your Lord"},
+	{"title": "Tutorial (4/16)", "body": "Choose a Lord by clicking the arrows"},
+	{"title": "Tutorial (5/16)", "body": "Select which tournament to sign up for at the top."},
+	{"title": "Tutorial (6/16)", "body": "The next screen will be the Armory, where you can buy upgrades for gold"},
+	{"title": "Feedback (7/16)", "body": "You have 3 types of upgrades: Weapons, Fans & Power-ups "},
+	{"title": "Feedback (8/16)", "body": "There are 6 types of Power-ups: Health, Damage, Thorns, Defense, Regen & Gold"},
+	{"title": "Tutorial (9/16)", "body": "Each weapon has also one of those types."},
+	{"title": "Tutorial (10/16)", "body": "Sword do damage + type : Shields add +1 of the type."},
+	{"title": "Tutorial (11/16)", "body": "Fans give 2 coins per victory, 1 coin per loss"},
+	{"title": "Tutorial (12/16)", "body": "Survive 9 rounds and voila... they are your champions!"},
 	{"title": "Tutorial (13/16)", "body": "Looking for tips? The weapons in the shop can be merged if they are the same type."},
-	{"title": "Tutorial (14/16)", "body": "You can hold and drag items to equip or move them around."},
-	{"title": "Feedback (15/16)", "body": "We are mainly looking in this stage to find the fun.\n\nWhat if weapon slots had different curses?"},
-	{"title": "Feedback (16/16)", "body": "Enjoy!"}
+	{"title": "Tutorial (14/16)", "body": "We are mainly looking in this stage to find the fun.\n"},
+	{"title": "Feedback (15/16)", "body": "Example: What if each fight had a special scene?\n\nFor example: fighting in a forest might buff fire attacks!"},
+	{"title": "Feedback (16/16)", "body": "Enjoy the game!"}
 	
 ]
 

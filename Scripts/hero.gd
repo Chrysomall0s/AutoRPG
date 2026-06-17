@@ -275,22 +275,79 @@ func _check_drop(dropped_weapon: Area2D):
     if target_weapon:
         var dropped_idx = dropped_weapon.get_meta("slot_index")
         var target_idx = target_weapon.get_meta("slot_index")
-        if(target_idx >=6):
-            if weapon_sprites[target_idx].has_meta("Item"):
-                return
                 
-        if (dropped_idx >= 6 and target_idx < 6): 
-            var shop_data = GameManager.GlobalUpgrades[dropped_idx - 6]
-            var own_data = GameManager.player_profile["weapons"][target_idx]  
+        if ((dropped_idx >= 6 and target_idx < 6)):
+            var shop_data
+            var own_data
+            shop_data = GameManager.GlobalUpgrades[dropped_idx - 6]
+            own_data = GameManager.player_profile["weapons"][target_idx]  
+            
             if(shop_data and own_data) :
-                if (shop_data.get("type", 0) == own_data.get("type", 0)):
+                # MERGING
+                if (shop_data.get("type", "") == own_data.get("type", "")):
                     if (shop_data.get("friendly", 0) == own_data.get("friendly", 0)):
                         own_data["speed"] += shop_data["speed"]
                         own_data["level"] += shop_data["level"]
+                        own_data["cost"] += shop_data["cost"]
                         GameManager.addtopassive("MAXGold", -shop_data["cost"])
                         GameManager.GlobalUpgrades[dropped_idx - 6] = null
                         refresh_character_and_weapons(GameManager.player_profile)
                         return
+                        
+        if dropped_idx < 6 and target_idx < 6:
+            var shop_data = GameManager.player_profile["weapons"][dropped_idx]
+            var own_data = GameManager.player_profile["weapons"][target_idx]
+            
+            if shop_data and own_data:
+                # MERGING
+                if shop_data.get("type", "") == own_data.get("type", ""):
+                    if shop_data.get("friendly", 0) == own_data.get("friendly", 0):
+                        own_data["speed"] += shop_data["speed"]
+                        own_data["level"] += shop_data["level"]
+                        own_data["cost"] += shop_data["cost"]
+                        GameManager.addtopassive("MAXGold", -shop_data["cost"])
+                        GameManager.player_profile["weapons"][dropped_idx] = null
+                        refresh_character_and_weapons(GameManager.player_profile)
+                        return         
+                        
+                        
+                        
+        if (target_idx >= 6 and dropped_idx < 6):
+                # REPLACE WITH ITEM
+                var shop_data = GameManager.GlobalUpgrades[target_idx - 6]
+                var own_data = GameManager.player_profile["weapons"][dropped_idx]  
+                if (weapon_sprites[target_idx].has_meta("Item")):
+                    var cost = shop_data["cost"]
+                    if cost <= GameManager.getpassive("MAXGold") + own_data["cost"]:
+                        GameManager.addtopassive("MAXGold", -shop_data["cost"] + own_data["cost"])
+                        GameManager.GlobalUpgrades[target_idx - 6] = own_data 
+                        GameManager.player_profile["weapons"][dropped_idx] = null
+                        refresh_character_and_weapons(GameManager.player_profile)
+                        return
+        # --- NEW PURCHASE LOGIC ---
+        if dropped_idx >= 6 and target_idx < 6:
+            var shop_item = GameManager.GlobalUpgrades[dropped_idx - 6]
+            if shop_item and shop_item.has("cost"):
+                var cost = shop_item["cost"]
+                # Check if enough money
+                if cost <= GameManager.getpassive("MAXGold"):
+                    # Set the item slot to your weapon
+                    GameManager.player_profile["weapons"][target_idx] = shop_item
+                    # Buy the item and set the dragged slot to null
+                    GameManager.GlobalUpgrades[dropped_idx - 6] = null
+                    # Exchange the money
+                    GameManager.addtopassive("MAXGold", -cost)
+                    
+                    # Refresh UI
+                    refresh_character_and_weapons(GameManager.player_profile)
+                    return # Return after successful purchase
+                else:
+                    print("Not enough gold!")
+        # ---------------------------
+                        
+        if(target_idx >=6):
+            if weapon_sprites[target_idx].has_meta("Item"):
+                return
         #we switch
         if (dropped_idx >= 6 and target_idx < 6) or (target_idx >= 6 and dropped_idx < 6):
             var shop = dropped_idx
