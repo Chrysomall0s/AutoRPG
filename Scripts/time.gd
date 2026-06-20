@@ -16,20 +16,20 @@ var atlas_tex2: Texture2D = preload("res://Assets/atlas/icon2.tres")
 
 # Update the public API to support 5 buttons
 func create_time_buttons(parent: Control):
-	_generate_row(parent, 0, [0, 1, 2, 3, 4], ["Pause", "Slow", "Normal", "Fast", "Surrender"])
+	_generate_row(parent, 0, [0, 1, 2, 3, 4], ["", "", "", "", ""])
 
 func create_difficulty_buttons(parent: Control):
-	_generate_row(parent, 1, [5, 5, 5, 5, 1], ["Tournament 1", "Tournament 2", "Tournament 3", "Tournament 4", "Go"])
+	_generate_row(parent, 1, [20, 6, 5, 1, 1], ["", "", "", "", ""])
 
 func create_shop_buttons(parent: Control):
-	_generate_row(parent, 2, [22, 20, 21, 19, 23], ["", "", "", "Reroll", "Go"])
+	_generate_row(parent, 2, [22, 20, 21, 19, 1], ["", "", "", "", ""])
 # Update the lookup function
 func _get_callback_for_row(row: int, index: int) -> Callable:
 	if row == 0:
 		var funcs = [pausespeed, slowspeed, normalspeed, fastspeed, extraspeed]
 		return funcs[index]
 	elif row == 1:
-		var funcs = [easydifficulty, normaldifficulty, harddifficulty, insanedifficulty, impossibledifficulty]
+		var funcs = [buy_item_one, previous, buy_item_one, next, impossibledifficulty]
 		return funcs[index]
 	else: # Row 2 (Shop)
 		var funcs = [buy_item_three, buy_item_one, buy_item_two, reroll_shop, go_to_battle]
@@ -125,6 +125,8 @@ func _create_btn(parent: Control, text: String, row: int, index: int, pos: Vecto
 	return btn
 
 # Callback functions
+func previous(): GameManager.selected_difficulty = 0
+func next(): GameManager.selected_difficulty = 0
 func pausespeed(): Engine.time_scale = 0.0
 func slowspeed(): Engine.time_scale = 0.5
 func normalspeed(): Engine.time_scale = 2.0

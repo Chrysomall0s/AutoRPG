@@ -120,9 +120,9 @@ func display_results():
 			4: status_label.text = "Four victories! A solid streak."
 			5: status_label.text = "Halfway there! Keep that momentum going."
 			6: status_label.text = "Six wins! You are becoming a force to be reckoned with."
-			7: status_label.text = "Seven! Only a few more to go."
-			8: status_label.text = "One more before the finaly!"
-			9: status_label.text = "Final showdown! Show them what you've got!"
+			7: status_label.text = "One more before the finaly!."
+			8: status_label.text = "Final showdown! Show them what you've got!"
+			9: status_label.text = "You did it you won the tournament!"
 			_: status_label.text = "Another victory for your collection!"
 	else:
 		match GameManager.Defeats:
